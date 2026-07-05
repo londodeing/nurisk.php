@@ -1,0 +1,32 @@
+# /etc/logrotate.d/nurisk
+# sudo cp deployment/logrotate/nurisk /etc/logrotate.d/nurisk
+#
+# Rotasi log aplikasi NURISK: harian, kompres, simpan 30 hari.
+
+/var/www/nurisk/storage/logs/*.log {
+    daily
+    missingok
+    rotate 30
+    compress
+    delaycompress
+    notifempty
+    create 0644 www-data www-data
+    sharedscripts
+    postrotate
+        /usr/bin/kill -USR1 $(cat /var/run/php/php8.3-fpm.pid 2>/dev/null) 2>/dev/null || true
+    endscript
+}
+
+# Log Nginx
+/var/log/nginx/nurisk*.log {
+    daily
+    missingok
+    rotate 30
+    compress
+    delaycompress
+    notifempty
+    sharedscripts
+    postrotate
+        nginx -s reopen 2>/dev/null || true
+    endscript
+}

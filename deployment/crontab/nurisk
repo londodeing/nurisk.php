@@ -1,0 +1,72 @@
+# /etc/cron.d/nurisk
+# sudo cp deployment/crontab/nurisk /etc/cron.d/nurisk
+# sudo chmod 644 /etc/cron.d/nurisk
+#
+# Format: menit jam hari bulan hari-minggu user command
+
+# === BACKUP ===
+
+# Backup database + files — setiap hari jam 03:00
+0 3 * * * root /opt/nurisk/scripts/backup.sh >> /var/log/nurisk-backup.log 2>&1
+
+# === QUEUE ===
+
+# Queue failed jobs alert — setiap 5 menit
+*/5 * * * * www-data cd /var/www/nurisk && \
+    php artisan queue:failed --count 2>/dev/null | grep -q "^0$" || \
+    echo "Ada failed jobs di queue! $(date)" | mail -s "NURISK Queue Alert" admin@nurisk.or.id
+
+# Queue pending backlog alert — setiap 5 menit
+*/5 * * * * www-data cd /var/www/nurisk && \
+    PENDING=$(php artisan tinker --execute="echo DB::table('jobs')->count();" 2>/dev/null); \
+    [ "$PENDING" -gt 100 ] 2>/dev/null && \
+    echo "Queue pending: ${PENDING} jobs (threshold: 100)" | mail -s "NURISK Queue Backlog" admin@nurisk.or.id
+
+# Cleanup failed jobs > 7 hari — setiap jam 04:00
+0 4 * * * www-data cd /var/www/nurisk && \
+    php artisan queue:prune-failed --hours=168
+
+# === HEALTH ===
+
+# Health check dari dalam server — setiap 5 menit
+*/5 * * * * www-data curl -sf http://127.0.0.1/health > /dev/null || \
+    echo "Health check FAILED at $(date)" | mail -s "NURISK DOWN" admin@nurisk.or.id
+
+# === DISK ===
+
+# Disk usage — setiap jam (threshold 80%)
+0 * * * * root \
+    DISK=$(df /var/www/nurisk | tail -1 | awk '{print $5}' | tr -d '%'); \
+    [ "$DISK" -gt 80 ] && \
+    echo "Disk /var/www/nurisk: ${DISK}% penuh" | mail -s "NURISK Disk Alert" admin@nurisk.or.id
+
+# === RESOURCE ===
+
+# CPU load + RAM + disk — setiap 30 menit (threshold 85%)
+*/30 * * * * root \
+    LOAD=$(cat /proc/loadavg | cut -d' ' -f1); \
+    LOAD_PCT=$(echo "$LOAD * 100 / $(nproc)" | bc 2>/dev/null || echo 0); \
+    [ "$LOAD_PCT" -gt 85 ] && \
+    echo "CPU load: ${LOAD} (${LOAD_PCT}%)" | mail -s "NURISK CPU Alert" admin@nurisk.or.id; \
+    \
+    MEM_TOTAL=$(free -m | awk '/^Mem:/{print $2}'); \
+    MEM_USED=$(free -m | awk '/^Mem:/{print $3}'); \
+    MEM_PCT=$(( MEM_USED * 100 / MEM_TOTAL )); \
+    [ "$MEM_PCT" -gt 85 ] && \
+    echo "RAM: ${MEM_USED}MB / ${MEM_TOTAL}MB (${MEM_PCT}%)" | mail -s "NURISK RAM Alert" admin@nurisk.or.id
+
+# === SLOW QUERY ===
+
+# Slow query count — setiap jam (threshold: 10 sejak log terakhir dirotasi)
+0 * * * * root \
+    SLOW_LOG="/var/log/mysql/nurisk-slow.log"; \
+    [ -f "$SLOW_LOG" ] && \
+    COUNT=$(wc -l < "$SLOW_LOG") && \
+    [ "$COUNT" -gt 10 ] && \
+    echo "Slow query log: ${COUNT} baris sejak rotasi terakhir" | mail -s "NURISK Slow Query Alert" admin@nurisk.or.id
+
+# === LOG ===
+
+# Rotate log queue — setiap tanggal 1 jam 05:00
+0 5 1 * * www-data find /var/www/nurisk/storage/logs -name "queue*.log" \
+    -mtime +30 -delete

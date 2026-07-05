@@ -1,0 +1,16 @@
+TYPE=VIEW
+query=select `o`.`id_surat` AS `id_surat`,`o`.`nomor_surat_resmi` AS `nomor_surat_resmi`,\'INSIDEN TIDAK VALID\' AS `catatan` from `nurisk`.`operasi_surat_keluar` `o` where !(`o`.`id_insiden` in (select `i`.`id_insiden` from `nurisk`.`operasi_insiden` `i`))
+md5=8bc1e2031110a06fbfa0e4625aab1eb2
+updatable=1
+algorithm=0
+definer_user=root
+definer_host=localhost
+suid=1
+with_check_option=0
+timestamp=0001781714102599294
+create-version=2
+source=SELECT `o`.`id_surat` AS `id_surat`, `o`.`nomor_surat_resmi` AS `nomor_surat_resmi`, \'INSIDEN TIDAK VALID\' AS `catatan` FROM `operasi_surat_keluar` AS `o` WHERE !(`o`.`id_insiden` in (select `i`.`id_insiden` from `operasi_insiden` `i`))
+client_cs_name=utf8mb4
+connection_cl_name=utf8mb4_general_ci
+view_body_utf8=select `o`.`id_surat` AS `id_surat`,`o`.`nomor_surat_resmi` AS `nomor_surat_resmi`,\'INSIDEN TIDAK VALID\' AS `catatan` from `nurisk`.`operasi_surat_keluar` `o` where !(`o`.`id_insiden` in (select `i`.`id_insiden` from `nurisk`.`operasi_insiden` `i`))
+mariadb-version=100432
