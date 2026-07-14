@@ -1,0 +1,93 @@
+[
+    {
+        "id": 1,
+        "nama": "Banjir",
+        "slug": "banjir",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 2,
+        "nama": "Banjir Bandang",
+        "slug": "banjir-bandang",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 3,
+        "nama": "Cuaca Ekstrem",
+        "slug": "cuaca-ekstrem",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 4,
+        "nama": "Gelombang Ekstrem dan Abrasi",
+        "slug": "gelombang-ekstrem-abrasi",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 5,
+        "nama": "Gempa Bumi",
+        "slug": "gempa-bumi",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 6,
+        "nama": "Kebakaran Hutan dan Lahan",
+        "slug": "karhutla",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 7,
+        "nama": "Kekeringan",
+        "slug": "kekeringan",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 8,
+        "nama": "Letusan Gunung Api",
+        "slug": "gunung-meletus",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 9,
+        "nama": "Tanah Longsor",
+        "slug": "tanah-longsor",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 10,
+        "nama": "Tsunami",
+        "slug": "tsunami",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 11,
+        "nama": "Likuefaksi",
+        "slug": "likuefaksi",
+        "kategori": "alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 12,
+        "nama": "Kebakaran Pemukiman",
+        "slug": "kebakaran-pemukiman",
+        "kategori": "non_alam",
+        "ikon_map": "default.png"
+    },
+    {
+        "id": 13,
+        "nama": "Epidemi \/ Wabah Penyakit",
+        "slug": "epidemi-wabah",
+        "kategori": "non_alam",
+        "ikon_map": "default.png"
+    }
+]

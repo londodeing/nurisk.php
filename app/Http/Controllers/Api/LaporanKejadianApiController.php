@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Application\Media\Commands\UploadMediaCommand;
+use App\Application\Media\Handlers\UploadMediaHandler;
 use App\Http\Controllers\Controller;
 use App\Models\AuthUser;
 use App\Models\LaporanKejadian;
@@ -10,7 +12,6 @@ use App\Models\OperasiInsiden;
 use App\Models\OperasiPenugasan;
 use App\Models\OperasiPenugasanHistory;
 use App\Services\LocationService;
-use App\Services\Media\MediaUploadService;
 use App\Services\SuratService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class LaporanKejadianApiController extends Controller
 {
     public function __construct(
         private LocationService $locationService,
-        private MediaUploadService $mediaUploadService,
+        private UploadMediaHandler $uploadMediaHandler,
         private SuratService $suratService,
     ) {}
 
@@ -83,7 +84,7 @@ class LaporanKejadianApiController extends Controller
             'id_desa'          => 'nullable|string|exists:wilayah_desa,id_desa',
             'latitude'         => 'nullable|numeric',
             'longitude'        => 'nullable|numeric',
-            'foto'             => ['nullable', ...$this->mediaUploadService->toValidationRules('laporan')],
+            'foto'             => ['nullable', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
         ]);
 
         if ($request->files->has('foto') && !$request->hasFile('foto')) {
@@ -138,18 +139,18 @@ class LaporanKejadianApiController extends Controller
             $validated['id_pcnu'] = $idPcnu;
         }
 
-        $mediaResult = null;
-        if ($request->hasFile('foto')) {
-            $mediaResult = $this->mediaUploadService->upload($request->file('foto'), 'laporan');
-            $validated['photo_path'] = $mediaResult->path;
-        }
-
         unset($validated['foto']);
 
         $laporan = LaporanKejadian::create($validated);
 
-        if ($mediaResult && $mediaResult->mediaId) {
-            $this->mediaUploadService->associate($mediaResult->mediaId, 'laporan', $laporan->id_laporan_kejadian);
+        if ($request->hasFile('foto')) {
+            $mediaResult = $this->uploadMediaHandler->handle(new UploadMediaCommand(
+                entityType: 'laporan',
+                entityId: $laporan->id_laporan_kejadian,
+                file: $request->file('foto'),
+                visibility: 'PUBLIC',
+            ));
+            $laporan->update(['photo_path' => $mediaResult->path]);
         }
 
         return response()->json([
@@ -157,7 +158,7 @@ class LaporanKejadianApiController extends Controller
                 'id' => $laporan->id_laporan_kejadian,
                 'kode_kejadian' => $laporan->kode_kejadian,
                 'photo_path' => $laporan->photo_path,
-                'media_url' => $laporan->photo_path ? Storage::disk('public')->url($laporan->photo_path) : null,
+                'media_url' => media_url($laporan->photo_path),
                 'message' => 'Laporan berhasil dikirim. Tim akan melakukan verifikasi.',
             ],
         ], 201);
@@ -210,6 +211,10 @@ class LaporanKejadianApiController extends Controller
             'is_valid'         => 'required|in:ya,tidak',
             'alasan_tolak'     => 'nullable|string|in:hoax,duplikat',
             'catatan_validasi' => 'nullable|string|max:500',
+            'latitude'         => 'nullable|numeric',
+            'longitude'        => 'nullable|numeric',
+            'alamat_lengkap'   => 'nullable|string|max:255',
+            'id_pcnu'          => 'nullable|integer|exists:organisasi_pcnu,id_pcnu',
         ]);
 
         $current = $laporan->is_valid;
@@ -235,10 +240,20 @@ class LaporanKejadianApiController extends Controller
             return response()->json(['message' => 'Tidak bisa menolak laporan yang sudah memiliki insiden.'], 422);
         }
 
-        if ($validated['is_valid'] === 'ya' && is_null($laporan->id_pcnu) && $laporan->latitude && $laporan->longitude) {
-            $idPcnu = $this->locationService->findPcnuByCoordinates($laporan->latitude, $laporan->longitude);
-            if ($idPcnu) {
-                $validated['id_pcnu'] = $idPcnu;
+        // Tetapkan id_pcnu: prioritaskan yang dikirim dari request, fallback ke auto-detect dari koordinat
+        if ($validated['is_valid'] === 'ya' && is_null($laporan->id_pcnu)) {
+            if (!empty($validated['id_pcnu'])) {
+                // id_pcnu dikirim eksplisit dari admin
+            } else {
+                // Fallback: auto-detect dari koordinat
+                $checkLat = $validated['latitude'] ?? $laporan->latitude;
+                $checkLng = $validated['longitude'] ?? $laporan->longitude;
+                if ($checkLat && $checkLng) {
+                    $idPcnu = $this->locationService->findPcnuByCoordinates($checkLat, $checkLng);
+                    if ($idPcnu) {
+                        $validated['id_pcnu'] = $idPcnu;
+                    }
+                }
             }
         }
 
@@ -267,7 +282,10 @@ class LaporanKejadianApiController extends Controller
         $idPcnu = $laporan->id_pcnu;
 
         $validated = $request->validate([
-            'id_petugas_trc' => ['nullable', 'integer', 'exists:auth_users,id_pengguna'],
+            'petugas_trc_ids'   => ['nullable', 'array'],
+            'petugas_trc_ids.*' => ['integer', 'exists:auth_users,id_pengguna'],
+            'prioritas'         => ['nullable', 'string', 'in:rendah,sedang,tinggi,kritis'],
+            'status_insiden'    => ['nullable', 'string', 'in:draft,terverifikasi,respon,pemulihan'],
         ]);
 
         if (is_null($idPcnu)) {
@@ -303,23 +321,27 @@ class LaporanKejadianApiController extends Controller
                 'id_laporan_asal'  => $laporan->id_laporan_kejadian,
                 'id_jenis_bencana' => $laporan->id_jenis_bencana,
                 'id_pcnu'          => $idPcnu,
-                'status_insiden'   => 'draft',
-                'prioritas'        => 'sedang',
+                'status_insiden'   => $validated['status_insiden'] ?? 'draft',
+                'prioritas'        => $validated['prioritas'] ?? 'sedang',
                 'waktu_mulai'      => $laporan->waktu_kejadian,
             ]);
 
-            if (!empty($validated['id_petugas_trc'])) {
+            if (!empty($validated['petugas_trc_ids'])) {
                 $jenisSurat = MasterSuratJenis::where('kode_jenis', 'ST')
                     ->orWhere('nama_jenis', 'like', '%tugas%')
                     ->first();
 
                 if ($jenisSurat) {
-                    $penerima = AuthUser::find($validated['id_petugas_trc']);
-                    $namaPenerima = $penerima?->profil?->nama_lengkap ?? $penerima?->no_hp ?? 'Anggota TRC';
+                    $trcNames = [];
+                    foreach ($validated['petugas_trc_ids'] as $trcId) {
+                        $penerima = AuthUser::with('profil')->find($trcId);
+                        $trcNames[] = $penerima?->profil?->nama_lengkap ?? $penerima?->no_hp ?? 'Anggota TRC';
+                    }
 
-                    $isiSnapshot = "Memberikan tugas kepada:\n"
-                                 . "Nama: " . $namaPenerima . "\n"
-                                 . "Peran: TRC\n\n"
+                    $namaPenerimaList = implode("\n- ", $trcNames);
+
+                    $isiSnapshot = "Memberikan tugas kepada:\n- " . $namaPenerimaList . "\n"
+                                 . "\nPeran: TRC\n"
                                  . "Untuk melaksanakan tugas assessment atas insiden " . $insiden->kode_kejadian . ".\n"
                                  . "Berdasarkan eskalasi laporan: " . $laporan->kode_kejadian . ".";
 
@@ -329,49 +351,49 @@ class LaporanKejadianApiController extends Controller
                         'perihal'            => 'Surat Perintah Tugas Assessment (SPK)',
                         'tgl_terbit'         => now(),
                         'id_pengguna_ttd'    => Auth::id(),
-                        'status_surat'       => 'siap_tanda_tangan',
+                        'status_surat'       => 'siap_tanda_tangan', // Menunggu persetujuan Ketua M5
                         'isi_surat_snapshot' => $isiSnapshot,
                     ]);
-
-                    $this->suratService->finalisasi($surat, Auth::user(), $isiSnapshot);
 
                     $insiden->update([
                         'no_spk_assesment'  => $surat->nomor_surat_resmi,
                         'tgl_spk_assesment' => now(),
                         'id_pemberi_spk'    => Auth::id(),
-                        'id_penerima_spk'   => $validated['id_petugas_trc'],
                     ]);
 
-                    $alreadyAssigned = OperasiPenugasan::where('id_insiden', $insiden->id_insiden)
-                        ->where('id_pengguna', $validated['id_petugas_trc'])
-                        ->whereNotIn('status_penugasan', ['completed', 'cancelled', 'rejected'])
-                        ->exists();
+                    foreach ($validated['petugas_trc_ids'] as $trcId) {
+                        $alreadyAssigned = OperasiPenugasan::where('id_insiden', $insiden->id_insiden)
+                            ->where('id_pengguna', $trcId)
+                            ->whereNotIn('status_penugasan', ['completed', 'cancelled', 'rejected'])
+                            ->exists();
 
-                    if (!$alreadyAssigned) {
-                        $penugasan = OperasiPenugasan::create([
-                            'uuid_penugasan'   => (string) Str::uuid(),
-                            'id_insiden'       => $insiden->id_insiden,
-                            'id_pengguna'      => $validated['id_petugas_trc'],
-                            'peran_otoritas'   => 'trc',
-                            'status_penugasan' => 'draft',
-                            'waktu_mulai'      => now(),
-                            'ditugaskan_oleh'  => Auth::id(),
-                            'catatan'          => 'Auto-created dari eskalasi laporan: ' . $laporan->kode_kejadian,
-                        ]);
+                        if (!$alreadyAssigned) {
+                            $penugasan = OperasiPenugasan::create([
+                                'uuid_penugasan'   => (string) Str::uuid(),
+                                'id_insiden'       => $insiden->id_insiden,
+                                'id_pengguna'      => $trcId,
+                                'peran_otoritas'   => 'trc',
+                                'status_penugasan' => 'draft', // Menunggu SPK disetujui
+                                'waktu_mulai'      => now(),
+                                'ditugaskan_oleh'  => Auth::id(),
+                                'catatan'          => 'Auto-created dari eskalasi laporan: ' . $laporan->kode_kejadian,
+                            ]);
 
-                        OperasiPenugasanHistory::create([
-                            'id_penugasan'      => $penugasan->id_penugasan,
-                            'status_sebelumnya'  => null,
-                            'status_baru'        => 'draft',
-                            'waktu_perubahan'    => now(),
-                            'diubah_oleh'        => Auth::id(),
-                        ]);
+                            OperasiPenugasanHistory::create([
+                                'id_penugasan'      => $penugasan->id_penugasan,
+                                'status_sebelumnya'  => null,
+                                'status_baru'        => 'draft',
+                                'waktu_perubahan'    => now(),
+                                'diubah_oleh'        => Auth::id(),
+                            ]);
+                        }
                     }
                 }
             }
 
+            // Untuk kompatibilitas field lama, simpan id TRC pertama (jika ada) ke id_petugas_trc
             $laporan->update([
-                'id_petugas_trc' => $validated['id_petugas_trc'] ?? null,
+                'id_petugas_trc' => !empty($validated['petugas_trc_ids']) ? $validated['petugas_trc_ids'][0] : null,
             ]);
 
             return $insiden;
@@ -407,6 +429,84 @@ class LaporanKejadianApiController extends Controller
         return response()->json([
             'type'     => 'FeatureCollection',
             'features' => $items,
+        ]);
+    }
+
+    public function tracking(Request $request, string $kodeKejadian): JsonResponse
+    {
+        // Public API to track report status
+        $laporan = LaporanKejadian::with(['insiden.riwayatStatus'])->where('kode_kejadian', $kodeKejadian)->first();
+
+        if (!$laporan) {
+            return response()->json(['message' => 'Laporan tidak ditemukan.'], 404);
+        }
+
+        $tracking = [];
+        
+        // 1. DITERIMA
+        $tracking[] = [
+            'status' => 'DITERIMA',
+            'time' => $laporan->dibuat_pada?->toIso8601String(),
+            'description' => 'Laporan berhasil diterima oleh sistem.'
+        ];
+
+        // 2. VERIFIED
+        if ($laporan->is_valid === 'ya') {
+            $tracking[] = [
+                'status' => 'VERIFIED',
+                'time' => $laporan->diperbarui_pada?->toIso8601String(),
+                'description' => 'Laporan valid dan telah diverifikasi oleh Pusdalops.'
+            ];
+        } elseif ($laporan->is_valid === 'tidak') {
+            $tracking[] = [
+                'status' => 'REJECTED',
+                'time' => $laporan->diperbarui_pada?->toIso8601String(),
+                'description' => 'Laporan ditolak. Alasan: ' . ($laporan->alasan_tolak ?? 'Tidak valid')
+            ];
+            return response()->json(['data' => $tracking]);
+        }
+
+        // Jika memiliki insiden, kita ambil riwayat status insiden
+        if ($laporan->insiden) {
+            $riwayat = collect($laporan->insiden->riwayatStatus ?? [])->sortBy('waktu_perubahan');
+            
+            // 3. TRC DEPLOYED / ASSESSMENT
+            $hasAssessment = $riwayat->contains(fn($r) => in_array($r->status_baru, ['assessment', 'trc_deployed']));
+            if ($hasAssessment) {
+                $assessmentLog = $riwayat->first(fn($r) => in_array($r->status_baru, ['assessment', 'trc_deployed']));
+                $tracking[] = [
+                    'status' => 'ASSESSMENT',
+                    'time' => $assessmentLog->waktu_perubahan,
+                    'description' => 'Tim Reaksi Cepat (TRC) menuju lokasi untuk kaji cepat.'
+                ];
+            }
+
+            // 4. RESPONSE
+            $hasResponse = $riwayat->contains(fn($r) => $r->status_baru === 'response');
+            if ($hasResponse) {
+                $responseLog = $riwayat->first(fn($r) => $r->status_baru === 'response');
+                $tracking[] = [
+                    'status' => 'RESPONSE',
+                    'time' => $responseLog->waktu_perubahan,
+                    'description' => 'Operasi tanggap darurat sedang berlangsung.'
+                ];
+            }
+
+            // 5. RECOVERY / CLOSED
+            $hasClosed = $riwayat->contains(fn($r) => in_array($r->status_baru, ['closed', 'recovery']));
+            if ($hasClosed) {
+                $closedLog = $riwayat->first(fn($r) => in_array($r->status_baru, ['closed', 'recovery']));
+                $tracking[] = [
+                    'status' => 'RECOVERY',
+                    'time' => $closedLog->waktu_perubahan,
+                    'description' => 'Penanganan selesai atau masuk masa pemulihan.'
+                ];
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $tracking
         ]);
     }
 }

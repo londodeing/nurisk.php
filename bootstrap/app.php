@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\CorrelationIdMiddleware::class,
         ])->api(append: [
             \App\Http\Middleware\SentryUserContextMiddleware::class,
+            \App\Http\Middleware\CheckAccountStatus::class,
         ]);
 
         $middleware->throttleApi('api');

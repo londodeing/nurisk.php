@@ -86,6 +86,47 @@ class AssessmentController extends Controller
         return view('operasi.assessment.skor', compact('insiden', 'assessment'));
     }
 
+    public function submit(Request $request, OperasiInsiden $insiden, AssessmentUtama $assessment)
+    {
+        $this->authorize('submit', $assessment);
+
+        if ($assessment->status_review !== 'draft') {
+            return redirect()->back()->with('error', 'Assessment sudah di-submit.');
+        }
+
+        $assessment->update(['status_review' => 'submitted']);
+
+        return redirect()->back()->with('success', 'Assessment diajukan untuk review.');
+    }
+
+    public function review(Request $request, OperasiInsiden $insiden, AssessmentUtama $assessment)
+    {
+        $validated = $request->validate([
+            'action'        => 'required|in:approved,rejected',
+            'catatan_review' => 'required_if:action,rejected|nullable|string|max:1000',
+        ]);
+
+        if ($assessment->status_review !== 'submitted') {
+            return redirect()->back()->with('error', 'Assessment belum di-submit.');
+        }
+
+        $this->authorize($validated['action'] === 'approved' ? 'approve' : 'reject', $assessment);
+
+        $assessment->update([
+            'status_review'  => $validated['action'] === 'approved' ? 'in_review' : 'rejected',
+            'catatan_review' => $validated['catatan_review'] ?? null,
+            'id_reviewer'    => auth()->id(),
+            'waktu_review'   => now(),
+        ]);
+
+        if ($validated['action'] === 'approved') {
+            return redirect()->route('insiden.pleno.create', $insiden)
+                ->with('success', 'Assessment disetujui! Silakan buat Pleno untuk melanjutkan.');
+        }
+
+        return redirect()->back()->with('success', 'Assessment ditolak.');
+    }
+
     public function cetak(OperasiInsiden $insiden, AssessmentUtama $assessment)
     {
         $this->authorize('view', $assessment);

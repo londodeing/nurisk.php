@@ -1,0 +1,20 @@
+{
+  "status_insiden": ["draft", "terverifikasi", "respon", "pemulihan", "selesai", "dibatalkan"],
+  "status_operasi": ["monitoring", "siaga", "tanggap_darurat", "pemulihan", "selesai"],
+  "status_laporan": ["menunggu", "ya", "tidak"],
+  "status_surat": ["draft", "review_paraf", "siap_tanda_tangan", "ditandatangani", "ditolak", "arsip"],
+  "status_paraf": ["menunggu", "disetujui", "ditolak"],
+  "status_pleno": ["draft", "ditinjau", "disetujui", "ditandatangani", "final", "dibatalkan"],
+  "prioritas": ["rendah", "sedang", "tinggi", "kritis"],
+  "tipe_unit": ["pwnu", "pcnu", "mwc", "ranting", "lembaga", "banom"],
+  "status_review": ["draft", "submitted", "in_review", "approved", "rejected"],
+  "status_permintaan": ["draft", "diajukan", "disetujui", "ditolak", "dikirim", "selesai"],
+  "status_rekrutmen": ["dibuka", "terpenuhi", "dibatalkan", "ditutup"],
+  "status_pendaftaran": ["dibuka", "seleksi", "diterima", "ditugaskan", "selesai", "ditolak"],
+  "status_tugas": ["rencana", "berjalan", "tertunda", "selesai"],
+  "status_darurat": ["siaga", "tanggap_darurat", "pemulihan", "selesai"],
+  "level_risiko": ["sangat_rendah", "rendah", "sedang", "tinggi", "sangat_tinggi"],
+  "skala_kejadian": ["lokal", "kecamatan", "kabupaten", "provinsi", "nasional"],
+  "tingkat_keparahan": ["minor", "sedang", "signifikan", "berat", "katastrofik"],
+  "kategori_bencana": ["alam", "non_alam", "sosial"]
+}

@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Application\Media\Commands\UploadMediaCommand;
+use App\Application\Media\Handlers\UploadMediaHandler;
 use App\Models\OrgAsset;
-use App\Services\Media\MediaUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class OrgAssetController extends Controller
 {
     public function __construct(
-        private MediaUploadService $mediaUploadService,
+        private UploadMediaHandler $uploadMediaHandler,
     ) {}
 
     public function index()
@@ -35,7 +36,7 @@ class OrgAssetController extends Controller
             'custodian_node_id' => 'nullable|exists:org_nodes,id',
             'home_territory_code' => 'required|string|max:20',
             'metadata' => 'nullable|array',
-            'foto' => ['nullable', ...$this->mediaUploadService->toValidationRules('aset')],
+            'foto' => ['nullable', 'mimes:jpg,jpeg,png,pdf', 'max:10240'],
         ]);
 
         $validated['asset_code'] = 'AST-' . strtoupper(Str::random(8));
@@ -43,12 +44,17 @@ class OrgAssetController extends Controller
         $validated['readiness'] = 'UNAVAILABLE';
         $validated['current_territory_code'] = $validated['home_territory_code'];
 
-        if ($request->hasFile('foto')) {
-            $result = $this->mediaUploadService->upload($request->file('foto'), 'aset');
-            $validated['foto_utama_path'] = $result->path;
-        }
-
         $asset = OrgAsset::create($validated);
+
+        if ($request->hasFile('foto')) {
+            $result = $this->uploadMediaHandler->handle(new UploadMediaCommand(
+                entityType: 'aset',
+                entityId: $asset->id,
+                file: $request->file('foto'),
+                visibility: 'PUBLIC',
+            ));
+            $asset->update(['foto_utama_path' => $result->path]);
+        }
 
         return redirect()->route('assets.create')->with('success', 'Aset ' . $asset->name . ' berhasil didaftarkan!');
     }
@@ -68,7 +74,6 @@ class OrgAssetController extends Controller
         ]);
 
         $file = $request->file('csv_file');
-        $result = $this->mediaUploadService->upload($file, 'aset');
         $handle = fopen($file->getRealPath(), 'r');
 
         $header = true;

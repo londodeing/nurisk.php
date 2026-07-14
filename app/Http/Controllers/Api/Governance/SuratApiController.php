@@ -6,11 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\DokumenSuratUtama;
 use App\Models\DokumenSuratParaf;
 use App\Models\DokumenSuratTembusan;
+use App\Services\SuratService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class SuratApiController extends Controller
 {
+    public function __construct(
+        private SuratService $suratService
+    ) {}
+
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', DokumenSuratUtama::class);
@@ -148,14 +153,16 @@ class SuratApiController extends Controller
         return response()->json(['message' => 'Paraf disetujui. Menunggu paraf berikutnya.']);
     }
 
-    public function finalisasi(DokumenSuratUtama $surat): JsonResponse
+    public function finalisasi(Request $request, DokumenSuratUtama $surat): JsonResponse
     {
         $this->authorize('finalisasi', $surat);
 
-        $surat->update([
-            'status_surat' => 'ditandatangani',
-            'nomor_surat_resmi' => $surat->nomor_surat_resmi ?? 'SRT-' . strtoupper(\Illuminate\Support\Str::random(10)),
-        ]);
+        try {
+            $isiSnapshot = $request->input('isi_surat_snapshot');
+            $this->suratService->finalisasi($surat, $request->user(), $isiSnapshot);
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
         return response()->json(['message' => 'Surat difinalisasi dan ditandatangani.']);
     }

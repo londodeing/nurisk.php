@@ -17,6 +17,7 @@
                                 <option value="">Semua Status</option>
                                 <option value="direncanakan" {{ request('status_alur') === 'direncanakan' ? 'selected' : '' }}>Direncanakan</option>
                                 <option value="aktif" {{ request('status_alur') === 'aktif' ? 'selected' : '' }}>Aktif</option>
+                                <option value="diperpanjang" {{ request('status_alur') === 'diperpanjang' ? 'selected' : '' }}>Diperpanjang</option>
                                 <option value="ditutup" {{ request('status_alur') === 'ditutup' ? 'selected' : '' }}>Ditutup</option>
                             </select>
                         </div>
@@ -43,7 +44,7 @@
                                     <td class="px-4 py-2">{{ $p->nama_posaju }}</td>
                                     <td class="px-4 py-2">{{ $p->insiden?->kode_kejadian }}</td>
                                     <td class="px-4 py-2">{{ $p->pj?->profil?->nama_lengkap ?? '—' }}</td>
-                                    <td class="px-4 py-2"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-{{ $p->status_alur === 'aktif' ? 'green-100 text-green-700' : ($p->status_alur === 'ditutup' ? 'slate-100 text-slate-700' : 'yellow-100 text-yellow-700') }}">{{ $p->labelStatus() }}</span></td>
+                                    <td class="px-4 py-2"><x-operasi.posaju-status-badge :status="$p->status_alur" size="sm" /></td>
                                     <td class="px-4 py-2">{{ $p->waktu_diaktifkan?->format('d/m/Y') ?? '—' }}</td>
                                     <td class="px-4 py-2">{{ $p->waktu_ditutup?->format('d/m/Y') ?? '—' }}</td>
                                     <td class="px-4 py-2">

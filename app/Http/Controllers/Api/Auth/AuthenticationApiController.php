@@ -54,14 +54,24 @@ class AuthenticationApiController extends Controller
             $token = $user->createToken($deviceName)->plainTextToken;
 
             // Load relasi standar agar profilnya terbawa
-            $user->load(['profil', 'peran']);
+            $user->load(['profil', 'peran', 'jabatanAktif.jabatan']);
+
+            // Sertakan daftar mandat aktif untuk MandatePickerScreen
+            $mandates = $user->jabatanAktif->map(function ($jabatan) {
+                return [
+                    'id' => (string) $jabatan->id_pengguna_jabatan,
+                    'role' => $jabatan->jabatan?->nama_jabatan ?? 'Anggota',
+                    'territory' => $jabatan->tipe_lingkup . ':' . $jabatan->id_lingkup,
+                ];
+            })->values();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Login berhasil',
                 'data' => [
                     'token' => $token,
-                    'user' => $user
+                    'user' => $user,
+                    'mandates' => $mandates,
                 ]
             ]);
 
@@ -142,12 +152,14 @@ class AuthenticationApiController extends Controller
         ]);
     }
 
-    /**
-     * Mencabut Bearer Token saat ini.
-     */
     public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+        
+        if ($user) {
+            $user->currentAccessToken()->delete();
+            $user->update(['is_tersedia' => 0]);
+        }
 
         return response()->json([
             'success' => true,

@@ -1,0 +1,5 @@
+[
+  {"id": "menunggu", "nama": "Menunggu",     "warna": "#F59E0B", "urutan": 1},
+  {"id": "ya",       "nama": "Terverifikasi","warna": "#10B981", "urutan": 2},
+  {"id": "tidak",    "nama": "Ditolak",      "warna": "#EF4444", "urutan": 3}
+]

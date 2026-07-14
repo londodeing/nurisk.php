@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\LogistikPermintaan;
+use App\Models\OperasiJurnal;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -23,8 +26,8 @@ class OperasiPosaju extends Model
     // protected $with = ["insiden"]; // removed — eager-load explicitly where needed
     protected $fillable = [
         'id_insiden',
-        'id_periode_operasi',
         'id_pleno_pendirian',
+        'id_pleno_keputusan',
         'nama_posaju',
         'id_surat_pendirian',
         'alamat_lokasi',
@@ -36,6 +39,7 @@ class OperasiPosaju extends Model
         'diperpanjang_hingga',
         'waktu_ditutup',
         'alasan_penutupan',
+        'alasan_perpanjangan',
     ];
 
     protected $casts = [
@@ -94,6 +98,52 @@ class OperasiPosaju extends Model
         return $this->hasMany(RelawanPenugasan::class, 'id_posaju', 'id_posaju');
     }
 
+    /**
+     * Distribusi bantuan dari pos aju ini
+     */
+    public function distribusi(): HasMany
+    {
+        return $this->hasMany(OperasiDistribusi::class, 'id_posaju', 'id_posaju');
+    }
+
+    /**
+     * Permintaan logistik ke pos aju ini
+     */
+    public function permintaanLogistik(): HasMany
+    {
+        return $this->hasMany(LogistikPermintaan::class, 'id_posaju_tujuan', 'id_posaju');
+    }
+
+    /**
+     * Penugasan personel ke pos aju ini
+     */
+    public function penugasan(): HasMany
+    {
+        return $this->hasMany(OperasiPenugasan::class, 'id_posaju', 'id_posaju');
+    }
+
+    /**
+     * Riwayat komandan pos aju
+     */
+    public function komandan(): HasMany
+    {
+        return $this->hasMany(OperasiPosajuKomandan::class, 'id_posaju', 'id_posaju');
+    }
+
+    /**
+     * Komandan yang sedang aktif (belum selesai tugas)
+     */
+    public function komandanAktif(): HasOne
+    {
+        return $this->hasOne(OperasiPosajuKomandan::class, 'id_posaju', 'id_posaju')
+            ->whereNull('waktu_selesai_tugas');
+    }
+
+    public function keputusanPleno(): BelongsTo
+    {
+        return $this->belongsTo(OperasiPlenoKeputusan::class, 'id_pleno_keputusan', 'id_keputusan');
+    }
+
     // --- Helpers ---
 
     public function isAktif(): bool
@@ -114,5 +164,14 @@ class OperasiPosaju extends Model
     public function scopeAktif($query)
     {
         return $query->where('status_alur', 'aktif');
+    }
+
+    /**
+     * Jurnal terkait pos aju ini
+     */
+    public function jurnal(): HasMany
+    {
+        return $this->hasMany(OperasiJurnal::class, 'id_referensi', 'id_posaju')
+            ->where('tabel_referensi', 'operasi_posaju');
     }
 }

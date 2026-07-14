@@ -22,11 +22,12 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Pleno <span class="text-red-500">*</span></label>
                     <select name="jenis_pleno" required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500">
                         <option value="">-- Pilih Jenis Pleno --</option>
-                        <option value="penentuan_status">Penentuan Status Bencana</option>
-                        <option value="evaluasi_operasi">Evaluasi Operasi</option>
-                        <option value="pembentukan_posko">Pembentukan Posko</option>
+                        <option value="aktivasi_operasi">Aktivasi Operasi</option>
+                        <option value="evaluasi_rutin">Evaluasi Rutin</option>
+                        <option value="perpanjangan_operasi">Perpanjangan Operasi</option>
                         <option value="penutupan_operasi">Penutupan Operasi</option>
-                        <option value="lainnya">Lainnya</option>
+                        <option value="eskalasi_wilayah">Eskalasi Wilayah</option>
+                        <option value="khusus">Khusus</option>
                     </select>
                 </div>
 

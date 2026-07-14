@@ -137,6 +137,10 @@ Route::middleware(['auth', 'role:super_admin,pwnu,pcnu,trc'])->group(function ()
     Route::post('insiden/{insiden}/spk', [\App\Http\Controllers\Operasi\InsidenSpkController::class, 'store'])
          ->name('insiden.spk.store');
     Route::resource('insiden.assessment', \App\Http\Controllers\Operasi\AssessmentController::class)->only(['create', 'store', 'show', 'edit', 'update']);
+    Route::post('insiden/{insiden}/assessment/{assessment}/submit', [\App\Http\Controllers\Operasi\AssessmentController::class, 'submit'])
+         ->name('insiden.assessment.submit');
+    Route::post('insiden/{insiden}/assessment/{assessment}/review', [\App\Http\Controllers\Operasi\AssessmentController::class, 'review'])
+         ->name('insiden.assessment.review');
     Route::get('insiden/{insiden}/assessment/{assessment}/cetak', [\App\Http\Controllers\Operasi\AssessmentController::class, 'cetak'])
          ->name('insiden.assessment.cetak');
     // Pleno
@@ -165,7 +169,7 @@ Route::middleware(['auth', 'role:super_admin,pwnu,pcnu,trc'])->group(function ()
         Route::post('/{penugasan}/terbitkan-surat-tugas', [\App\Http\Controllers\Operasi\TerbitkanSuratTugasController::class, 'store'])->name('terbitkan-surat-tugas');
     });
 
-    // Pos Aju Web (Blade)
+    // Pos Aju Web (Blade) — legacy flat routes
     Route::prefix('posaju')->name('posaju.')->controller(PosAjuWebController::class)->group(function () {
         Route::get('/',                 'index')->name('index');
         Route::get('/create',           'create')->name('create');
@@ -175,6 +179,46 @@ Route::middleware(['auth', 'role:super_admin,pwnu,pcnu,trc'])->group(function ()
         Route::post('/{posaju}/close',  'close')->name('close');
         Route::post('/{posaju}/extend', 'extend')->name('extend');
     });
+
+    // Pos Aju Web — scoped under insiden
+    Route::prefix('insiden/{insiden}/posaju')->name('insiden.posaju.')->controller(PosAjuWebController::class)->group(function () {
+        Route::get('/',                 'index')->name('index');
+        Route::get('/create',           'create')->name('create');
+        Route::post('/',                'store')->name('store');
+        Route::get('/{posaju}',         'show')->name('show');
+        Route::post('/{posaju}/activate', 'activate')->name('activate');
+        Route::post('/{posaju}/tutup',  'tutup')->name('tutup');
+        Route::post('/{posaju}/perpanjang', 'extend')->name('extend');
+    });
+    Route::post('insiden/{insiden}/posaju/{posaju}/komandan', [\App\Http\Controllers\Operasi\PosajuKomandanController::class, 'store'])
+        ->name('insiden.posaju.komandan.store');
+    Route::delete('insiden/{insiden}/posaju/{posaju}/komandan/{komandan}', [\App\Http\Controllers\Operasi\PosajuKomandanController::class, 'destroy'])
+        ->name('insiden.posaju.komandan.destroy');
+
+    // Feedback Klaster Web (Blade)
+    Route::prefix('insiden/{insiden}/feedback-klaster')
+        ->name('insiden.feedback-klaster.')
+        ->controller(\App\Http\Controllers\Operasi\FeedbackKlasterController::class)
+        ->group(function () {
+            Route::get('/',                 'index')->name('index');
+            Route::get('/buat',             'create')->name('create');
+            Route::post('/',                'store')->name('store');
+            Route::get('/{feedback}',       'show')->name('show');
+        });
+
+    // Distribusi Bantuan Web (Blade)
+Route::prefix('insiden/{insiden}/posaju/{posaju}/distribusi')
+        ->name('insiden.posaju.distribusi.')
+        ->controller(\App\Http\Controllers\Operasi\DistribusiWebController::class)
+        ->group(function () {
+            Route::get('/',                 'index')->name('index');
+            Route::get('/buat',             'create')->name('create');
+            Route::post('/',                'store')->name('store');
+            Route::get('/{distribusi}',     'show')->name('show');
+            Route::post('/{distribusi}/distribusikan', 'distribusikan')->name('distribusikan');
+            Route::post('/{distribusi}/terima',        'terima')->name('terima');
+            Route::post('/{distribusi}/feedback',      'feedback')->name('feedback');
+        });
 
     // Logistik Permintaan Web (Blade)
     Route::prefix('logistik/permintaan')->name('logistik.permintaan.')->controller(\App\Http\Controllers\Logistik\PermintaanWebController::class)->group(function () {

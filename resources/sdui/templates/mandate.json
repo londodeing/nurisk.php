@@ -1,0 +1,49 @@
+{
+  "type": "Container",
+  "props": {
+    "padding": [12, 12, 12, 12],
+    "margin": [16, 0, 16, 16],
+    "backgroundColor": "danger_light",
+    "borderRadius": 12
+  },
+  "children": [
+    {
+      "type": "Row",
+      "children": [
+        {
+          "type": "Icon",
+          "props": {
+            "name": "shield",
+            "color": "danger",
+            "size": 24
+          }
+        },
+        {
+          "type": "Column",
+          "props": {
+            "margin_left": 12,
+            "expanded": true
+          },
+          "children": [
+            {
+              "type": "Text",
+              "props": {
+                "text": "{{ title }}",
+                "style": "subtitle",
+                "color": "danger"
+              }
+            },
+            {
+              "type": "Text",
+              "props": {
+                "text": "{{ description }}",
+                "style": "caption",
+                "color": "danger"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -96,6 +96,21 @@ class AssessmentPolicy
         return $this->authCtx()->isSuperAdmin() || $this->authCtx()->hasRole('pwnu');
     }
 
+    public function submit(AuthUser $user, AssessmentUtama $assessment): bool
+    {
+        if ($assessment->insiden->isTerkunci()) {
+            return false;
+        }
+
+        // Creator can always submit their own draft assessment
+        if ($assessment->id_petugas_assessment === $user->id_pengguna) {
+            return true;
+        }
+
+        // Super admin, PWNU, and scope-matching PCNU/TRC can also submit
+        return $this->bolehAksesInsiden($user, $assessment->insiden);
+    }
+
     public function review(AuthUser $user, AssessmentUtama $assessment): bool
     {
         if ($this->authCtx()->hasAnyRole(['super_admin', 'pwnu'])) {

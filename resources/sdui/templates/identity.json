@@ -1,0 +1,49 @@
+{
+  "type": "Container",
+  "props": {
+    "padding": [16, 16, 16, 16],
+    "margin": [16, 16, 16, 8],
+    "backgroundColor": "surface",
+    "borderRadius": 16
+  },
+  "children": [
+    {
+      "type": "Row",
+      "children": [
+        {
+          "type": "Icon",
+          "props": {
+            "name": "{{ icon }}",
+            "size": 48,
+            "color": "{{ icon_color }}"
+          }
+        },
+        {
+          "type": "Column",
+          "props": {
+            "crossAxisAlignment": "start",
+            "expanded": true
+          },
+          "children": [
+            {
+              "type": "Text",
+              "props": {
+                "text": "{{ name }}",
+                "style": "headline",
+                "color": "text_main"
+              }
+            },
+            {
+              "type": "Text",
+              "props": {
+                "text": "{{ subtitle }}",
+                "style": "subtitle",
+                "color": "text_muted"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

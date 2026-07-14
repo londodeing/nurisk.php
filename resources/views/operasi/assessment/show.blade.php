@@ -442,7 +442,7 @@
 
         @can('update', $assessment)
             @if($statusReview === 'draft')
-                <form action="{{ route('api.insiden.assessment.submit', [$insiden->id_insiden, $assessment->id_assessment_utama]) }}" method="POST" class="inline">
+                <form action="{{ route('insiden.assessment.submit', [$insiden->id_insiden, $assessment->id_assessment_utama]) }}" method="POST" class="inline">
                     @csrf
                     <button type="submit"
                             class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">
@@ -456,7 +456,7 @@
             @if($statusReview === 'submitted')
             <div class="mt-4 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
                 <h4 class="text-sm font-semibold text-indigo-800 mb-3">Tindakan Review</h4>
-                <form action="{{ route('api.insiden.assessment.review', [$insiden->id_insiden, $assessment->id_assessment_utama]) }}" method="POST">
+                <form action="{{ route('insiden.assessment.review', [$insiden->id_insiden, $assessment->id_assessment_utama]) }}" method="POST">
                     @csrf
                     <div class="mb-3">
                         <textarea name="catatan_review" rows="3" placeholder="Catatan review (wajib jika ditolak)..."
@@ -476,5 +476,16 @@
             </div>
             @endif
         @endcan
+
+        @if($statusReview === 'in_review')
+            <div class="mt-4 p-4 bg-teal-50 rounded-xl border border-teal-200">
+                <h4 class="text-sm font-semibold text-teal-800 mb-2">Lanjut ke Pleno</h4>
+                <p class="text-sm text-teal-700 mb-3">Assessment telah disetujui. Silakan buat Pleno untuk menentukan tindak lanjut.</p>
+                <a href="{{ route('insiden.pleno.create', $insiden) }}"
+                   class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 transition-colors">
+                    <i class="bi bi-file-earmark-text"></i> Buat Pleno
+                </a>
+            </div>
+        @endif
     </div>
 </x-app-layout>

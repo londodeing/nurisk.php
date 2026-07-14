@@ -32,7 +32,7 @@ class TrcDashboardService
 
         $suratTugasUrl = null;
         if ($penugasan->suratTugas?->file_pdf_path) {
-            $suratTugasUrl = Storage::disk('public')->url($penugasan->suratTugas->file_pdf_path);
+            $suratTugasUrl = media_url($penugasan->suratTugas->file_pdf_path);
         }
 
         return [

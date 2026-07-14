@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             BencanaMasterJenisSeeder::class,
             KeahlianMasterSeeder::class,
             MasterKlasterSeeder::class,
+            DemoBanjirKudusSeeder::class,
+            \Database\Seeders\Operasi\PosAjuSeeder::class,
         ]);
     }
 }

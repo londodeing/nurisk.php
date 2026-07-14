@@ -32,10 +32,10 @@ class GenerateSuratPdfJob implements ShouldQueue
     {
         $surat = DokumenSuratUtama::findOrFail($this->idSurat);
 
-        if ($surat->status_surat !== 'siap_tanda_tangan') {
-            Log::warning('GenerateSuratPdfJob skipped: wrong status', [
+        if ($surat->file_pdf_path) {
+            Log::warning('GenerateSuratPdfJob skipped: PDF already exists', [
                 'id_surat' => $this->idSurat,
-                'status' => $surat->status_surat,
+                'path' => $surat->file_pdf_path,
             ]);
             return;
         }
@@ -43,8 +43,6 @@ class GenerateSuratPdfJob implements ShouldQueue
         $pdfPath = $pdfService->generate($surat);
 
         $surat->update([
-            'isi_surat_snapshot' => $this->isiSnapshot,
-            'status_surat' => 'ditandatangani',
             'file_pdf_path' => $pdfPath,
         ]);
 

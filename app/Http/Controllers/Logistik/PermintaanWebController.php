@@ -31,14 +31,14 @@ class PermintaanWebController extends Controller
     {
         $validated = $request->validate([
             'id_posaju_tujuan' => ['required', 'integer', 'exists:operasi_posaju,id_posaju'],
-            'prioritas'        => ['nullable', 'string', 'in:rendah,sedang,tinggi'],
+            'prioritas'        => ['nullable', 'string', 'in:biasa,mendesak,darurat'],
             'keterangan'       => ['nullable', 'string', 'max:1000'],
         ]);
 
         $permintaan = LogistikPermintaan::create([
             'id_posaju_tujuan' => $validated['id_posaju_tujuan'],
-            'prioritas'        => $validated['prioritas'] ?? 'sedang',
-            'status_permintaan' => 'pending',
+            'prioritas'        => $validated['prioritas'] ?? 'biasa',
+            'status_permintaan' => 'draft',
         ]);
 
         return redirect()->route('logistik.permintaan.index')
@@ -47,14 +47,14 @@ class PermintaanWebController extends Controller
 
     public function setujui(LogistikPermintaan $permintaan)
     {
-        if (!in_array($permintaan->status_permintaan, ['pending'])) {
+        if (!in_array($permintaan->status_permintaan, ['draft'])) {
             return back()->with('error', 'Permintaan ini sudah diproses sebelumnya.');
         }
 
         $permintaan->update([
-            'status_permintaan' => 'diproses',
+            'status_permintaan' => 'diajukan',
         ]);
 
-        return back()->with('success', 'Permintaan disetujui dan sedang diproses.');
+        return back()->with('success', 'Permintaan disetujui dan diajukan.');
     }
 }

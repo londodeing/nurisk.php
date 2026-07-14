@@ -55,7 +55,7 @@ class LegalValidationService
         if ($mandate) {
             return [
                 'actor_id' => $user->id_pengguna,
-                'actor_name' => $user->nama_lengkap ?? 'Unknown',
+                'actor_name' => $user->profil?->nama_lengkap ?? 'Unknown',
                 'actor_position' => $mandate->position_name . ' ' . $mandate->node_name,
                 'sk_number' => $mandate->sk_snapshot,
                 'mandate_id' => $mandate->mandat_id,
@@ -94,7 +94,7 @@ class LegalValidationService
         if ($delegation) {
             return [
                 'actor_id' => $user->id_pengguna,
-                'actor_name' => $user->nama_lengkap ?? 'Unknown',
+                'actor_name' => $user->profil?->nama_lengkap ?? 'Unknown',
                 'actor_position' => $delegation->position_name . ' ' . $delegation->node_name . ' (A.N. Delegasi)',
                 'sk_number' => $delegation->sk_snapshot,
                 'mandate_id' => $delegation->mandat_id,

@@ -74,7 +74,7 @@
 
     const CENTER_JATENG = [-7.15, 110.14];
     const JATENG_BOUNDS = [[-8.8, 108.3], [-5.4, 111.9]];
-    const INARISK_WMS_URL = "{{ env('INARISK_WMS_URL', 'https://inarisk1.bnpb.go.id:8443/geoserver/raster/wms') }}";
+    const INARISK_WMS_URL = "/api/public/map/proxy/inarisk/wms";
 
     const STATUS_COLORS = {
         'draft': '#64748b',

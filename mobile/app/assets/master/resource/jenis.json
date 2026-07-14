@@ -1,0 +1,7 @@
+[
+  {"id": "manusia",  "nama": "Sumber Daya Manusia"},
+  {"id": "material", "nama": "Material / Peralatan"},
+  {"id": "dana",     "nama": "Dana / Anggaran"},
+  {"id": "informasi","nama": "Informasi / Data"},
+  {"id": "waktu",    "nama": "Waktu / Tenaga"}
+]

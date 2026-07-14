@@ -25,8 +25,8 @@ class UpdatePosajuRequest extends FormRequest
         return [
             'nama_posaju' => ['sometimes', 'required', 'string', 'max:150'],
             'alamat_lokasi' => ['nullable', 'string'],
-            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'latitude' => ['sometimes', 'required', 'numeric', 'between:-90,90'],
+            'longitude' => ['sometimes', 'required', 'numeric', 'between:-180,180'],
             'pj_posaju' => ['sometimes', 'required', 'integer', 'exists:auth_users,id_pengguna'],
         ];
     }

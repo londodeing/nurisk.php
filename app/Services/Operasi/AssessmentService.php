@@ -31,6 +31,8 @@ class AssessmentService
         }
 
         return DB::transaction(function () use ($data) {
+            $clean = fn (array $arr) => array_filter($arr, fn ($v) => $v !== null && $v !== '');
+
             $utama = AssessmentUtama::create([
                 'id_insiden'               => $data['id_insiden'],
                 'id_petugas_assessment'    => $data['id_petugas_assessment'] ?? auth()->id() ?? 1,
@@ -110,22 +112,22 @@ class AssessmentService
 
             // ─── Dampak Lingkungan (V1) ────────────────────────────────────
             if (isset($data['dampak_lingkungan'])) {
-                $utama->dampakLingkungan()->create($data['dampak_lingkungan']);
+                $utama->dampakLingkungan()->create($clean($data['dampak_lingkungan']));
             }
 
             // ─── Dampak Ekonomi (V1) ───────────────────────────────────────
             if (isset($data['dampak_ekonomi'])) {
-                $utama->dampakEkonomi()->create($data['dampak_ekonomi']);
+                $utama->dampakEkonomi()->create($clean($data['dampak_ekonomi']));
             }
 
             // ─── Biodata Kejadian (V1) ──────────────────────────────────────
             if (isset($data['biodata_kejadian'])) {
-                $utama->biodataKejadian()->create($data['biodata_kejadian']);
+                $utama->biodataKejadian()->create($clean($data['biodata_kejadian']));
             }
 
             // ─── Narasi Kejadian (V1) ───────────────────────────────────────
             if (isset($data['narasi_kejadian'])) {
-                $utama->narasiKejadian()->create($data['narasi_kejadian']);
+                $utama->narasiKejadian()->create($clean($data['narasi_kejadian']));
             }
 
             return $utama->load([
@@ -143,6 +145,7 @@ class AssessmentService
     public function updateAssessment(AssessmentUtama $assessment, array $data): AssessmentUtama
     {
         return DB::transaction(function () use ($assessment, $data) {
+            $clean = fn (array $arr) => array_filter($arr, fn ($v) => $v !== null && $v !== '');
             $assessment->update([
                 'jenis_laporan'            => $data['jenis_laporan'] ?? $assessment->jenis_laporan,
                 'cakupan_wilayah_deskripsi'=> $data['cakupan_wilayah_deskripsi'] ?? $assessment->cakupan_wilayah_deskripsi,
@@ -220,35 +223,38 @@ class AssessmentService
 
             // ─── Dampak Lingkungan ─────────────────────────────────────────
             if (isset($data['dampak_lingkungan'])) {
+                $cleaned = $clean($data['dampak_lingkungan']);
                 if ($assessment->dampakLingkungan) {
-                    $assessment->dampakLingkungan->update($data['dampak_lingkungan']);
+                    $assessment->dampakLingkungan->update($cleaned);
                 } else {
-                    $assessment->dampakLingkungan()->create($data['dampak_lingkungan']);
+                    $assessment->dampakLingkungan()->create($cleaned);
                 }
             }
 
             // ─── Dampak Ekonomi ────────────────────────────────────────────
             if (isset($data['dampak_ekonomi'])) {
+                $cleaned = $clean($data['dampak_ekonomi']);
                 if ($assessment->dampakEkonomi) {
-                    $assessment->dampakEkonomi->update($data['dampak_ekonomi']);
+                    $assessment->dampakEkonomi->update($cleaned);
                 } else {
-                    $assessment->dampakEkonomi()->create($data['dampak_ekonomi']);
+                    $assessment->dampakEkonomi()->create($cleaned);
                 }
             }
 
             // ─── Biodata Kejadian ──────────────────────────────────────────
             if (isset($data['biodata_kejadian'])) {
+                $cleaned = $clean($data['biodata_kejadian']);
                 if ($assessment->biodataKejadian) {
-                    $assessment->biodataKejadian->update($data['biodata_kejadian']);
+                    $assessment->biodataKejadian->update($cleaned);
                 } else {
-                    $assessment->biodataKejadian()->create($data['biodata_kejadian']);
+                    $assessment->biodataKejadian()->create($cleaned);
                 }
             }
 
             // ─── Narasi Kejadian ───────────────────────────────────────────
             if (isset($data['narasi_kejadian'])) {
                 $assessment->narasiKejadian()->delete();
-                $assessment->narasiKejadian()->create($data['narasi_kejadian']);
+                $assessment->narasiKejadian()->create($clean($data['narasi_kejadian']));
             }
 
             return $assessment->refresh()->load([

@@ -79,7 +79,7 @@
                         <p class="text-xs text-gray-400">Diterbitkan: {{ $penugasan->suratTugas->tgl_terbit ? Carbon\Carbon::parse($penugasan->suratTugas->tgl_terbit)->locale('id')->isoFormat('D MMM YYYY') : '-' }}</p>
                     </div>
                     @if($penugasan->suratTugas->file_pdf_path)
-                    <a href="{{ Storage::disk('public')->url($penugasan->suratTugas->file_pdf_path) }}" target="_blank"
+                    <a href="{{ route('surat.pdf', $penugasan->suratTugas) }}" target="_blank"
                        class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 flex items-center gap-2">
                         <i class="bi bi-download"></i> Download PDF
                     </a>

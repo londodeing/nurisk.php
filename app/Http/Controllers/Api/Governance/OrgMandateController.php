@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api\Governance;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\Governance\GovernanceAuthorization;
 use App\Models\OrgMandate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class OrgMandateController extends Controller
 {
+    use GovernanceAuthorization;
+
     public function index(Request $request): JsonResponse
     {
         $items = OrgMandate::with(['user.profil', 'sk'])
@@ -20,6 +23,7 @@ class OrgMandateController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorizeGovernance($request);
         $validated = $request->validate([
             'sk_id' => 'required|exists:org_sks,id',
             'user_id' => 'required|exists:auth_users,id_pengguna',
@@ -38,6 +42,7 @@ class OrgMandateController extends Controller
 
     public function destroy(OrgMandate $orgMandate): JsonResponse
     {
+        $this->authorizeGovernance(request());
         $orgMandate->delete();
         return response()->json(['message' => 'Mandat dihapus.']);
     }

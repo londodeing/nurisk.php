@@ -24,6 +24,7 @@ class OperasiPenugasan extends Model
         'id_insiden',
         'id_pengguna',
         'id_klaster_operasi',
+        'id_posaju',
         'peran_otoritas',
         'status_penugasan',
         'waktu_mulai',
@@ -88,6 +89,11 @@ class OperasiPenugasan extends Model
     public function klasterOperasi()
     {
         return $this->belongsTo(OperasiKlaster::class, 'id_klaster_operasi', 'id_klaster_operasi');
+    }
+
+    public function posaju()
+    {
+        return $this->belongsTo(OperasiPosaju::class, 'id_posaju', 'id_posaju');
     }
 
     public function suratTugas()

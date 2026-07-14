@@ -1,0 +1,15 @@
+{
+  "banjir":             "flood",
+  "banjir-bandang":     "flood",
+  "cuaca-ekstrem":      "storm",
+  "gelombang-ekstrem-abrasi": "wave",
+  "gempa-bumi":         "earthquake",
+  "karhutla":           "fire",
+  "kekeringan":         "drought",
+  "gunung-meletus":      "volcano",
+  "tanah-longsor":      "landslide",
+  "tsunami":            "tsunami",
+  "likuefaksi":         "liquefaction",
+  "kebakaran-pemukiman":"fire",
+  "epidemi-wabah":      "epidemic"
+}

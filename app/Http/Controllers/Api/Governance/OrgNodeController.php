@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Governance;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\Governance\GovernanceAuthorization;
 use App\Models\OrgNode;
 use App\Models\OrgNodePosition;
 use Illuminate\Http\JsonResponse;
@@ -10,6 +11,8 @@ use Illuminate\Http\Request;
 
 class OrgNodeController extends Controller
 {
+    use GovernanceAuthorization;
+
     public function index(Request $request): JsonResponse
     {
         $items = OrgNode::with(['institution', 'structureLevel', 'positions'])
@@ -21,6 +24,7 @@ class OrgNodeController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorizeGovernance($request);
         $validated = $request->validate([
             'institution_id' => 'required|exists:org_institutions,id',
             'structure_level_id' => 'required|exists:org_structure_levels,id',
@@ -39,18 +43,21 @@ class OrgNodeController extends Controller
 
     public function update(Request $request, OrgNode $orgNode): JsonResponse
     {
+        $this->authorizeGovernance($request);
         $orgNode->update($request->validate(['name' => 'sometimes|string|max:200', 'status' => 'sometimes|in:aktif,nonaktif', 'territory_code' => 'nullable|string|max:20']));
         return response()->json(['message' => 'Node diperbarui.']);
     }
 
     public function destroy(OrgNode $orgNode): JsonResponse
     {
+        $this->authorizeGovernance(request());
         $orgNode->delete();
         return response()->json(['message' => 'Node dihapus.']);
     }
 
     public function assignPosition(Request $request): JsonResponse
     {
+        $this->authorizeGovernance($request);
         $validated = $request->validate([
             'node_id' => 'required|exists:org_nodes,id',
             'position_id' => 'required|exists:org_positions,id',
@@ -61,6 +68,7 @@ class OrgNodeController extends Controller
 
     public function removePosition(OrgNodePosition $nodePosition): JsonResponse
     {
+        $this->authorizeGovernance(request());
         $nodePosition->delete();
         return response()->json(['message' => 'Posisi dihapus dari node.']);
     }

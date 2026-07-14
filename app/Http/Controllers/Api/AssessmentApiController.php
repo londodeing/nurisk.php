@@ -72,7 +72,7 @@ class AssessmentApiController extends Controller
      */
     public function submit(Request $request, OperasiInsiden $insiden, AssessmentUtama $assessment): JsonResponse
     {
-        $this->authorize('update', $assessment);
+        $this->authorize('submit', $assessment);
 
         if ($assessment->status_review !== 'draft') {
             return response()->json(['message' => 'Assessment sudah di-submit.'], 422);

@@ -172,8 +172,15 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Jenis / Judul Keputusan</label>
-                                <input type="text" name="jenis_keputusan" required class="w-full text-sm rounded-lg border-gray-300" placeholder="Misal: Status Tanggap Darurat">
+                                <label class="block text-xs font-medium text-gray-700 mb-1">Jenis Keputusan</label>
+                                <select name="jenis_keputusan" required class="w-full text-sm rounded-lg border-gray-300">
+                                    <option value="">-- Pilih Jenis --</option>
+                                    <option value="penunjukan_personil">Penunjukan Personil</option>
+                                    <option value="aktivasi_pos">Aktivasi Pos</option>
+                                    <option value="perubahan_status_insiden">Perubahan Status Insiden</option>
+                                    <option value="alokasi_sumberdaya">Alokasi Sumberdaya</option>
+                                    <option value="lainnya">Lainnya</option>
+                                </select>
                             </div>
                         </div>
 
@@ -267,7 +274,9 @@
                             @if($keputusan->status_pelaksanaan === 'selesai' && $keputusan->referensi_tabel === 'operasi_posaju' && $keputusan->referensi_id)
                                 @php $posaju = \App\Models\OperasiPosaju::find($keputusan->referensi_id); @endphp
                                 @if($posaju)
-                                <span class="text-xs text-gray-400">Pos Aju: {{ $posaju->nama_posaju }}</span>
+                                <a href="{{ route('insiden.posaju.show', [$insiden, $posaju]) }}" class="text-xs text-blue-600 hover:text-blue-800 underline">
+                                    Pos Aju: {{ $posaju->nama_posaju }}
+                                </a>
                                 @endif
                             @endif
                         </div>

@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api\Governance;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\Governance\GovernanceAuthorization;
 use App\Models\OrgSk;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class OrgSkController extends Controller
 {
+    use GovernanceAuthorization;
+
     public function index(Request $request): JsonResponse
     {
         $items = OrgSk::with(['mandates.user.profil'])
@@ -19,6 +22,7 @@ class OrgSkController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $this->authorizeGovernance($request);
         $validated = $request->validate([
             'nomor_sk' => 'required|string|max:100|unique:org_sks,nomor_sk',
             'tanggal_mulai' => 'required|date',
@@ -34,6 +38,7 @@ class OrgSkController extends Controller
 
     public function destroy(OrgSk $orgSk): JsonResponse
     {
+        $this->authorizeGovernance(request());
         $orgSk->delete();
         return response()->json(['message' => 'SK dihapus.']);
     }

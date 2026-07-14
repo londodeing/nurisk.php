@@ -136,8 +136,13 @@ class SuratService
 
         $snapshot = $isiSnapshot ?? 'Snapshot tidak tersedia.';
 
+        $surat->update([
+            'status_surat' => 'ditandatangani',
+            'isi_surat_snapshot' => $snapshot,
+        ]);
+
         GenerateSuratPdfJob::dispatch($surat->id_surat, $snapshot);
 
-        return $surat;
+        return $surat->fresh();
     }
 }

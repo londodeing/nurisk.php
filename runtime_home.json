@@ -1,0 +1,2603 @@
+{
+    "schema_version": "1.0.0",
+    "screen": "akun_workspace",
+    "layout": "vertical",
+    "nodes": [
+        {
+            "id": "account_workspace",
+            "type": "ListView",
+            "props": {
+                "title": "Akun & Pusat Komando",
+                "spacing": 16,
+                "padding": 16
+            },
+            "actions": {},
+            "visible": true,
+            "enabled": true,
+            "children": [
+                {
+                    "id": "identity_section",
+                    "type": "Column",
+                    "props": {
+                        "spacing": 16
+                    },
+                    "actions": {},
+                    "visible": true,
+                    "enabled": true,
+                    "children": [
+                        {
+                            "id": "identity_card",
+                            "type": "Column",
+                            "props": {
+                                "spacing": 8
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "identity_card_container",
+                                    "type": "Container",
+                                    "props": {
+                                        "background": "primary",
+                                        "radius": "xl",
+                                        "padding": {
+                                            "all": 16
+                                        },
+                                        "margin": {
+                                            "t": 12,
+                                            "l": 16,
+                                            "r": 16
+                                        }
+                                    },
+                                    "actions": {},
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "profile_main_column",
+                                            "type": "Column",
+                                            "props": {
+                                                "spacing": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "profile_row_main",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 12
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "profile_avatar_container",
+                                                            "type": "Container",
+                                                            "props": {
+                                                                "width": 64,
+                                                                "height": 64,
+                                                                "background": "success",
+                                                                "radius": "full"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true,
+                                                            "children": [
+                                                                {
+                                                                    "id": "profile_avatar_text",
+                                                                    "type": "Text",
+                                                                    "props": {
+                                                                        "text": "?",
+                                                                        "style": "headline",
+                                                                        "foreground": "text_inverse",
+                                                                        "align": "center"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "id": "profile_name_col",
+                                                            "type": "Column",
+                                                            "props": {
+                                                                "spacing": 4
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true,
+                                                            "children": [
+                                                                {
+                                                                    "id": "profile_name_text",
+                                                                    "type": "Text",
+                                                                    "props": {
+                                                                        "text": "081111111111",
+                                                                        "style": "headline",
+                                                                        "foreground": "text_inverse",
+                                                                        "maxLines": 1,
+                                                                        "overflow": "ellipsis"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                },
+                                                                {
+                                                                    "id": "profile_role_text",
+                                                                    "type": "Text",
+                                                                    "props": {
+                                                                        "text": "Super Admin",
+                                                                        "style": "caption",
+                                                                        "foreground": "text_inverse"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                },
+                                                                {
+                                                                    "id": "profile_scope_text",
+                                                                    "type": "Text",
+                                                                    "props": {
+                                                                        "text": "LPBI NU Jawa Tengah \u2014 Akses Penuh",
+                                                                        "style": "caption",
+                                                                        "foreground": "text_inverse"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "id": "profile_toggle_container",
+                                                            "type": "Container",
+                                                            "props": {
+                                                                "background": "success",
+                                                                "radius": "full",
+                                                                "padding": {
+                                                                    "x": 12,
+                                                                    "y": 8
+                                                                }
+                                                            },
+                                                            "actions": {
+                                                                "on_tap": {
+                                                                    "type": "action",
+                                                                    "payload": {
+                                                                        "action_type": "profil.toggle_tersedia",
+                                                                        "id_pengguna": 1
+                                                                    },
+                                                                    "confirm": {
+                                                                        "title": "Tandai Tidak Tersedia?",
+                                                                        "message": "Status Anda akan berubah menjadi tidak tersedia untuk penugasan.",
+                                                                        "confirm_label": "Ya",
+                                                                        "cancel_label": "Batal"
+                                                                    },
+                                                                    "on_success": {
+                                                                        "type": "reload"
+                                                                    }
+                                                                }
+                                                            },
+                                                            "visible": true,
+                                                            "enabled": true,
+                                                            "children": [
+                                                                {
+                                                                    "id": "profile_toggle_row",
+                                                                    "type": "Row",
+                                                                    "props": {
+                                                                        "spacing": 8
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true,
+                                                                    "children": [
+                                                                        {
+                                                                            "id": "profile_toggle_dot",
+                                                                            "type": "Container",
+                                                                            "props": {
+                                                                                "width": 8,
+                                                                                "height": 8,
+                                                                                "radius": "full",
+                                                                                "background": "surface"
+                                                                            },
+                                                                            "actions": {},
+                                                                            "visible": true,
+                                                                            "enabled": true
+                                                                        },
+                                                                        {
+                                                                            "id": "profile_toggle_text",
+                                                                            "type": "Text",
+                                                                            "props": {
+                                                                                "text": "Tersedia",
+                                                                                "style": "caption",
+                                                                                "foreground": "text_inverse"
+                                                                            },
+                                                                            "actions": {},
+                                                                            "visible": true,
+                                                                            "enabled": true
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "profile_position_spacer",
+                                                    "type": "SizedBox",
+                                                    "props": {
+                                                        "height": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "profile_position_row",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 8
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "profile_position_icon",
+                                                            "type": "Icon",
+                                                            "props": {
+                                                                "name": "favorite",
+                                                                "foreground": "warning"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "profile_position_text",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Ketua PWNU",
+                                                                "style": "body",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "status_operasional",
+                    "type": "Column",
+                    "props": {
+                        "spacing": 16
+                    },
+                    "actions": {},
+                    "visible": true,
+                    "enabled": true,
+                    "children": [
+                        {
+                            "id": "status_empty_card",
+                            "type": "Column",
+                            "props": {
+                                "spacing": 8
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "empty_card_container",
+                                    "type": "Container",
+                                    "props": {
+                                        "background": "surface",
+                                        "radius": "xl",
+                                        "padding": {
+                                            "all": 16
+                                        },
+                                        "margin": {
+                                            "t": 12,
+                                            "l": 16,
+                                            "r": 16
+                                        }
+                                    },
+                                    "actions": {},
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "empty_title",
+                                            "type": "Text",
+                                            "props": {
+                                                "text": "Penugasan Aktif Saya",
+                                                "style": "subtitle"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "empty_spacer",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 16
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "empty_state_widget",
+                                            "type": "Column",
+                                            "props": {
+                                                "spacing": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "empty_state_icon",
+                                                    "type": "Icon",
+                                                    "props": {
+                                                        "name": "person",
+                                                        "foreground": "text_muted"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "empty_state_msg",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Tidak ada penugasan aktif saat ini",
+                                                        "style": "body"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "empty_state_sub",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Anda akan muncul di sini saat ditugaskan ke operasi bencana",
+                                                        "style": "caption"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "command_center",
+                    "type": "Column",
+                    "props": {
+                        "spacing": 16
+                    },
+                    "actions": {},
+                    "visible": true,
+                    "enabled": true,
+                    "children": [
+                        {
+                            "id": "cc_alerts",
+                            "type": "Column",
+                            "props": {
+                                "spacing": 8
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "alerts_container",
+                                    "type": "Container",
+                                    "props": {
+                                        "background": "warning",
+                                        "radius": "xl",
+                                        "padding": {
+                                            "all": 16
+                                        },
+                                        "margin": {
+                                            "t": 12,
+                                            "l": 16,
+                                            "r": 16
+                                        }
+                                    },
+                                    "actions": {},
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "alerts_row",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "alerts_icon",
+                                                    "type": "Icon",
+                                                    "props": {
+                                                        "name": "warning",
+                                                        "foreground": "warning"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "alerts_content_col",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 6
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "alerts_title",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "3 insiden belum terbentuk klaster",
+                                                                "style": "subtitle",
+                                                                "foreground": "warning"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "alert_list_col",
+                                                            "type": "Column",
+                                                            "props": {
+                                                                "spacing": 4
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true,
+                                                            "children": [
+                                                                {
+                                                                    "id": "alert_item_0",
+                                                                    "type": "Text",
+                                                                    "props": {
+                                                                        "text": "INS-2606-01-12881 \u2014 Banjir, PCNU Kabupaten Kudus",
+                                                                        "style": "caption",
+                                                                        "foreground": "warning"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                },
+                                                                {
+                                                                    "id": "alert_item_1",
+                                                                    "type": "Text",
+                                                                    "props": {
+                                                                        "text": "INS-2606-01-93260 \u2014 Banjir, PCNU Kabupaten Kudus",
+                                                                        "style": "caption",
+                                                                        "foreground": "warning"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "cc_header",
+                            "type": "Column",
+                            "props": {
+                                "spacing": 8
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "cc_header_wrapper_container",
+                                    "type": "Container",
+                                    "props": {
+                                        "margin": {
+                                            "t": 12,
+                                            "l": 16,
+                                            "r": 16,
+                                            "b": 12
+                                        }
+                                    },
+                                    "actions": {},
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "cc_header_row",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_between"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_header_title",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Pusat Komando",
+                                                        "style": "headline"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_header_badge_row",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_dot",
+                                                            "type": "Icon",
+                                                            "props": {
+                                                                "name": "check_circle",
+                                                                "foreground": "success"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_badge_text",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "5 Insiden Aktif",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "cc_item_0",
+                            "type": "Column",
+                            "props": {
+                                "spacing": 8
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "cc_item_container_0",
+                                    "type": "Container",
+                                    "props": {
+                                        "background": "surface",
+                                        "radius": "xl",
+                                        "padding": {
+                                            "all": 16
+                                        },
+                                        "margin": {
+                                            "b": 12,
+                                            "l": 16,
+                                            "r": 16
+                                        }
+                                    },
+                                    "actions": {
+                                        "on_tap": {
+                                            "type": "navigate",
+                                            "target": "\/incident\/detail\/2"
+                                        }
+                                    },
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "cc_item_row1_0",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_between"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_item_code_0",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "INS-2606-01-68420",
+                                                        "style": "subtitle"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_item_badges_row_0",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 8
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_item_prio_badge_0",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "TINGGI",
+                                                                "background": "warning",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_item_status_badge_0",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "Terverifikasi",
+                                                                "background": "info",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cc_item_spacer1_0",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_row2_0",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_item_cluster_icon_0",
+                                                    "type": "Icon",
+                                                    "props": {
+                                                        "name": "group",
+                                                        "foreground": "success"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_item_cluster_text_0",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Kesehatan",
+                                                        "style": "body",
+                                                        "foreground": "success"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cc_item_spacer2_0",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_divider_0",
+                                            "type": "Divider",
+                                            "props": {},
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_spacer3_0",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_stats_row_0",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_around"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_stat_days_col_0",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_days_val_0",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "18",
+                                                                "style": "headline",
+                                                                "foreground": "danger"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_days_lbl_0",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Hari",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "cc_stat_vdiv1_0",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "width": 1,
+                                                        "height": 32,
+                                                        "background": "background"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_stat_sitreps_col_0",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_sitreps_val_0",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "1",
+                                                                "style": "headline"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_sitreps_lbl_0",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Sitrep",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "cc_stat_vdiv2_0",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "width": 1,
+                                                        "height": 32,
+                                                        "background": "background"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_stat_status_col_0",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_status_val_0",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Monitoring",
+                                                                "style": "subtitle",
+                                                                "foreground": "text_muted"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_status_lbl_0",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Status Ops",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "cc_item_1",
+                            "type": "Column",
+                            "props": {
+                                "spacing": 8
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "cc_item_container_1",
+                                    "type": "Container",
+                                    "props": {
+                                        "background": "surface",
+                                        "radius": "xl",
+                                        "padding": {
+                                            "all": 16
+                                        },
+                                        "margin": {
+                                            "b": 12,
+                                            "l": 16,
+                                            "r": 16
+                                        }
+                                    },
+                                    "actions": {
+                                        "on_tap": {
+                                            "type": "navigate",
+                                            "target": "\/incident\/detail\/2"
+                                        }
+                                    },
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "cc_item_row1_1",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_between"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_item_code_1",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "INS-2606-01-68420",
+                                                        "style": "subtitle"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_item_badges_row_1",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 8
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_item_prio_badge_1",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "TINGGI",
+                                                                "background": "warning",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_item_status_badge_1",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "Terverifikasi",
+                                                                "background": "info",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cc_item_spacer1_1",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_row2_1",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_item_cluster_icon_1",
+                                                    "type": "Icon",
+                                                    "props": {
+                                                        "name": "group",
+                                                        "foreground": "success"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_item_cluster_text_1",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Pencarian dan Penyelamatan (SAR)",
+                                                        "style": "body",
+                                                        "foreground": "success"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cc_item_spacer2_1",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_divider_1",
+                                            "type": "Divider",
+                                            "props": {},
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_spacer3_1",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_stats_row_1",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_around"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_stat_days_col_1",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_days_val_1",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "18",
+                                                                "style": "headline",
+                                                                "foreground": "danger"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_days_lbl_1",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Hari",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "cc_stat_vdiv1_1",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "width": 1,
+                                                        "height": 32,
+                                                        "background": "background"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_stat_sitreps_col_1",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_sitreps_val_1",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "1",
+                                                                "style": "headline"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_sitreps_lbl_1",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Sitrep",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "cc_stat_vdiv2_1",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "width": 1,
+                                                        "height": 32,
+                                                        "background": "background"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_stat_status_col_1",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_status_val_1",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Monitoring",
+                                                                "style": "subtitle",
+                                                                "foreground": "text_muted"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_status_lbl_1",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Status Ops",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "cc_item_2",
+                            "type": "Column",
+                            "props": {
+                                "spacing": 8
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "cc_item_container_2",
+                                    "type": "Container",
+                                    "props": {
+                                        "background": "surface",
+                                        "radius": "xl",
+                                        "padding": {
+                                            "all": 16
+                                        },
+                                        "margin": {
+                                            "b": 12,
+                                            "l": 16,
+                                            "r": 16
+                                        }
+                                    },
+                                    "actions": {
+                                        "on_tap": {
+                                            "type": "navigate",
+                                            "target": "\/incident\/detail\/2"
+                                        }
+                                    },
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "cc_item_row1_2",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_between"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_item_code_2",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "INS-2606-01-68420",
+                                                        "style": "subtitle"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_item_badges_row_2",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 8
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_item_prio_badge_2",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "TINGGI",
+                                                                "background": "warning",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_item_status_badge_2",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "Terverifikasi",
+                                                                "background": "info",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cc_item_spacer1_2",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_row2_2",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_item_cluster_icon_2",
+                                                    "type": "Icon",
+                                                    "props": {
+                                                        "name": "group",
+                                                        "foreground": "success"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_item_cluster_text_2",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Logistik",
+                                                        "style": "body",
+                                                        "foreground": "success"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cc_item_spacer2_2",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_divider_2",
+                                            "type": "Divider",
+                                            "props": {},
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_spacer3_2",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_stats_row_2",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_around"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_stat_days_col_2",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_days_val_2",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "18",
+                                                                "style": "headline",
+                                                                "foreground": "danger"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_days_lbl_2",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Hari",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "cc_stat_vdiv1_2",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "width": 1,
+                                                        "height": 32,
+                                                        "background": "background"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_stat_sitreps_col_2",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_sitreps_val_2",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "1",
+                                                                "style": "headline"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_sitreps_lbl_2",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Sitrep",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "cc_stat_vdiv2_2",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "width": 1,
+                                                        "height": 32,
+                                                        "background": "background"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_stat_status_col_2",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_status_val_2",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Monitoring",
+                                                                "style": "subtitle",
+                                                                "foreground": "text_muted"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_status_lbl_2",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Status Ops",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "cc_item_3",
+                            "type": "Column",
+                            "props": {
+                                "spacing": 8
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "cc_item_container_3",
+                                    "type": "Container",
+                                    "props": {
+                                        "background": "surface",
+                                        "radius": "xl",
+                                        "padding": {
+                                            "all": 16
+                                        },
+                                        "margin": {
+                                            "b": 12,
+                                            "l": 16,
+                                            "r": 16
+                                        }
+                                    },
+                                    "actions": {
+                                        "on_tap": {
+                                            "type": "navigate",
+                                            "target": "\/incident\/detail\/18"
+                                        }
+                                    },
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "cc_item_row1_3",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_between"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_item_code_3",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "INS-2606-01-36578",
+                                                        "style": "subtitle"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_item_badges_row_3",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 8
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_item_prio_badge_3",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "TINGGI",
+                                                                "background": "warning",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_item_status_badge_3",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "Terverifikasi",
+                                                                "background": "info",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cc_item_spacer1_3",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_row2_3",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_item_cluster_icon_3",
+                                                    "type": "Icon",
+                                                    "props": {
+                                                        "name": "group",
+                                                        "foreground": "success"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_item_cluster_text_3",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Kesehatan",
+                                                        "style": "body",
+                                                        "foreground": "success"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cc_item_spacer2_3",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_divider_3",
+                                            "type": "Divider",
+                                            "props": {},
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_spacer3_3",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_stats_row_3",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_around"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_stat_days_col_3",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_days_val_3",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "18",
+                                                                "style": "headline",
+                                                                "foreground": "danger"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_days_lbl_3",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Hari",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "cc_stat_vdiv1_3",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "width": 1,
+                                                        "height": 32,
+                                                        "background": "background"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_stat_sitreps_col_3",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_sitreps_val_3",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "1",
+                                                                "style": "headline"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_sitreps_lbl_3",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Sitrep",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "cc_stat_vdiv2_3",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "width": 1,
+                                                        "height": 32,
+                                                        "background": "background"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_stat_status_col_3",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_status_val_3",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Monitoring",
+                                                                "style": "subtitle",
+                                                                "foreground": "text_muted"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_status_lbl_3",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Status Ops",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "cc_item_4",
+                            "type": "Column",
+                            "props": {
+                                "spacing": 8
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "cc_item_container_4",
+                                    "type": "Container",
+                                    "props": {
+                                        "background": "surface",
+                                        "radius": "xl",
+                                        "padding": {
+                                            "all": 16
+                                        },
+                                        "margin": {
+                                            "b": 12,
+                                            "l": 16,
+                                            "r": 16
+                                        }
+                                    },
+                                    "actions": {
+                                        "on_tap": {
+                                            "type": "navigate",
+                                            "target": "\/incident\/detail\/18"
+                                        }
+                                    },
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "cc_item_row1_4",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_between"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_item_code_4",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "INS-2606-01-36578",
+                                                        "style": "subtitle"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_item_badges_row_4",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 8
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_item_prio_badge_4",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "TINGGI",
+                                                                "background": "warning",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_item_status_badge_4",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "Terverifikasi",
+                                                                "background": "info",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cc_item_spacer1_4",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_row2_4",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 8
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_item_cluster_icon_4",
+                                                    "type": "Icon",
+                                                    "props": {
+                                                        "name": "group",
+                                                        "foreground": "success"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_item_cluster_text_4",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Pencarian dan Penyelamatan (SAR)",
+                                                        "style": "body",
+                                                        "foreground": "success"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": "cc_item_spacer2_4",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_divider_4",
+                                            "type": "Divider",
+                                            "props": {},
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_spacer3_4",
+                                            "type": "SizedBox",
+                                            "props": {
+                                                "height": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "cc_item_stats_row_4",
+                                            "type": "Row",
+                                            "props": {
+                                                "spacing": 0,
+                                                "justify": "space_around"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "cc_stat_days_col_4",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_days_val_4",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "18",
+                                                                "style": "headline",
+                                                                "foreground": "danger"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_days_lbl_4",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Hari",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "cc_stat_vdiv1_4",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "width": 1,
+                                                        "height": 32,
+                                                        "background": "background"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_stat_sitreps_col_4",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_sitreps_val_4",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "1",
+                                                                "style": "headline"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_sitreps_lbl_4",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Sitrep",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "cc_stat_vdiv2_4",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "width": 1,
+                                                        "height": 32,
+                                                        "background": "background"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "cc_stat_status_col_4",
+                                                    "type": "Column",
+                                                    "props": {
+                                                        "spacing": 4
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "cc_stat_status_val_4",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Monitoring",
+                                                                "style": "subtitle",
+                                                                "foreground": "text_muted"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        },
+                                                        {
+                                                            "id": "cc_stat_status_lbl_4",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Status Ops",
+                                                                "style": "caption"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "menu_section",
+                    "type": "Column",
+                    "props": {
+                        "spacing": 16
+                    },
+                    "actions": {},
+                    "visible": true,
+                    "enabled": true,
+                    "children": [
+                        {
+                            "id": "menu_card",
+                            "type": "Column",
+                            "props": {
+                                "spacing": 8
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "menu_card_container",
+                                    "type": "Container",
+                                    "props": {
+                                        "background": "surface",
+                                        "radius": "xl",
+                                        "padding": {
+                                            "all": 16
+                                        },
+                                        "margin": {
+                                            "t": 12,
+                                            "l": 16,
+                                            "r": 16,
+                                            "b": 24
+                                        }
+                                    },
+                                    "actions": {},
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "menu_rows_col",
+                                            "type": "Column",
+                                            "props": {
+                                                "spacing": 12
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "menu_title",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Akun",
+                                                        "style": "subtitle"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "menu_spacer_1",
+                                                    "type": "SizedBox",
+                                                    "props": {
+                                                        "height": 8
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "menu_row_hp",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 0,
+                                                        "justify": "space_between"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "menu_row_hp_left",
+                                                            "type": "Row",
+                                                            "props": {
+                                                                "spacing": 12
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true,
+                                                            "children": [
+                                                                {
+                                                                    "id": "menu_row_hp_icon",
+                                                                    "type": "Icon",
+                                                                    "props": {
+                                                                        "name": "phone",
+                                                                        "foreground": "text_muted"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                },
+                                                                {
+                                                                    "id": "menu_row_hp_label",
+                                                                    "type": "Text",
+                                                                    "props": {
+                                                                        "text": "No HP",
+                                                                        "style": "body"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "id": "menu_row_hp_value",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "081111111111",
+                                                                "style": "caption",
+                                                                "foreground": "text_muted"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "menu_divider_1",
+                                                    "type": "Divider",
+                                                    "props": {},
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "menu_row_status",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 0,
+                                                        "justify": "space_between"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "menu_row_status_left",
+                                                            "type": "Row",
+                                                            "props": {
+                                                                "spacing": 12
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true,
+                                                            "children": [
+                                                                {
+                                                                    "id": "menu_row_status_icon",
+                                                                    "type": "Icon",
+                                                                    "props": {
+                                                                        "name": "info",
+                                                                        "foreground": "text_muted"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                },
+                                                                {
+                                                                    "id": "menu_row_status_label",
+                                                                    "type": "Text",
+                                                                    "props": {
+                                                                        "text": "Status Akun",
+                                                                        "style": "body"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "id": "menu_row_status_badge",
+                                                            "type": "Badge",
+                                                            "props": {
+                                                                "label": "Aktif",
+                                                                "background": "success",
+                                                                "foreground": "text_inverse"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "menu_divider_2",
+                                                    "type": "Divider",
+                                                    "props": {},
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "menu_row_last_login",
+                                                    "type": "Row",
+                                                    "props": {
+                                                        "spacing": 0,
+                                                        "justify": "space_between"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "menu_row_last_login_left",
+                                                            "type": "Row",
+                                                            "props": {
+                                                                "spacing": 12
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true,
+                                                            "children": [
+                                                                {
+                                                                    "id": "menu_row_last_login_icon",
+                                                                    "type": "Icon",
+                                                                    "props": {
+                                                                        "name": "schedule",
+                                                                        "foreground": "text_muted"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                },
+                                                                {
+                                                                    "id": "menu_row_last_login_label",
+                                                                    "type": "Text",
+                                                                    "props": {
+                                                                        "text": "Terakhir Masuk",
+                                                                        "style": "body"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "id": "menu_row_last_login_value",
+                                                            "type": "Text",
+                                                            "props": {
+                                                                "text": "Belum pernah",
+                                                                "style": "caption",
+                                                                "foreground": "text_muted"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "menu_divider_3",
+                                                    "type": "Divider",
+                                                    "props": {},
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "menu_ganti_password",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "padding": {
+                                                            "y": 8
+                                                        }
+                                                    },
+                                                    "actions": {
+                                                        "on_tap": {
+                                                            "type": "navigate",
+                                                            "target": "\/profil\/ganti-password"
+                                                        }
+                                                    },
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "menu_ganti_password_row",
+                                                            "type": "Row",
+                                                            "props": {
+                                                                "spacing": 0,
+                                                                "justify": "space_between"
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true,
+                                                            "children": [
+                                                                {
+                                                                    "id": "menu_ganti_password_left",
+                                                                    "type": "Row",
+                                                                    "props": {
+                                                                        "spacing": 12
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true,
+                                                                    "children": [
+                                                                        {
+                                                                            "id": "menu_ganti_password_icon",
+                                                                            "type": "Icon",
+                                                                            "props": {
+                                                                                "name": "lock",
+                                                                                "foreground": "text_muted"
+                                                                            },
+                                                                            "actions": {},
+                                                                            "visible": true,
+                                                                            "enabled": true
+                                                                        },
+                                                                        {
+                                                                            "id": "menu_ganti_password_text",
+                                                                            "type": "Text",
+                                                                            "props": {
+                                                                                "text": "Ganti Kata Sandi",
+                                                                                "style": "body"
+                                                                            },
+                                                                            "actions": {},
+                                                                            "visible": true,
+                                                                            "enabled": true
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "id": "menu_ganti_password_chevron",
+                                                                    "type": "Icon",
+                                                                    "props": {
+                                                                        "name": "chevron_right",
+                                                                        "foreground": "text_muted"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "id": "menu_divider_4",
+                                                    "type": "Divider",
+                                                    "props": {},
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "menu_logout",
+                                                    "type": "Container",
+                                                    "props": {
+                                                        "padding": {
+                                                            "y": 8
+                                                        }
+                                                    },
+                                                    "actions": {
+                                                        "on_tap": {
+                                                            "type": "submit",
+                                                            "endpoint": "\/api\/v1\/auth\/logout",
+                                                            "method": "POST",
+                                                            "fields": {},
+                                                            "confirm": {
+                                                                "title": "Keluar dari NURISK?",
+                                                                "message": "Sesi Anda akan diakhiri. Data offline masih tersimpan di perangkat.",
+                                                                "confirm_label": "Ya, Keluar",
+                                                                "cancel_label": "Batal"
+                                                            },
+                                                            "on_success": {
+                                                                "type": "navigate",
+                                                                "target": "\/login",
+                                                                "clear_stack": true
+                                                            }
+                                                        }
+                                                    },
+                                                    "visible": true,
+                                                    "enabled": true,
+                                                    "children": [
+                                                        {
+                                                            "id": "menu_logout_row",
+                                                            "type": "Row",
+                                                            "props": {
+                                                                "spacing": 12
+                                                            },
+                                                            "actions": {},
+                                                            "visible": true,
+                                                            "enabled": true,
+                                                            "children": [
+                                                                {
+                                                                    "id": "menu_logout_icon",
+                                                                    "type": "Icon",
+                                                                    "props": {
+                                                                        "name": "logout",
+                                                                        "foreground": "danger"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                },
+                                                                {
+                                                                    "id": "menu_logout_text",
+                                                                    "type": "Text",
+                                                                    "props": {
+                                                                        "text": "Keluar",
+                                                                        "style": "body",
+                                                                        "foreground": "danger"
+                                                                    },
+                                                                    "actions": {},
+                                                                    "visible": true,
+                                                                    "enabled": true
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "schema_version": "1.0.0"
+        }
+    ]
+}

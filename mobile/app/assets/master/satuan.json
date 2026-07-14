@@ -1,0 +1,17 @@
+[
+  {"id": "unit",   "nama": "Unit",   "singkatan": "unit"},
+  {"id": "paket",  "nama": "Paket",  "singkatan": "paket"},
+  {"id": "kg",     "nama": "Kilogram", "singkatan": "kg"},
+  {"id": "dus",    "nama": "Dus",    "singkatan": "dus"},
+  {"id": "liter",  "nama": "Liter",  "singkatan": "L"},
+  {"id": "lembar", "nama": "Lembar", "singkatan": "lbr"},
+  {"id": "set",    "nama": "Set",    "singkatan": "set"},
+  {"id": "lusin",  "nama": "Lusin",  "singkatan": "lusin"},
+  {"id": "kaleng", "nama": "Kaleng", "singkatan": "kaleng"},
+  {"id": "orang",  "nama": "Orang",  "singkatan": "org"},
+  {"id": "buah",   "nama": "Buah",   "singkatan": "bh"},
+  {"id": "meter",  "nama": "Meter",  "singkatan": "m"},
+  {"id": "hektar", "nama": "Hektar", "singkatan": "ha"},
+  {"id": "km",     "nama": "Kilometer", "singkatan": "km"},
+  {"id": "skala",  "nama": "Skala",  "singkatan": "skala"}
+]

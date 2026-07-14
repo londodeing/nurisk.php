@@ -1,0 +1,11 @@
+{
+  "draft":         {"bg": "bg-gray-100",  "text": "text-gray-600",  "hex": "#6B7280"},
+  "terverifikasi": {"bg": "bg-blue-100",  "text": "text-blue-700",  "hex": "#3B82F6"},
+  "respon":        {"bg": "bg-orange-100","text": "text-orange-700","hex": "#F97316"},
+  "pemulihan":     {"bg": "bg-yellow-100","text": "text-yellow-700","hex": "#EAB308"},
+  "selesai":       {"bg": "bg-green-100", "text": "text-green-700", "hex": "#22C55E"},
+  "dibatalkan":    {"bg": "bg-red-100",   "text": "text-red-600",   "hex": "#EF4444"},
+  "menunggu":      {"bg": "bg-yellow-100","text": "text-yellow-700","hex": "#F59E0B"},
+  "ya":            {"bg": "bg-green-100", "text": "text-green-700", "hex": "#10B981"},
+  "tidak":         {"bg": "bg-red-100",   "text": "text-red-600",   "hex": "#EF4444"}
+}

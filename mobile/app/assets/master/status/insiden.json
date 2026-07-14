@@ -1,0 +1,8 @@
+[
+  {"id": "draft",         "nama": "Draft",         "warna": "#6B7280", "urutan": 0},
+  {"id": "terverifikasi", "nama": "Terverifikasi", "warna": "#3B82F6", "urutan": 1},
+  {"id": "respon",        "nama": "Respon",        "warna": "#F97316", "urutan": 2},
+  {"id": "pemulihan",     "nama": "Pemulihan",     "warna": "#EAB308", "urutan": 3},
+  {"id": "selesai",       "nama": "Selesai",       "warna": "#22C55E", "urutan": 4},
+  {"id": "dibatalkan",    "nama": "Dibatalkan",    "warna": "#EF4444", "urutan": 5}
+]

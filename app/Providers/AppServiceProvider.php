@@ -2,11 +2,99 @@
 
 namespace App\Providers;
 
+use App\Application\Media\Events\MediaDeletionRequested;
+use App\Application\Media\Events\MediaReplacementRequested;
+use App\Application\Media\Events\ThumbnailGenerationRequested;
+use App\Application\Media\Events\WebpConversionRequested;
+use App\Events\Governance\MeetingStatusChanged;
+use App\Infrastructure\Media\Persistence\Models\MediaModel;
+use App\Listeners\Governance\RecordMeetingAuditTrail;
+use App\Listeners\Media\DispatchStorageDeletion;
+use App\Listeners\Media\DispatchThumbnailGeneration;
+use App\Listeners\Media\DispatchWebpConversion;
+use App\Listeners\Operasi\ExecutePlenoDecisions;
+use App\Events\Operasi\PlenoFinalized;
+use App\Models\AssessmentUtama;
+use App\Models\AuthPenggunaProfil;
+use App\Models\AuthRoleApplication;
+use App\Models\AuthUser;
+use App\Models\BencanaMasterJenis;
+use App\Models\DokumenSuratParaf;
+use App\Models\DokumenSuratUtama;
+use App\Models\JabatanPosisi;
+use App\Models\LaporanKejadian;
+use App\Models\LogistikBarangKatalog;
+use App\Models\LogistikGudang;
+use App\Models\LogistikKategori;
+use App\Models\LogistikMutasi;
+use App\Models\LogistikPermintaan;
+use App\Models\LogistikStok;
+use App\Models\MasterJabatanPenandatangan;
+use App\Models\MasterKlaster;
+use App\Models\MasterSuratJenis;
+use App\Models\MasterSuratTemplate;
+use App\Models\MeetingSession;
+use App\Models\OperasiAktivasi;
+use App\Models\OperasiEskalasi;
+use App\Models\OperasiInsiden;
+use App\Models\OperasiKlaster;
+use App\Models\OperasiMobilisasi;
+use App\Models\OperasiPenugasan;
+use App\Models\OperasiPleno;
+use App\Models\OperasiPosaju;
+use App\Models\OperasiSitrep;
+use App\Models\OperasiTugas;
+use App\Models\OrganisasiDelegasi;
+use App\Models\OrganisasiJabatan;
+use App\Models\OrganisasiMandat;
+use App\Models\OrganisasiMwc;
+use App\Models\OrganisasiPcnu;
+use App\Models\OrganisasiRanting;
+use App\Models\OrganisasiSk;
+use App\Models\OrganisasiUnit;
+use App\Models\OrgAsset;
+use App\Models\PenggunaJabatan;
+use App\Models\RelawanKebutuhan;
+use App\Models\RelawanPendaftaran;
+use App\Models\RelawanPenugasan;
+use App\Models\RelawanSertifikasi;
+use App\Models\RelawanShift;
+use App\Observers\AssessmentUtamaObserver;
+use App\Observers\AuthUserObserver;
+use App\Observers\SyncObserver;
+use App\Policies\AssessmentPolicy;
+use App\Policies\AuthUserPolicy;
+use App\Policies\DashboardPolicy;
+use App\Policies\EskalasiPolicy;
+use App\Policies\Governance\MeetingPolicy;
+use App\Policies\InsidenPolicy;
+use App\Policies\JabatanPolicy;
+use App\Policies\LaporanKejadianPolicy;
+use App\Policies\LogistikPolicy;
+use App\Policies\MasterDataPolicy;
+use App\Policies\MediaPolicy;
+use App\Policies\OperasiKlasterPolicy;
+use App\Policies\OperasiMobilisasiPolicy;
+use App\Policies\OperasiPosajuPolicy;
+use App\Policies\OperasiTugasPolicy;
+use App\Policies\OrganisasiPolicy;
+use App\Policies\OrgAssetPolicy;
+use App\Policies\PenugasanPolicy;
+use App\Policies\PlanoPolicy;
+use App\Policies\RelawanKebutuhanPolicy;
+use App\Policies\RelawanPendaftaranPolicy;
+use App\Policies\RelawanPenugasanPolicy;
+use App\Policies\RelawanProfilPolicy;
+use App\Policies\SitrepPolicy;
+use App\Policies\SuratPolicy;
 use App\View\Composers\DashboardComposer;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
-use App\Services\Media\MediaServiceProvider;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -16,7 +104,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(
+            \App\Services\Sdui\Runtime\Certification\StructuralValidator::class
+        );
+        $this->app->singleton(
+            \App\Services\Sdui\Runtime\Certification\SemanticValidator::class
+        );
+        $this->app->singleton(
+            \App\Services\Sdui\Runtime\Certification\RuntimeNormalizer::class
+        );
+        $this->app->singleton(
+            \App\Services\Sdui\Runtime\Certification\RuntimeCertificationEngine::class
+        );
+        $this->app->singleton(
+            \App\Services\Sdui\Runtime\Serializer\SduiSerializer::class
+        );
     }
 
     /**
@@ -26,260 +128,290 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(60)->by($request->user()?->id_pengguna ?? $request->ip()));
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\AuthUser::class,
-            \App\Policies\AuthUserPolicy::class
+        Gate::policy(
+            AuthUser::class,
+            AuthUserPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\JabatanPosisi::class,
-            \App\Policies\JabatanPolicy::class
+        Gate::policy(
+            JabatanPosisi::class,
+            JabatanPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OperasiInsiden::class,
-            \App\Policies\InsidenPolicy::class
+        Gate::policy(
+            OperasiInsiden::class,
+            InsidenPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\RelawanKebutuhan::class,
-            \App\Policies\RelawanKebutuhanPolicy::class
+        Gate::policy(
+            RelawanKebutuhan::class,
+            RelawanKebutuhanPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\RelawanPendaftaran::class,
-            \App\Policies\RelawanPendaftaranPolicy::class
+        Gate::policy(
+            RelawanPendaftaran::class,
+            RelawanPendaftaranPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\AuthPenggunaProfil::class,
-            \App\Policies\RelawanProfilPolicy::class
+        Gate::policy(
+            AuthPenggunaProfil::class,
+            RelawanProfilPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\RelawanPenugasan::class,
-            \App\Policies\RelawanPenugasanPolicy::class
+        Gate::policy(
+            RelawanPenugasan::class,
+            RelawanPenugasanPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OperasiPosaju::class,
-            \App\Policies\OperasiPosajuPolicy::class
+        Gate::policy(
+            OperasiPosaju::class,
+            OperasiPosajuPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OperasiKlaster::class,
-            \App\Policies\OperasiKlasterPolicy::class
+        Gate::policy(
+            OperasiKlaster::class,
+            OperasiKlasterPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OperasiTugas::class,
-            \App\Policies\OperasiTugasPolicy::class
+        Gate::policy(
+            OperasiTugas::class,
+            OperasiTugasPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\AssessmentUtama::class,
-            \App\Policies\AssessmentPolicy::class
+        Gate::policy(
+            AssessmentUtama::class,
+            AssessmentPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OperasiSitrep::class,
-            \App\Policies\SitrepPolicy::class
+        Gate::policy(
+            OperasiSitrep::class,
+            SitrepPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OperasiPenugasan::class,
-            \App\Policies\PenugasanPolicy::class
+        Gate::policy(
+            OperasiPenugasan::class,
+            PenugasanPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OperasiMobilisasi::class,
-            \App\Policies\OperasiMobilisasiPolicy::class
+        Gate::policy(
+            OperasiMobilisasi::class,
+            OperasiMobilisasiPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OperasiPleno::class,
-            \App\Policies\PlanoPolicy::class
+        Gate::policy(
+            OperasiPleno::class,
+            PlanoPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OperasiEskalasi::class,
-            \App\Policies\EskalasiPolicy::class
+        Gate::policy(
+            OperasiEskalasi::class,
+            EskalasiPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\DokumenSuratUtama::class,
-            \App\Policies\SuratPolicy::class
+        Gate::policy(
+            DokumenSuratUtama::class,
+            SuratPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\DokumenSuratParaf::class,
-            \App\Policies\SuratPolicy::class
+        Gate::policy(
+            DokumenSuratParaf::class,
+            SuratPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\LogistikKategori::class,
-            \App\Policies\LogistikPolicy::class
+        Gate::policy(
+            LogistikKategori::class,
+            LogistikPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\LogistikBarangKatalog::class,
-            \App\Policies\LogistikPolicy::class
+        Gate::policy(
+            LogistikBarangKatalog::class,
+            LogistikPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\LogistikStok::class,
-            \App\Policies\LogistikPolicy::class
+        Gate::policy(
+            LogistikStok::class,
+            LogistikPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\LogistikMutasi::class,
-            \App\Policies\LogistikPolicy::class
+        Gate::policy(
+            LogistikMutasi::class,
+            LogistikPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\LaporanKejadian::class,
-            \App\Policies\LaporanKejadianPolicy::class
+        Gate::policy(
+            LaporanKejadian::class,
+            LaporanKejadianPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OrgAsset::class,
-            \App\Policies\OrgAssetPolicy::class
+        Gate::policy(
+            OrgAsset::class,
+            OrgAssetPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OrganisasiPcnu::class,
-            \App\Policies\OrganisasiPolicy::class
+        Gate::policy(
+            OrganisasiPcnu::class,
+            OrganisasiPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OrganisasiMwc::class,
-            \App\Policies\OrganisasiPolicy::class
+        Gate::policy(
+            OrganisasiMwc::class,
+            OrganisasiPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OrganisasiUnit::class,
-            \App\Policies\OrganisasiPolicy::class
+        Gate::policy(
+            OrganisasiUnit::class,
+            OrganisasiPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\MasterJabatanPenandatangan::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            MasterJabatanPenandatangan::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\MasterSuratTemplate::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            MasterSuratTemplate::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\MasterSuratJenis::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            MasterSuratJenis::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\MasterKlaster::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            MasterKlaster::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\BencanaMasterJenis::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            BencanaMasterJenis::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\LogistikGudang::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            LogistikGudang::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\LogistikPermintaan::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            LogistikPermintaan::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OrganisasiSk::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            OrganisasiSk::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OrganisasiMandat::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            OrganisasiMandat::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OrganisasiJabatan::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            OrganisasiJabatan::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OrganisasiDelegasi::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            OrganisasiDelegasi::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\RelawanSertifikasi::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            RelawanSertifikasi::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\RelawanShift::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            RelawanShift::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OperasiAktivasi::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            OperasiAktivasi::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\OrganisasiRanting::class,
-            \App\Policies\OrganisasiPolicy::class
+        Gate::policy(
+            OrganisasiRanting::class,
+            OrganisasiPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\PenggunaJabatan::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            PenggunaJabatan::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\AuthRoleApplication::class,
-            \App\Policies\MasterDataPolicy::class
+        Gate::policy(
+            AuthRoleApplication::class,
+            MasterDataPolicy::class
         );
 
-        \Illuminate\Support\Facades\Gate::define('viewCommandCenter', [\App\Policies\DashboardPolicy::class, 'viewCommandCenter']);
+        Gate::define('viewCommandCenter', [DashboardPolicy::class, 'viewCommandCenter']);
 
         // ============================================================
         // Governance Workflow Policies (Mandate-Based)
         // ============================================================
-        \Illuminate\Support\Facades\Gate::policy(
-            \App\Models\MeetingSession::class,
-            \App\Policies\Governance\MeetingPolicy::class
+        Gate::policy(
+            MeetingSession::class,
+            MeetingPolicy::class
         );
 
         // ============================================================
         // Governance Event Listeners
         // ============================================================
-        \Illuminate\Support\Facades\Event::listen(
-            \App\Events\Governance\MeetingStatusChanged::class,
-            \App\Listeners\Governance\RecordMeetingAuditTrail::class
+        Event::listen(
+            MeetingStatusChanged::class,
+            RecordMeetingAuditTrail::class
         );
 
-        \Illuminate\Database\Eloquent\Model::preventLazyLoading();
+        // ============================================================
+        // Media Policy
+        // ============================================================
+        Gate::policy(MediaModel::class, MediaPolicy::class);
 
-        \App\Models\AuthUser::observe(\App\Observers\AuthUserObserver::class);
-        \App\Models\AssessmentUtama::observe(\App\Observers\AssessmentUtamaObserver::class);
-        \App\Models\AssessmentUtama::observe(\App\Observers\SyncObserver::class);
-        \App\Models\OperasiSitrep::observe(\App\Observers\SyncObserver::class);
-        \App\Models\OperasiKlaster::observe(\App\Observers\SyncObserver::class);
-        \App\Models\OperasiPenugasan::observe(\App\Observers\SyncObserver::class);
-        \App\Models\OperasiMobilisasi::observe(\App\Observers\SyncObserver::class);
+        // ============================================================
+        // Media Event Listeners
+        // ============================================================
+        Event::listen(
+            ThumbnailGenerationRequested::class,
+            DispatchThumbnailGeneration::class,
+        );
+        Event::listen(
+            WebpConversionRequested::class,
+            DispatchWebpConversion::class,
+        );
+        Event::listen(
+            MediaDeletionRequested::class,
+            DispatchStorageDeletion::class,
+        );
+        Event::listen(
+            MediaReplacementRequested::class,
+            DispatchStorageDeletion::class,
+        );
+
+        Event::listen(
+            PlenoFinalized::class,
+            ExecutePlenoDecisions::class,
+        );
+
+        Model::preventLazyLoading();
+
+        AuthUser::observe(AuthUserObserver::class);
+        AssessmentUtama::observe(AssessmentUtamaObserver::class);
+        AssessmentUtama::observe(SyncObserver::class);
+        OperasiSitrep::observe(SyncObserver::class);
+        OperasiKlaster::observe(SyncObserver::class);
+        OperasiPenugasan::observe(SyncObserver::class);
+        OperasiMobilisasi::observe(SyncObserver::class);
 
         RateLimiter::for('login', fn (Request $request) => [
             Limit::perMinute(10)->by($request->ip()),
             Limit::perMinute(10)->by($request->input('no_hp', $request->ip())),
         ]);
 
-        \Illuminate\Support\Facades\View::composer('dashboard.layouts.master', DashboardComposer::class);
-        \Illuminate\Support\Facades\View::composer('dashboard.posko.dashboard', DashboardComposer::class);
+        View::composer('dashboard.layouts.master', DashboardComposer::class);
+        View::composer('dashboard.posko.dashboard', DashboardComposer::class);
     }
 }

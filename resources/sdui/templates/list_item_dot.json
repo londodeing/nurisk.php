@@ -1,0 +1,50 @@
+{
+  "type": "Row",
+  "props": {
+    "margin": [0, 0, 0, 16]
+  },
+  "children": [
+    {
+      "type": "Container",
+      "props": {
+        "width": 8,
+        "height": 8,
+        "borderRadius": 4,
+        "backgroundColor": "primary",
+        "margin": [0, 4, 12, 0]
+      }
+    },
+    {
+      "type": "Column",
+      "props": {
+        "expanded": true
+      },
+      "children": [
+        {
+          "type": "Text",
+          "props": {
+            "text": "{{ label }}",
+            "style": "subtitle",
+            "color": "text_main"
+          }
+        },
+        {
+          "type": "Text",
+          "props": {
+            "text": "{{ subtitle }}",
+            "style": "caption",
+            "color": "text_muted"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Text",
+      "props": {
+        "text": "{{ time }}",
+        "style": "caption",
+        "color": "text_muted"
+      }
+    }
+  ]
+}

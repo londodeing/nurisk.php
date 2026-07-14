@@ -1,0 +1,107 @@
+{
+    "id": "account_workspace",
+    "type": "ListView",
+    "props": {
+        "title": "Akun & Pusat Komando",
+        "spacing": 16,
+        "padding": 16
+    },
+    "actions": {},
+    "visible": true,
+    "enabled": true,
+    "children": [
+        {
+            "id": "identity_section",
+            "type": "Column",
+            "props": {
+                "spacing": 16
+            },
+            "actions": {},
+            "visible": true,
+            "enabled": true,
+            "children": [
+                {
+                    "id": "profile_card",
+                    "type": "Column",
+                    "props": {
+                        "spacing": 8
+                    },
+                    "actions": {},
+                    "visible": true,
+                    "enabled": true,
+                    "children": [
+                        {
+                            "id": "profile_container",
+                            "type": "Container",
+                            "props": {
+                                "padding": 16
+                            },
+                            "actions": {},
+                            "visible": true,
+                            "enabled": true,
+                            "children": [
+                                {
+                                    "id": "profile_row",
+                                    "type": "Row",
+                                    "props": {
+                                        "spacing": 12
+                                    },
+                                    "actions": {},
+                                    "visible": true,
+                                    "enabled": true,
+                                    "children": [
+                                        {
+                                            "id": "profile_avatar",
+                                            "type": "Avatar",
+                                            "props": {
+                                                "image": "default_avatar.png"
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true
+                                        },
+                                        {
+                                            "id": "profile_text_col",
+                                            "type": "Column",
+                                            "props": {
+                                                "spacing": 4
+                                            },
+                                            "actions": {},
+                                            "visible": true,
+                                            "enabled": true,
+                                            "children": [
+                                                {
+                                                    "id": "profile_name",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Unknown User",
+                                                        "style": "headline"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                },
+                                                {
+                                                    "id": "profile_role",
+                                                    "type": "Text",
+                                                    "props": {
+                                                        "text": "Ketua PWNU",
+                                                        "style": "caption"
+                                                    },
+                                                    "actions": {},
+                                                    "visible": true,
+                                                    "enabled": true
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "schema_version": "1.0.0"
+}

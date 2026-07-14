@@ -1,0 +1,65 @@
+{
+  "type": "Container",
+  "props": {
+    "padding": [12, 0, 12, 16]
+  },
+  "actions": "{{ action }}",
+  "children": [
+    {
+      "type": "Row",
+      "children": [
+        {
+          "type": "Container",
+          "props": {
+            "backgroundColor": "{{ icon_bg_color }}",
+            "padding": [8, 8, 8, 8],
+            "borderRadius": 24
+          },
+          "children": [
+            {
+              "type": "Icon",
+              "props": {
+                "name": "{{ icon }}",
+                "color": "{{ icon_color }}",
+                "size": 20
+              }
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "props": {
+            "margin_left": 12,
+            "expanded": true
+          },
+          "children": [
+            {
+              "type": "Text",
+              "props": {
+                "text": "{{ label }}",
+                "style": "subtitle",
+                "color": "text_main"
+              }
+            },
+            {
+              "type": "Text",
+              "props": {
+                "text": "{{ subtitle }}",
+                "style": "caption",
+                "color": "text_muted"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Icon",
+          "props": {
+            "name": "chevron_right",
+            "color": "text_muted",
+            "size": 20
+          }
+        }
+      ]
+    }
+  ]
+}

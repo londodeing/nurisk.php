@@ -1,0 +1,18 @@
+[
+  {"kode": "sembako",    "nama": "Paket Sembako",      "satuan": "paket", "kategori": "pangan"},
+  {"kode": "beras",      "nama": "Beras",              "satuan": "kg",    "kategori": "pangan"},
+  {"kode": "mie_instan", "nama": "Mie Instan",         "satuan": "dus",   "kategori": "pangan"},
+  {"kode": "air_bersih", "nama": "Air Bersih",         "satuan": "liter", "kategori": "pangan"},
+  {"kode": "selimut",    "nama": "Selimut",            "satuan": "unit",  "kategori": "sandang"},
+  {"kode": "pakaian",    "nama": "Pakaian Layak Pakai","satuan": "paket", "kategori": "sandang"},
+  {"kode": "matras",     "nama": "Matras/Tikar",       "satuan": "unit",  "kategori": "papan"},
+  {"kode": "tenda",      "nama": "Tenda Pengungsian",  "satuan": "unit",  "kategori": "papan"},
+  {"kode": "terpal",     "nama": "Terpal",             "satuan": "lembar","kategori": "papan"},
+  {"kode": "obat",       "nama": "Paket Obat-obatan",  "satuan": "paket", "kategori": "kesehatan"},
+  {"kode": "masker",     "nama": "Masker",             "satuan": "dus",   "kategori": "kesehatan"},
+  {"kode": "popok",      "nama": "Popok/Pampers",      "satuan": "paket", "kategori": "kesehatan"},
+  {"kode": "susu_bayi",  "nama": "Susu Bayi",          "satuan": "kaleng","kategori": "kesehatan"},
+  {"kode": "perahu",     "nama": "Perahu Karet",       "satuan": "unit",  "kategori": "peralatan"},
+  {"kode": "pompa_air",  "nama": "Pompa Air",          "satuan": "unit",  "kategori": "peralatan"},
+  {"kode": "genset",     "nama": "Genset Portabel",    "satuan": "unit",  "kategori": "peralatan"}
+]

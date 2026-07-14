@@ -115,6 +115,15 @@ class InsidenService
         }
     }
 
+    private const ALLOWED_TRANSITIONS = [
+        'draft'        => ['terverifikasi', 'dibatalkan'],
+        'terverifikasi'=> ['respon', 'dibatalkan'],
+        'respon'       => ['pemulihan', 'dibatalkan'],
+        'pemulihan'    => ['selesai', 'dibatalkan'],
+        'selesai'      => [],
+        'dibatalkan'   => [],
+    ];
+
     /**
      * Transisi status insiden beserta pencatatan riwayat.
      * Berjalan di dalam DB::transaction().
@@ -128,6 +137,14 @@ class InsidenService
     ): OperasiInsiden {
         if ($insiden->isTerkunci()) {
             throw new \RuntimeException('Data Terkunci: Insiden ini sudah Closed dan tidak boleh diubah lagi.');
+        }
+
+        $statusLama = $insiden->status_insiden;
+
+        if (!$this->isTransitionAllowed($statusLama, $statusBaru)) {
+            throw new \InvalidArgumentException(
+                "Transisi status tidak diizinkan: {$statusLama} → {$statusBaru}."
+            );
         }
 
         return DB::transaction(function () use ($insiden, $statusBaru, $pengguna, $alasan) {
@@ -164,6 +181,11 @@ class InsidenService
             $insiden->update($updateData);
             return $insiden->fresh();
         });
+    }
+
+    private function isTransitionAllowed(string $from, string $to): bool
+    {
+        return in_array($to, self::ALLOWED_TRANSITIONS[$from] ?? [], true);
     }
 
     /**

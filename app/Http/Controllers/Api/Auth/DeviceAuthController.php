@@ -6,30 +6,44 @@ use App\Http\Controllers\Controller;
 use App\Models\MobileDevice;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 
 class DeviceAuthController extends Controller
 {
+    private const MAX_DEVICES_PER_USER = 5;
+
     public function refreshToken(Request $request): JsonResponse
     {
-        $request->validate([
-            'device_uuid' => 'required|string',
+        $validator = Validator::make($request->all(), [
+            'device_uuid' => 'required|string|regex:/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Format UUID tidak valid.',
+            ], 422);
+        }
+
         $deviceUuid = $request->input('device_uuid');
+        $user = $request->user();
 
         $device = MobileDevice::where('uuid_device', $deviceUuid)->first();
 
         if (!$device) {
-            // For now, if device doesn't exist, we just fail or maybe we shouldn't create it here.
-            // Let's create it if it doesn't exist, since in SyncApiController we do firstOrCreate.
-            // Wait, let's just create it to be safe, assuming user is authenticated via Sanctum 
-            // but the prompt says we don't use JWT. The device might just register.
+            $deviceCount = MobileDevice::where('id_pengguna', $user->id_pengguna)->count();
+            if ($deviceCount >= self::MAX_DEVICES_PER_USER) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Maksimal ' . self::MAX_DEVICES_PER_USER . ' perangkat per pengguna.',
+                ], 403);
+            }
+
             $device = MobileDevice::create([
                 'uuid_device' => $deviceUuid,
-                'id_pengguna' => auth()->id() ?? 1, // Fallback for testing
+                'id_pengguna' => $user->id_pengguna,
                 'platform' => $request->header('User-Agent', 'unknown'),
-                'app_version' => '1.0.0',
+                'app_version' => $request->input('app_version', '1.0.0'),
                 'status' => 'active',
                 'trust_score' => 100,
             ]);
@@ -42,21 +56,20 @@ class DeviceAuthController extends Controller
             ], 403);
         }
 
-        // Generate new long-lived token
-        $newToken = Str::random(60);
-        $expiresAt = now()->addDays(30);
+        $tokenName = 'device-' . $deviceUuid;
+        $token = $user->createToken($tokenName, ['device-access']);
 
         $device->update([
-            'device_token' => hash('sha256', $newToken),
-            'token_expires_at' => $expiresAt,
+            'device_token' => hash('sha256', $token->plainTextToken),
+            'token_expires_at' => now()->addDays(30),
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Token refreshed successfully',
             'data' => [
-                'device_token' => $newToken,
-                'expires_at' => $expiresAt->toIso8601String(),
+                'device_token' => $token->plainTextToken,
+                'expires_at' => now()->addDays(30)->toIso8601String(),
             ]
         ]);
     }

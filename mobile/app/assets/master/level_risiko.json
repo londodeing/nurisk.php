@@ -1,0 +1,7 @@
+[
+  {"id": "sangat_rendah", "nama": "Sangat Rendah", "skor": 1, "warna": "#22C55E"},
+  {"id": "rendah",        "nama": "Rendah",        "skor": 2, "warna": "#86EFAC"},
+  {"id": "sedang",        "nama": "Sedang",        "skor": 3, "warna": "#EAB308"},
+  {"id": "tinggi",        "nama": "Tinggi",        "skor": 4, "warna": "#F97316"},
+  {"id": "sangat_tinggi", "nama": "Sangat Tinggi", "skor": 5, "warna": "#EF4444"}
+]

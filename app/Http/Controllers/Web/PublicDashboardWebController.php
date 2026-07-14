@@ -22,7 +22,10 @@ class PublicDashboardWebController extends Controller
     {
         $jenisBencana = BencanaMasterJenis::orderBy('nama_bencana')->get();
         $kabupatenList = \App\Models\WilayahKabupaten::orderBy('nama_kab')->get();
-        return view('public.lapor', compact('jenisBencana', 'kabupatenList'));
+        $kecamatanList = \App\Models\WilayahKecamatan::orderBy('nama_kec')->get();
+        $desaList = \App\Models\WilayahDesa::orderBy('nama_desa')->get();
+        
+        return view('public.lapor', compact('jenisBencana', 'kabupatenList', 'kecamatanList', 'desaList'));
     }
 
     public function resource()

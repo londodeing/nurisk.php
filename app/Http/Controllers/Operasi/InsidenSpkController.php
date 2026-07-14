@@ -27,7 +27,8 @@ class InsidenSpkController extends Controller
         $this->authorize('issueSpk', $insiden);
 
         $validated = $request->validate([
-            'id_penerima_spk' => ['required', 'integer', 'exists:auth_users,id_pengguna'],
+            'petugas_trc_ids' => ['required', 'array'],
+            'petugas_trc_ids.*' => ['integer', 'exists:auth_users,id_pengguna'],
             'catatan_penugasan' => ['nullable', 'string', 'max:500'],
         ]);
 
@@ -42,12 +43,14 @@ class InsidenSpkController extends Controller
                 throw new \Exception('Jenis Surat "Surat Tugas" belum tersedia di sistem. Silakan tambahkan di Master Data.');
             }
 
-            $penerima = \App\Models\AuthUser::find($validated['id_penerima_spk']);
-            $namaPenerima = $penerima->profil->nama_lengkap ?? $penerima->no_hp ?? 'Anggota TRC';
+            $trcNames = [];
+            foreach ($validated['petugas_trc_ids'] as $trcId) {
+                $penerima = \App\Models\AuthUser::find($trcId);
+                $trcNames[] = ($penerima->profil->nama_lengkap ?? $penerima->no_hp ?? 'Anggota TRC') . ' (' . ($penerima->peran->nama_peran ?? 'TRC') . ')';
+            }
+            $namaPenerimaList = implode("\n- ", $trcNames);
 
-            $isiSnapshot = "Memberikan tugas kepada:\n"
-                         . "Nama: " . $namaPenerima . "\n"
-                         . "Peran: " . ($penerima->peran->nama_peran ?? 'TRC') . "\n\n"
+            $isiSnapshot = "Memberikan tugas kepada:\n- " . $namaPenerimaList . "\n\n"
                          . "Untuk melaksanakan tugas assessment atas insiden " . $insiden->kode_kejadian . " di wilayah PCNU " . optional($insiden->pcnu)->nama_pcnu . ".\n"
                          . "Catatan Tambahan: " . ($validated['catatan_penugasan'] ?: '-');
 
@@ -58,12 +61,9 @@ class InsidenSpkController extends Controller
                 'perihal' => 'Surat Perintah Tugas Assessment (SPK)',
                 'tgl_terbit' => now(),
                 'id_pengguna_ttd' => Auth::id(),
-                'status_surat' => 'siap_tanda_tangan',
+                'status_surat' => 'siap_tanda_tangan', // Menunggu persetujuan Ketua PCNU (M5)
                 'isi_surat_snapshot' => $isiSnapshot,
             ]);
-
-            // Finalisasi agar bisa digenerate PDF dan statusnya sah
-            $this->suratService->finalisasi($surat, Auth::user(), $isiSnapshot);
 
             // 2. Update Operasi Insiden dengan detail SPK
             // Perhatikan bahwa updateSpk membutuhkan jabatan aktif untuk pemberi (jika menggunakan id_pemberi_spk).
@@ -72,13 +72,13 @@ class InsidenSpkController extends Controller
                 'no_spk_assesment' => $surat->nomor_surat_resmi,
                 'tgl_spk_assesment' => now(),
                 'id_pemberi_spk' => Auth::id(),
-                'id_penerima_spk' => $validated['id_penerima_spk'],
+                'id_penerima_spk' => $validated['petugas_trc_ids'][0] ?? null,
             ]);
 
-            // 3. Auto-create penugasan untuk penerima SPK (jika belum ada penugasan aktif)
-            if (!empty($validated['id_penerima_spk'])) {
+            // 3. Auto-create penugasan untuk semua penerima SPK dengan status 'draft'
+            foreach ($validated['petugas_trc_ids'] as $trcId) {
                 $alreadyAssigned = OperasiPenugasan::where('id_insiden', $insiden->id_insiden)
-                    ->where('id_pengguna', $validated['id_penerima_spk'])
+                    ->where('id_pengguna', $trcId)
                     ->whereNotIn('status_penugasan', ['completed', 'cancelled', 'rejected'])
                     ->exists();
 
@@ -86,9 +86,9 @@ class InsidenSpkController extends Controller
                     $penugasan = OperasiPenugasan::create([
                         'uuid_penugasan'   => (string) Str::uuid(),
                         'id_insiden'       => $insiden->id_insiden,
-                        'id_pengguna'      => $validated['id_penerima_spk'],
+                        'id_pengguna'      => $trcId,
                         'peran_otoritas'   => 'trc',
-                        'status_penugasan' => 'assigned',
+                        'status_penugasan' => 'draft', // Draft karena SPK belum disetujui Ketua
                         'waktu_mulai'      => now(),
                         'ditugaskan_oleh'  => Auth::id(),
                         'id_surat_tugas'   => $surat->id_surat,
@@ -98,7 +98,7 @@ class InsidenSpkController extends Controller
                     OperasiPenugasanHistory::create([
                         'id_penugasan'      => $penugasan->id_penugasan,
                         'status_sebelumnya'  => null,
-                        'status_baru'        => 'assigned',
+                        'status_baru'        => 'draft',
                         'waktu_perubahan'    => now(),
                         'diubah_oleh'        => Auth::id(),
                     ]);

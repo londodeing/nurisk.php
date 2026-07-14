@@ -1,0 +1,41 @@
+{
+  "type": "Container",
+  "props": {
+    "padding": [12, 12, 12, 12],
+    "backgroundColor": "primary_light",
+    "borderRadius": 8
+  },
+  "actions": "{{ action }}",
+  "children": [
+    {
+      "type": "Row",
+      "children": [
+        {
+          "type": "Icon",
+          "props": {
+            "name": "{{ icon }}",
+            "color": "primary",
+            "size": 20
+          }
+        },
+        {
+          "type": "Column",
+          "props": {
+            "margin_left": 8,
+            "expanded": true
+          },
+          "children": [
+            {
+              "type": "Text",
+              "props": {
+                "text": "{{ label }}",
+                "style": "subtitle",
+                "color": "text_main"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

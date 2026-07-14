@@ -205,13 +205,13 @@
                         <form action="{{ route('insiden.spk.store', $insiden) }}" method="POST" class="space-y-4">
                             @csrf
                             <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">Pilih Petugas TRC / Relawan Penerima Tugas <span class="text-red-500">*</span></label>
-                                <select name="id_penerima_spk" required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500 text-sm">
-                                    <option value="">-- Pilih Anggota TRC --</option>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Pilih Petugas TRC / Relawan Penerima Tugas (Bisa pilih lebih dari satu) <span class="text-red-500">*</span></label>
+                                <select name="petugas_trc_ids[]" multiple required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500 text-sm h-32">
                                     @foreach($trcList as $trc)
                                         <option value="{{ $trc->id_pengguna }}">{{ $trc->profil->nama_lengkap ?? $trc->no_hp }} ({{ $trc->peran->nama_peran ?? 'TRC' }})</option>
                                     @endforeach
                                 </select>
+                                <p class="text-[10px] text-gray-500 mt-1">Tahan tombol Ctrl (Windows) atau Command (Mac) untuk memilih lebih dari satu.</p>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Catatan Penugasan / Instruksi Khusus</label>

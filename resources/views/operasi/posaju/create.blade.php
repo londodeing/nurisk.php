@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl rounded-2xl">
                 <div class="p-6">
-                    <form method="POST" action="{{ route('posaju.store') }}">
+                    <form method="POST" action="{{ $insiden ? route('insiden.posaju.store', $insiden) : route('posaju.store') }}">
                         @csrf
                         <div class="mb-3">
                             <label class="block text-sm font-medium text-slate-700 mb-1">Nama Pos Aju</label>
@@ -17,12 +17,29 @@
                         </div>
                         <div class="mb-3">
                             <label class="block text-sm font-medium text-slate-700 mb-1">Insiden</label>
-                            <select name="id_insiden" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300" required>
+                            <select name="id_insiden" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300" @required(!$insiden)>
                                 <option value="">— Pilih Insiden —</option>
                                 @foreach($insidenList as $i)
-                                <option value="{{ $i->id_insiden }}">{{ $i->kode_kejadian }}</option>
+                                <option value="{{ $i->id_insiden }}" @selected($insiden && $insiden->id_insiden === $i->id_insiden)>{{ $i->kode_kejadian }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Keputusan Pleno</label>
+                            <select name="id_pleno_keputusan" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300" required>
+                                <option value="">— Pilih Keputusan Pleno —</option>
+                                @foreach($plenoKeputusanList as $pk)
+                                <option value="{{ $pk->id_keputusan }}">[#{{ $pk->id_keputusan }}] {{ $pk->nama_keputusan }} ({{ $pk->pleno?->insiden?->kode_kejadian ?? '—' }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Latitude</label>
+                            <input type="text" name="latitude" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300" required placeholder="-6.2088">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Longitude</label>
+                            <input type="text" name="longitude" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300" required placeholder="106.8456">
                         </div>
                         <div class="mb-3">
                             <label class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>

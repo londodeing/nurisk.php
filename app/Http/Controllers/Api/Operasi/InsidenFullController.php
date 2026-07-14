@@ -69,6 +69,7 @@ class InsidenFullController extends Controller
         return response()->json([
             'data' => $items->map(fn($i) => [
                 'id' => $i->id_insiden,
+                'uuid' => $i->uuid_insiden,
                 'kode' => $i->kode_kejadian,
                 'status' => $i->status_insiden,
                 'label_status' => $i->labelStatus(),
@@ -115,30 +116,81 @@ class InsidenFullController extends Controller
 
         $insiden->load([
             'jenisBencana', 'pcnu', 'laporanAsal',
-            'posaju', 'riwayatStatus.pengubah',
+            'posaju', 'riwayatStatus.pengubah.profil',
+            'penugasan.pengguna.profil',
+            'assessments.petugas.profil',
         ]);
 
+        // Jurnal Operasi
+        $jurnal = \App\Models\OperasiJurnal::where('id_insiden', $insiden->id_insiden)
+            ->orderBy('dibuat_pada', 'desc')
+            ->get();
+
         return response()->json(['data' => [
-            'id' => $insiden->id_insiden,
-            'kode' => $insiden->kode_kejadian,
-            'status' => $insiden->status_insiden,
+            'id'           => $insiden->id_insiden,
+            'uuid'         => $insiden->uuid_insiden,
+            'kode'         => $insiden->kode_kejadian,
+            'status'       => $insiden->status_insiden,
             'label_status' => $insiden->labelStatus(),
-            'prioritas' => $insiden->prioritas,
-            'is_locked' => $insiden->is_locked,
-            'jenis_bencana' => $insiden->jenisBencana ? [
-                'id' => $insiden->jenisBencana->id_jenis,
-                'nama' => $insiden->jenisBencana->nama_bencana,
-            ] : null,
-            'pcnu' => $insiden->pcnu ? ['id' => $insiden->pcnu->id_pcnu, 'nama' => $insiden->pcnu->nama_pcnu] : null,
-            'waktu_mulai' => $insiden->waktu_mulai?->toIso8601String(),
+            'prioritas'    => $insiden->prioritas,
+            'is_locked'    => $insiden->is_locked,
+            'no_spk_assesment' => $insiden->no_spk_assesment,
+            'tgl_spk_assesment' => $insiden->tgl_spk_assesment?->toDateString(),
+            'jenis_bencana' => $insiden->jenisBencana?->nama_bencana,
+            'pcnu'          => $insiden->pcnu ? ['id' => $insiden->pcnu->id_pcnu, 'nama' => $insiden->pcnu->nama_pcnu] : null,
+            'waktu_mulai'   => $insiden->waktu_mulai?->toIso8601String(),
             'waktu_selesai' => $insiden->waktu_selesai?->toIso8601String(),
-            'posaju' => $insiden->posaju->map(fn($p) => ['id' => $p->id_posaju, 'nama' => $p->nama_posaju]),
+            'dibuat_pada'   => $insiden->dibuat_pada?->toIso8601String(),
+
+            // Laporan Asal
+            'laporan_asal' => $insiden->laporanAsal ? [
+                'id'                   => $insiden->laporanAsal->id_laporan_kejadian,
+                'kode_kejadian'        => $insiden->laporanAsal->kode_kejadian,
+                'nama_pelapor'         => $insiden->laporanAsal->nama_pelapor,
+                'hp_pelapor'           => $insiden->laporanAsal->hp_pelapor,
+                'keterangan_situasi'   => $insiden->laporanAsal->keterangan_situasi,
+                'titik_kenal'          => $insiden->laporanAsal->titik_kenal,
+                'alamat_lengkap'       => $insiden->laporanAsal->alamat_lengkap,
+                'latitude'             => $insiden->laporanAsal->latitude,
+                'longitude'            => $insiden->laporanAsal->longitude,
+                'waktu_kejadian'       => $insiden->laporanAsal->waktu_kejadian?->toIso8601String(),
+                'photo_path'           => $insiden->laporanAsal->photo_path,
+                'media_url'            => $insiden->laporanAsal->photo_path ? media_url($insiden->laporanAsal->photo_path) : null,
+            ] : null,
+
+            // Riwayat Status
             'riwayat_status' => $insiden->riwayatStatus->map(fn($r) => [
-                'status' => $r->status_baru,
-                'pengubah' => $r->pengubah?->profil?->nama_lengkap,
-                'waktu' => $r->dibuat_pada?->toIso8601String(),
+                'status'   => $r->status_baru,
+                'pengubah' => $r->pengubah?->profil?->nama_lengkap ?? $r->pengubah?->no_hp,
+                'waktu'    => $r->dibuat_pada?->toIso8601String(),
+                'alasan'   => $r->alasan,
             ]),
-            'dibuat_pada' => $insiden->dibuat_pada?->toIso8601String(),
+
+            // Penugasan Aktif
+            'penugasan' => $insiden->penugasan->map(fn($p) => [
+                'id'              => $p->id_penugasan,
+                'nama_personel'   => $p->pengguna?->profil?->nama_lengkap ?? $p->pengguna?->no_hp ?? '-',
+                'peran_otoritas'  => $p->peran_otoritas,
+                'status_penugasan' => $p->status_penugasan,
+                'waktu_mulai'     => $p->waktu_mulai?->toIso8601String(),
+            ]),
+
+            // Assessments Summary
+            'assessments' => $insiden->assessments->map(fn($a) => [
+                'id'              => $a->id_assessment,
+                'uuid'            => $a->uuid_assessment ?? '',
+                'is_latest'       => (bool) $a->is_latest,
+                'waktu_assesment' => $a->waktu_assesment?->toIso8601String(),
+                'nama_petugas'    => $a->petugas?->profil?->nama_lengkap ?? $a->petugas?->no_hp,
+            ]),
+
+            // Jurnal Operasi
+            'jurnal' => $jurnal->map(fn($j) => [
+                'judul_event'    => $j->judul_event,
+                'deskripsi_event' => $j->deskripsi_event,
+                'kategori_event'  => $j->kategori_event,
+                'dibuat_pada'     => $j->dibuat_pada?->toIso8601String(),
+            ]),
         ]]);
     }
 

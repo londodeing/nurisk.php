@@ -129,6 +129,14 @@ class OperasiInsiden extends Model
         return $this->hasMany(OperasiPleno::class, 'id_insiden', 'id_insiden');
     }
 
+    /**
+     * Relasi ke OperasiKlaster
+     */
+    public function klaster(): HasMany
+    {
+        return $this->hasMany(OperasiKlaster::class, 'id_insiden', 'id_insiden');
+    }
+
     public function pemberiSpk(): BelongsTo
     {
         return $this->belongsTo(AuthUser::class, 'id_pemberi_spk', 'id_pengguna');

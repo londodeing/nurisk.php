@@ -10,6 +10,8 @@ use App\Models\OperasiInsiden;
 use App\Models\OperasiKlaster;
 use App\Models\OperasiPenugasan;
 use App\Models\OperasiPosaju;
+use App\Models\OperasiPosajuKomandan;
+use App\Services\NomorSuratService;
 use App\Services\SuratPdfService;
 use App\Services\SuratService;
 use Illuminate\Support\Facades\Auth;
@@ -71,6 +73,7 @@ class ExecutePlenoDecisions
         $posAju = OperasiPosaju::create([
             'id_insiden' => $pleno->id_insiden,
             'id_pleno_pendirian' => $pleno->id_pleno,
+            'id_pleno_keputusan' => $keputusan->id_keputusan,
             'nama_posaju' => $payload['nama_posaju'] ?? 'Pos Aju Utama',
             'alamat_lokasi' => $payload['lokasi_posaju'] ?? $pleno->lokasi_pleno,
             'pj_posaju' => $payload['id_koordinator'] ?? null,
@@ -84,6 +87,13 @@ class ExecutePlenoDecisions
         ]);
 
         if (!empty($payload['id_koordinator'])) {
+            OperasiPosajuKomandan::create([
+                'id_posaju' => $posAju->id_posaju,
+                'id_pengguna' => $payload['id_koordinator'],
+                'id_pleno_keputusan' => $keputusan->id_keputusan,
+                'waktu_mulai_tugas' => now(),
+            ]);
+
             $penugasan = OperasiPenugasan::create([
                 'id_insiden' => $pleno->id_insiden,
                 'id_pengguna' => $payload['id_koordinator'],
@@ -178,6 +188,8 @@ class ExecutePlenoDecisions
             ->first();
         if (!$jenisSurat) return;
 
+        $nomorSurat = app(NomorSuratService::class)->generate($jenisSurat, now()->year, $insiden);
+
         $penerima = AuthUser::find($penugasan->id_pengguna);
         $namaPenerima = $penerima?->profil?->nama_lengkap ?? $penerima?->no_hp ?? 'Personel';
         $peranLabel = str_replace('_', ' ', $penugasan->peran_otoritas);
@@ -194,6 +206,7 @@ class ExecutePlenoDecisions
         $surat = \App\Models\DokumenSuratUtama::create([
             'id_insiden' => $insiden->id_insiden,
             'id_jenis_surat' => $jenisSurat->id_jenis_surat,
+            'nomor_surat_resmi' => $nomorSurat,
             'perihal' => 'Surat Tugas Operasi — ' . $insiden->kode_kejadian,
             'tgl_terbit' => now(),
             'id_pengguna_ttd' => $pleno->disetujui_oleh,
@@ -206,18 +219,18 @@ class ExecutePlenoDecisions
             ->first();
 
         try {
-            $this->pdfService->generateWithLampiran($surat, $assessment);
+            $pdfPath = $this->pdfService->generateWithLampiran($surat, $assessment);
 
             $surat->update([
                 'isi_surat_snapshot' => $isiSnapshot,
                 'status_surat' => 'ditandatangani',
-                'file_pdf_path' => 'surat/' . now()->format('Y/m') . '/surat-' . $surat->id_surat . '.pdf',
+                'file_pdf_path' => $pdfPath,
             ]);
+
+            $penugasan->update(['id_surat_tugas' => $surat->id_surat]);
         } catch (\Exception $e) {
             Log::warning("Gagal generate PDF Surat Tugas: " . $e->getMessage());
         }
-
-        $penugasan->update(['id_surat_tugas' => $surat->id_surat]);
     }
 
     private function validasiKoordinatorScope(int $idInsiden, int $idPengguna): void

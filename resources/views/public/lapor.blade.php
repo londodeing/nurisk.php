@@ -278,6 +278,10 @@
 
 @push('scripts')
 <script>
+// Data Wilayah passed from Laravel
+const masterKecamatan = @json($kecamatanList);
+const masterDesa = @json($desaList);
+
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/reverse';
 
 function setGpsStatus(dotClass, text) {
@@ -415,69 +419,53 @@ document.getElementById('no_hp').addEventListener('input', function() {
         noHpError.style.display = 'none';
         noHpError.style.display = 'none';
     }
-});
-
-function loadKecamatan() {
+}function loadKecamatan() {
     var idKab = document.getElementById('id_kab').value;
     var selectKec = document.getElementById('id_kec');
     var selectDesa = document.getElementById('id_desa');
-    
-    selectKec.innerHTML = '<option value="">-- Memuat Kecamatan... --</option>';
+
+    selectKec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
     selectKec.disabled = true;
     selectDesa.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
     selectDesa.disabled = true;
 
     if (!idKab) {
-        selectKec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
         return;
     }
 
-    fetch('/api/wilayah/kecamatan?id_kab=' + idKab)
-        .then(response => response.json())
-        .then(data => {
-            selectKec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
-            data.forEach(item => {
-                var option = document.createElement('option');
-                option.value = item.id_kec;
-                option.text = item.nama_kec;
-                selectKec.appendChild(option);
-            });
-            selectKec.disabled = false;
-        })
-        .catch(error => {
-            console.error('Error fetching kecamatan:', error);
-            selectKec.innerHTML = '<option value="">-- Gagal Memuat --</option>';
-        });
+    var filteredKecamatan = masterKecamatan.filter(function(k) { return k.id_kab === idKab; });
+    
+    filteredKecamatan.forEach(function(item) {
+        var option = document.createElement('option');
+        option.value = item.id_kec;
+        option.text = item.nama_kec;
+        selectKec.appendChild(option);
+    });
+    
+    selectKec.disabled = false;
 }
 
 function loadDesa() {
     var idKec = document.getElementById('id_kec').value;
     var selectDesa = document.getElementById('id_desa');
-    
-    selectDesa.innerHTML = '<option value="">-- Memuat Desa... --</option>';
+
+    selectDesa.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
     selectDesa.disabled = true;
 
     if (!idKec) {
-        selectDesa.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
         return;
     }
 
-    fetch('/api/wilayah/desa?id_kec=' + idKec)
-        .then(response => response.json())
-        .then(data => {
-            selectDesa.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
-            data.forEach(item => {
-                var option = document.createElement('option');
-                option.value = item.id_desa;
-                option.text = item.nama_desa;
-                selectDesa.appendChild(option);
-            });
-            selectDesa.disabled = false;
-        })
-        .catch(error => {
-            console.error('Error fetching desa:', error);
-            selectDesa.innerHTML = '<option value="">-- Gagal Memuat --</option>';
-        });
+    var filteredDesa = masterDesa.filter(function(d) { return d.id_kec === idKec; });
+    
+    filteredDesa.forEach(function(item) {
+        var option = document.createElement('option');
+        option.value = item.id_desa;
+        option.text = item.nama_desa;
+        selectDesa.appendChild(option);
+    });
+    
+    selectDesa.disabled = false;
 }
 </script>
 @endpush

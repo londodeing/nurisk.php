@@ -1,0 +1,36 @@
+{
+  "type": "Container",
+  "props": {
+    "padding": [16, 16, 16, 16],
+    "margin": [16, 8, 16, 8],
+    "backgroundColor": "surface",
+    "borderRadius": 16
+  },
+  "children": [
+    {
+      "type": "Column",
+      "props": {
+        "crossAxisAlignment": "start"
+      },
+      "children": [
+        {
+          "type": "Text",
+          "props": {
+            "text": "{{ title }}",
+            "style": "title",
+            "color": "text_main"
+          }
+        },
+        {
+          "type": "Row",
+          "props": {
+            "mainAxisAlignment": "spaceEvenly",
+            "spacing": 16,
+            "margin_top": 16
+          },
+          "children": "{{ items }}"
+        }
+      ]
+    }
+  ]
+}

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Application\Media\Commands\UploadMediaCommand;
+use App\Application\Media\Handlers\UploadMediaHandler;
 use App\Http\Controllers\Controller;
 use App\Models\LaporanKejadian;
 use App\Services\LocationService;
-use App\Services\Media\MediaUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +15,7 @@ class LaporController extends Controller
 {
     public function __construct(
         private LocationService $locationService,
-        private MediaUploadService $mediaUploadService,
+        private UploadMediaHandler $uploadMediaHandler,
     ) {}
 
     public function store(Request $request)
@@ -35,7 +36,8 @@ class LaporController extends Controller
             'waktu_kejadian'    => ['required', 'date', 'before_or_equal:now'],
             'foto'              => [
                 'nullable',
-                ...$this->mediaUploadService->toValidationRules('laporan'),
+                'mimes:jpg,jpeg,png,webp',
+                'max:10240',
             ],
         ], [
             'nama.required'                  => 'Nama harus diisi.',
@@ -94,22 +96,10 @@ class LaporController extends Controller
             // $titikKenal = $alamatLengkap . ' — ' . $titikKenal;
         }
 
-        $photoPath = null;
-        $mediaId = null;
-        if ($request->hasFile('foto')) {
-            try {
-                $result = $this->mediaUploadService->upload($request->file('foto'), 'laporan');
-                $photoPath = $result->path;
-                $mediaId = $result->mediaId;
-            } catch (\App\Services\Media\MediaUploadException $e) {
-                return back()->withInput()->withErrors(['foto' => $e->getMessage()]);
-            }
-        }
-
         unset($validated['foto']);
 
-        $laporan = DB::transaction(function () use ($validated, $lat, $lng, $titikKenal, $photoPath, $alamatLengkap, $idPcnu, $mediaId) {
-            $laporan = LaporanKejadian::create([
+        $laporan = DB::transaction(function () use ($validated, $lat, $lng, $titikKenal, $alamatLengkap, $idPcnu) {
+            return LaporanKejadian::create([
                 'kode_kejadian'      => LaporanKejadian::generateKodeKejadian(),
                 'id_pengguna'        => null,
                 'id_jenis_bencana'   => (int) $validated['id_jenis_bencana'],
@@ -125,16 +115,23 @@ class LaporController extends Controller
                 'id_kec'             => $validated['id_kec'] ?? null,
                 'id_desa'            => $validated['id_desa'] ?? null,
                 'id_pcnu'            => $idPcnu,
-                'photo_path'         => $photoPath,
                 'is_valid'           => 'menunggu',
             ]);
-
-            if ($mediaId) {
-                $this->mediaUploadService->associate($mediaId, 'laporan', $laporan->id_laporan_kejadian);
-            }
-
-            return $laporan;
         });
+
+        if ($request->hasFile('foto')) {
+            try {
+                $result = $this->uploadMediaHandler->handle(new UploadMediaCommand(
+                    entityType: 'laporan',
+                    entityId: $laporan->id_laporan_kejadian,
+                    file: $request->file('foto'),
+                    visibility: 'PUBLIC',
+                ));
+                $laporan->update(['photo_path' => $result->path]);
+            } catch (\Throwable $e) {
+                return back()->withInput()->withErrors(['foto' => $e->getMessage()]);
+            }
+        }
 
         return redirect()->route('public.lapor')
             ->with('success', 'Laporan Anda telah diterima. Kode: ' . $laporan->kode_kejadian . '. Tim NU Peduli akan menindaklanjuti laporan Anda. Terima kasih atas partisipasi Anda.');

@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "nama": "Kesehatan",
+        "deskripsi": "Penanganan medis, obat-obatan, dan trauma healing."
+    },
+    {
+        "id": 2,
+        "nama": "Pencarian dan Penyelamatan (SAR)",
+        "deskripsi": "Evakuasi korban dan pencarian orang hilang."
+    },
+    {
+        "id": 3,
+        "nama": "Logistik",
+        "deskripsi": "Pengelolaan distribusi bantuan, makanan, dan peralatan."
+    },
+    {
+        "id": 4,
+        "nama": "Pengungsian dan Perlindungan",
+        "deskripsi": "Penyediaan tempat berlindung sementara dan perlindungan rentan."
+    },
+    {
+        "id": 5,
+        "nama": "Pendidikan",
+        "deskripsi": "Fasilitas pendidikan darurat dan pemulihan sekolah."
+    },
+    {
+        "id": 6,
+        "nama": "Sarana Prasarana",
+        "deskripsi": "Pemulihan infrastruktur dasar seperti jalan, listrik, air bersih."
+    },
+    {
+        "id": 7,
+        "nama": "Ekonomi",
+        "deskripsi": "Pemulihan mata pencaharian warga terdampak."
+    },
+    {
+        "id": 8,
+        "nama": "Pemulihan Dini",
+        "deskripsi": "Transisi dari masa tanggap darurat menuju rehabilitasi."
+    }
+]

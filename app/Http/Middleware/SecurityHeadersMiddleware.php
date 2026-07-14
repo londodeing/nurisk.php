@@ -21,7 +21,7 @@ class SecurityHeadersMiddleware
         $imgSrc = "'self' data: https://images.unsplash.com https://unpkg.com https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com https://d.basemaps.cartocdn.com https://server.arcgisonline.com https://gibs.earthdata.nasa.gov https://inarisk1.bnpb.go.id:8443 https://*.tile.openstreetmap.org";
 
         if (!app()->environment('production')) {
-            $imgSrc .= " http://localhost:*";
+            $imgSrc .= " http://localhost:* http://127.0.0.1:*";
         }
 
         $csp = "default-src 'self'; "
@@ -31,7 +31,7 @@ class SecurityHeadersMiddleware
              . "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; "
              . "form-action 'self'; frame-ancestors 'none'; base-uri 'self'";
         if (!app()->environment('production')) {
-            $csp .= "; connect-src 'self' ws://localhost:* http://localhost:*";
+            $csp .= "; connect-src 'self' ws://localhost:* http://localhost:* ws://127.0.0.1:* http://127.0.0.1:*";
         }
         $response->headers->set('Content-Security-Policy', $csp);
 

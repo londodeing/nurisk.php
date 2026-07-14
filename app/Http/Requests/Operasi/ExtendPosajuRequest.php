@@ -24,7 +24,7 @@ class ExtendPosajuRequest extends FormRequest
     {
         return [
             'diperpanjang_hingga' => ['required', 'date', 'after:today'],
-            'alasan_penutupan' => ['nullable', 'string'],
+            'alasan_perpanjangan' => ['nullable', 'string'],
         ];
     }
 }

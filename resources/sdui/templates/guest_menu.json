@@ -1,0 +1,31 @@
+{
+  "type": "Container",
+  "props": {
+    "padding": [16, 16, 16, 16],
+    "margin": [16, 8, 16, 8],
+    "backgroundColor": "surface",
+    "borderRadius": 16
+  },
+  "children": [
+    {
+      "type": "Column",
+      "props": {
+        "crossAxisAlignment": "start"
+      },
+      "children": [
+        {
+          "type": "Text",
+          "props": {
+            "text": "Menu Publik & Informasi",
+            "style": "title",
+            "color": "text_main"
+          }
+        },
+        {
+          "type": "Column",
+          "children": "{{ items }}"
+        }
+      ]
+    }
+  ]
+}

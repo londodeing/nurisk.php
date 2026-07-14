@@ -27,7 +27,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('insiden.assessment.store', $insiden->id_insiden) }}" id="assessment-form" onsubmit="return validateFormBypass()" x-data="wizard">
+    <form method="POST" action="{{ route('insiden.assessment.store', $insiden->id_insiden) }}" id="assessment-form" onsubmit="return validateFormBypass()" x-data="wizard" novalidate>
         @csrf
         <input type="hidden" name="uuid_insiden" value="{{ $insiden->uuid_insiden }}">
 

@@ -2,14 +2,18 @@
 
 namespace App\Services;
 
+use App\Infrastructure\Media\Storage\Contracts\StorageProvider;
 use App\Models\AssessmentUtama;
 use App\Models\DokumenSuratUtama;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use Illuminate\Support\Facades\Storage;
 
 class SuratPdfService
 {
+    public function __construct(
+        private readonly StorageProvider $storage,
+    ) {}
+
     public function generate(DokumenSuratUtama $surat): string
     {
         $surat->load([
@@ -24,7 +28,7 @@ class SuratPdfService
         $dompdf = $this->createDompdf($html);
         $path = 'surat/' . now()->format('Y/m') . '/surat-' . $surat->id_surat . '.pdf';
 
-        Storage::disk('public')->put($path, $dompdf->output());
+        $this->storage->storeContents($path, $dompdf->output());
 
         return $path;
     }
@@ -52,7 +56,7 @@ class SuratPdfService
         $dompdf = $this->createDompdf($html);
         $path = 'surat/' . now()->format('Y/m') . '/surat-' . $surat->id_surat . '.pdf';
 
-        Storage::disk('public')->put($path, $dompdf->output());
+        $this->storage->storeContents($path, $dompdf->output());
 
         return $path;
     }

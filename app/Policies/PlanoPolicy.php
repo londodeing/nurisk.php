@@ -46,7 +46,7 @@ class PlanoPolicy
 
         $hasApprovedAssessment = AssessmentUtama::where('id_insiden', $insiden->id_insiden)
             ->where('is_latest', true)
-            ->where('status_review', 'approved')
+            ->whereIn('status_review', ['in_review', 'approved'])
             ->exists();
 
         if (!$hasApprovedAssessment) {

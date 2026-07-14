@@ -1,0 +1,6 @@
+[
+  {"id": 1, "kode": "SK", "nama": "Surat Keputusan",     "kategori": "ORGANISASI"},
+  {"id": 2, "kode": "ST", "nama": "Surat Tugas",         "kategori": "OPERASI"},
+  {"id": 3, "kode": "SE", "nama": "Surat Edaran",        "kategori": "UMUM"},
+  {"id": 4, "kode": "SU", "nama": "Surat Umum",          "kategori": "UMUM"}
+]

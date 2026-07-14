@@ -1,0 +1,25 @@
+{
+  "type": "Column",
+  "props": {
+    "expanded": true,
+    "crossAxisAlignment": "center"
+  },
+  "children": [
+    {
+      "type": "Text",
+      "props": {
+        "text": "{{ value }}",
+        "style": "metric",
+        "color": "{{ color }}"
+      }
+    },
+    {
+      "type": "Text",
+      "props": {
+        "text": "{{ label }}",
+        "style": "caption",
+        "color": "text_muted"
+      }
+    }
+  ]
+}

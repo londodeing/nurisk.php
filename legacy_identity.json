@@ -1,0 +1,196 @@
+{
+    "type": "column",
+    "children": [
+        {
+            "type": "container",
+            "style": {
+                "bg": "green-700",
+                "padding": {
+                    "t": "6",
+                    "b": "6",
+                    "l": "4",
+                    "r": "4"
+                }
+            },
+            "children": [
+                {
+                    "type": "row",
+                    "style": {
+                        "align": "center",
+                        "gap": "4"
+                    },
+                    "children": [
+                        {
+                            "type": "container",
+                            "style": {
+                                "width": 64,
+                                "height": 64,
+                                "bg": "green-500",
+                                "radius": "full",
+                                "align_self": "center"
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "content": "?",
+                                    "style": {
+                                        "color": "white",
+                                        "size": "2xl",
+                                        "weight": "bold",
+                                        "align": "center"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "type": "column",
+                            "style": {
+                                "flex": 1,
+                                "gap": "1"
+                            },
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "content": "081111111111",
+                                    "style": {
+                                        "color": "white",
+                                        "size": "xl",
+                                        "weight": "bold",
+                                        "max_lines": 1,
+                                        "overflow": "ellipsis"
+                                    }
+                                },
+                                {
+                                    "type": "text",
+                                    "content": "Super Admin",
+                                    "style": {
+                                        "color": "green-200",
+                                        "size": "sm"
+                                    }
+                                },
+                                {
+                                    "type": "text",
+                                    "content": "LPBI NU Jawa Tengah \u2014 Akses Penuh",
+                                    "style": {
+                                        "color": "green-300",
+                                        "size": "xs"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "type": "container",
+                            "style": {
+                                "bg": "green-500",
+                                "radius": "full",
+                                "padding": {
+                                    "t": "2",
+                                    "b": "2",
+                                    "l": "3",
+                                    "r": "3"
+                                }
+                            },
+                            "action": {
+                                "type": "action",
+                                "payload": {
+                                    "action_type": "profil.toggle_tersedia",
+                                    "id_pengguna": 1
+                                },
+                                "confirm": {
+                                    "title": "Tandai Tidak Tersedia?",
+                                    "message": "Status Anda akan berubah menjadi tidak tersedia untuk penugasan.",
+                                    "confirm_label": "Ya",
+                                    "cancel_label": "Batal"
+                                },
+                                "on_success": {
+                                    "type": "reload"
+                                }
+                            },
+                            "children": [
+                                {
+                                    "type": "row",
+                                    "style": {
+                                        "gap": "2",
+                                        "align": "center"
+                                    },
+                                    "children": [
+                                        {
+                                            "type": "container",
+                                            "style": {
+                                                "width": 8,
+                                                "height": 8,
+                                                "radius": "full",
+                                                "bg": "white"
+                                            }
+                                        },
+                                        {
+                                            "type": "text",
+                                            "content": "Tersedia",
+                                            "style": {
+                                                "color": "white",
+                                                "size": "xs",
+                                                "weight": "medium"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "spacer",
+                    "style": {
+                        "height": "4"
+                    }
+                },
+                {
+                    "type": "row",
+                    "style": {
+                        "align": "center",
+                        "gap": "3"
+                    },
+                    "children": [
+                        {
+                            "type": "icon",
+                            "name": "star",
+                            "style": {
+                                "size": 14,
+                                "color": "yellow-300"
+                            }
+                        },
+                        {
+                            "type": "text",
+                            "content": "Ketua PWNU",
+                            "style": {
+                                "color": "green-100",
+                                "size": "sm"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "container",
+            "style": {
+                "bg": "yellow-50",
+                "padding": "4"
+            },
+            "action": {
+                "type": "navigate",
+                "route": "profil.edit"
+            },
+            "children": [
+                {
+                    "type": "text",
+                    "content": "Lengkapi profil Anda untuk pengalaman lebih baik",
+                    "style": {
+                        "color": "yellow-800",
+                        "size": "sm"
+                    }
+                }
+            ]
+        }
+    ]
+}

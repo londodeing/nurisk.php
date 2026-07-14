@@ -17,6 +17,46 @@ class CheckAccountStatus
     public function handle(Request $request, Closure $next): Response
     {
         \Illuminate\Support\Facades\Log::info('CheckAccountStatus middleware executed');
+        
+        // Handle API/JSON requests
+        if ($request->expectsJson() || $request->is('api/*')) {
+            $user = $request->user();
+            if ($user) {
+                // 1. Validasi status akun (Source of Truth)
+                $dbUser = \App\Models\AuthUser::query()
+                    ->select(['id_pengguna', 'status_akun', 'id_peran'])
+                    ->find($user->id_pengguna);
+
+                if (!$dbUser || !$dbUser->isAktif()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Akun Anda telah dinonaktifkan atau ditangguhkan.'
+                    ], 401);
+                }
+
+                // 2. Validasi silang Mandat Aktif (Role & Scope)
+                $clientRole = $request->header('X-Role');
+                $clientScopeId = $request->header('X-Scope-Id');
+                
+                $exemptedRoles = ['public', 'publik', 'relawan', 'trc'];
+                if ($clientRole && !in_array(strtolower($clientRole), $exemptedRoles)) {
+                    $hasValidMandate = \Illuminate\Support\Facades\DB::table('pengguna_jabatan')
+                        ->where('id_pengguna', $user->id_pengguna)
+                        ->where('status_aktif', true)
+                        ->exists();
+
+                    if (!$hasValidMandate) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Mandat Anda telah kedaluwarsa atau dicabut.'
+                        ], 403);
+                    }
+                }
+            }
+            return $next($request);
+        }
+
+        // Handle Web requests
         if (Auth::check()) {
             // Kueri segar untuk memverifikasi status akun terbaru di database
             $user = \App\Models\AuthUser::query()
@@ -38,3 +78,4 @@ class CheckAccountStatus
         return $next($request);
     }
 }
+

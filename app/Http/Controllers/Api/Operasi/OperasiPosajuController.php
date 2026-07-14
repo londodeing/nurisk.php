@@ -30,8 +30,9 @@ class OperasiPosajuController extends Controller
 
     public function store(StorePosajuRequest $request): JsonResponse
     {
-        $this->authorize('create', OperasiPosaju::class);
-        
+        $insiden = \App\Models\OperasiInsiden::where('uuid_insiden', $request->validated('uuid_insiden'))->first();
+        $this->authorize('create', [OperasiPosaju::class, $insiden]);
+
         $posaju = OperasiPosaju::create($request->validated());
         $posaju->load(['insiden', 'pj']);
 
@@ -78,9 +79,9 @@ class OperasiPosajuController extends Controller
         
         $validated = $request->validated();
         $posaju = $this->service->extend(
-            $posaju, 
-            \Carbon\Carbon::parse($validated['diperpanjang_hingga']), 
-            $validated['alasan_penutupan'] ?? null
+            $posaju,
+            \Carbon\Carbon::parse($validated['diperpanjang_hingga']),
+            $validated['alasan_perpanjangan'] ?? null
         );
         $posaju->load(['insiden', 'pj']);
 
@@ -100,5 +101,18 @@ class OperasiPosajuController extends Controller
         return (new OperasiPosajuResource($posaju))
             ->additional(['message' => 'Pos Aju berhasil ditutup'])
             ->response();
+    }
+
+    public function activeByInsiden(\App\Models\OperasiInsiden $insiden): OperasiPosajuCollection
+    {
+        $this->authorize('viewAny', OperasiPosaju::class);
+
+        $posajus = OperasiPosaju::with(['insiden', 'pj', 'komandanAktif.pengguna.profil'])
+            ->where('id_insiden', $insiden->id_insiden)
+            ->where('status_alur', 'aktif')
+            ->orderBy('nama_posaju')
+            ->get();
+
+        return new OperasiPosajuCollection($posajus);
     }
 }

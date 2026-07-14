@@ -27,7 +27,7 @@
     @endif
 
     <form method="POST" action="{{ route('insiden.assessment.update', [$insiden->id_insiden, $assessment->id_assessment_utama]) }}"
-          id="assessment-edit-form" x-data="wizard">
+          id="assessment-edit-form" x-data="wizard" onsubmit="return validateEditForm()" novalidate>
         @csrf
         @method('PUT')
         <input type="hidden" name="uuid_insiden" value="{{ $insiden->uuid_insiden }}">
@@ -444,17 +444,20 @@
         </div>
     </form>
 
+    @php
+        $kebutuhanMendesakJson = json_encode(old('kebutuhan_mendesak', $assessment->kebutuhanMendesak->map(fn($item) => [
+            'nama_kebutuhan' => $item->nama_kebutuhan,
+            'jumlah' => $item->jumlah,
+            'satuan' => $item->satuan,
+            'catatan' => $item->catatan,
+        ])->toArray()));
+    @endphp
     @push('scripts')
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('wizard', () => ({
                 activeTab: 0,
-                kebutuhanMendesakList: @json(old('kebutuhan_mendesak', $assessment->kebutuhanMendesak->map(fn($item) => [
-                    'nama_kebutuhan' => $item->nama_kebutuhan,
-                    'jumlah' => $item->jumlah,
-                    'satuan' => $item->satuan,
-                    'catatan' => $item->catatan
-                ])->toArray())),
+                kebutuhanMendesakList: {!! $kebutuhanMendesakJson !!},
                 tabs: [
                     { name: 'Informasi' },
                     { name: 'Biodata' },
@@ -467,6 +470,32 @@
                 ],
             }));
         });
+
+        function validateEditForm() {
+            const form = document.getElementById('assessment-edit-form');
+            if (!form.checkValidity()) {
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) {
+                    const tabDiv = firstInvalid.closest('[x-show]');
+                    if (tabDiv) {
+                        const match = tabDiv.getAttribute('x-show').match(/activeTab\s*===\s*(\d+)/);
+                        if (match && window.Alpine) {
+                            const wizardEl = document.querySelector('[x-data="wizard"]');
+                            if (wizardEl) {
+                                Alpine.$data(wizardEl).activeTab = parseInt(match[1]);
+                            }
+                        }
+                    }
+                }
+                form.reportValidity();
+                return false;
+            }
+
+            const btn = form.querySelector('button[type="submit"]');
+            btn.innerHTML = '<i class="bi bi-arrow-repeat animate-spin"></i> Menyimpan...';
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            return true;
+        }
     </script>
     @endpush
 </x-app-layout>

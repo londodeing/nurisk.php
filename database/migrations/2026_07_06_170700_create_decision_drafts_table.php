@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('decision_drafts', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->morphs('draftable'); // e.g. Incident, Laporan
+            $table->json('content'); // The document/decision content
+            $table->enum('status', ['DRAFT', 'SUBMITTED', 'REVISION', 'FINAL'])->default('DRAFT');
+            $table->foreignId('created_by')->constrained('auth_users', 'id_pengguna'); // Admin who drafted
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('decision_drafts');
+    }
+};

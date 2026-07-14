@@ -27,9 +27,10 @@ class StorePosajuRequest extends FormRequest
             'uuid_insiden' => ['required', 'uuid', 'exists:operasi_insiden,uuid_insiden'],
             'nama_posaju' => ['required', 'string', 'max:150'],
             'alamat_lokasi' => ['nullable', 'string'],
-            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'latitude' => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
             'pj_posaju' => ['required', 'integer', 'exists:auth_users,id_pengguna'],
+            'id_pleno_keputusan' => ['required', 'integer', 'exists:operasi_pleno_keputusan,id_keputusan'],
         ];
     }
 }

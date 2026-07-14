@@ -367,7 +367,20 @@
 
         function validateFormBypass() {
             const form = document.getElementById('assessment-form');
-            if(!form.checkValidity()) {
+            if (!form.checkValidity()) {
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) {
+                    const tabDiv = firstInvalid.closest('[x-show]');
+                    if (tabDiv) {
+                        const match = tabDiv.getAttribute('x-show').match(/activeTab\s*===\s*(\d+)/);
+                        if (match && window.Alpine) {
+                            const wizardEl = document.querySelector('[x-data="wizard"]');
+                            if (wizardEl) {
+                                Alpine.$data(wizardEl).activeTab = parseInt(match[1]);
+                            }
+                        }
+                    }
+                }
                 form.reportValidity();
                 return false;
             }

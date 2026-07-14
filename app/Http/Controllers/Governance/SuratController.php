@@ -5,17 +5,20 @@ namespace App\Http\Controllers\Governance;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Governance\StoreSuratRequest;
 use App\Models\DokumenSuratUtama;
+use App\Infrastructure\Media\Storage\Contracts\StorageProvider;
 use App\Models\MasterJabatanPenandatangan;
 use App\Models\MasterSuratJenis;
 use App\Models\OperasiInsiden;
 use App\Models\AuthUser;
 use App\Services\SuratService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class SuratController extends Controller
 {
-    public function __construct(private SuratService $suratService) {}
+    public function __construct(
+        private SuratService $suratService,
+        private StorageProvider $storage,
+    ) {}
 
     public function index(Request $request)
     {
@@ -125,11 +128,17 @@ class SuratController extends Controller
             return back()->with('error', 'File PDF belum tersedia.');
         }
 
-        if (!Storage::disk('public')->exists($surat->file_pdf_path)) {
+        if (!$this->storage->exists($surat->file_pdf_path)) {
             return back()->with('error', 'File PDF tidak ditemukan.');
         }
 
-        return Storage::disk('public')->download($surat->file_pdf_path);
+        $url = $this->storage->url($surat->file_pdf_path);
+
+        if ($url) {
+            return redirect($url);
+        }
+
+        return back()->with('error', 'File PDF tidak dapat diakses.');
     }
 
     public function kirimReview(DokumenSuratUtama $surat)

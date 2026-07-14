@@ -10,23 +10,38 @@ use Symfony\Component\HttpFoundation\Response;
 class RoleMiddleware
 {
     private const ROLE_HIERARCHY = [
-        'super_admin' => 100,
-        'pwnu'        => 80,
-        'pcnu'        => 60,
-        'relawan'     => 40,
+        'super_admin' => 1,
+        'pwnu'        => 2,
+        'pcnu'        => 3,
     ];
 
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (!Auth::check()) {
-            \Illuminate\Support\Facades\Log::info('RoleMiddleware triggered 401: Auth::check() is false');
+        $user = null;
+
+        if ($request->is('api/*')) {
+            if (Auth::guard('sanctum')->check()) {
+                $user = Auth::guard('sanctum')->user();
+            } else {
+                $user = $request->user('sanctum');
+            }
+        }
+
+        if (!$user && Auth::guard('web')->check()) {
+            $user = Auth::guard('web')->user();
+        }
+
+        if (!$user) {
+            $user = $request->user();
+        }
+
+        if (!$user) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
             }
             return redirect()->route('login');
         }
 
-        $user = Auth::user();
         if (!$user->relationLoaded('peran')) {
             $user->load('peran');
         }
@@ -39,16 +54,16 @@ class RoleMiddleware
 
         $allowed = false;
         foreach ($roles as $role) {
-            if (isset(self::ROLE_HIERARCHY[$role])) {
-                $requiredLevel = self::ROLE_HIERARCHY[$role];
-                if ($userLevel >= $requiredLevel) {
-                    $allowed = true;
-                    break;
-                }
-            }
             if ($userRole === $role) {
                 $allowed = true;
                 break;
+            }
+            if (isset(self::ROLE_HIERARCHY[$role])) {
+                $requiredLevel = self::ROLE_HIERARCHY[$role];
+                if ($userLevel <= $requiredLevel) {
+                    $allowed = true;
+                    break;
+                }
             }
         }
 
