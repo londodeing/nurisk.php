@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <a href="{{ route('insiden.show', $insiden->id_insiden) }}"
+                <a href="{{ route('insiden.show', $insiden->kode_kejadian) }}"
                    class="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors">
                     <i class="bi bi-arrow-left text-lg"></i>
                 </a>
@@ -12,11 +12,11 @@
                 </div>
             </div>
             <div class="flex gap-2">
-                <a href="{{ route('insiden.assessment.cetak', [$insiden->id_insiden, $assessment->id_assessment_utama]) }}"
+                <a href="{{ route('insiden.assessment.cetak', [$insiden->kode_kejadian, $assessment->id_assessment_utama]) }}"
                    class="px-4 py-2 bg-slate-600 text-white rounded-xl text-sm font-semibold hover:bg-slate-700 transition-colors flex items-center gap-2">
                     <i class="bi bi-printer"></i> Cetak
                 </a>
-                <a href="{{ route('insiden.assessment.edit', [$insiden->id_insiden, $assessment->id_assessment_utama]) }}"
+                <a href="{{ route('insiden.assessment.edit', [$insiden->kode_kejadian, $assessment->id_assessment_utama]) }}"
                    class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors flex items-center gap-2">
                     <i class="bi bi-pencil"></i> Edit Assessment
                 </a>
@@ -62,6 +62,12 @@
                         <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Desa</span>
                         <p class="mt-1 font-medium text-slate-700">
                             {{ $assessment->lokasiDetail->desa?->nama_desa ?? '-' }}
+                        </p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Region Terdampak</span>
+                        <p class="mt-1 font-medium text-slate-700">
+                            {{ $assessment->lokasiDetail->region_terdampak ?? '-' }}
                         </p>
                     </div>
                     <div>
@@ -174,6 +180,7 @@
                         ['label' => 'Rusak Sedang', 'val' => $rumah->rusak_sedang ?? $rumah->rumah_rusak_sedang ?? 0, 'color' => 'orange'],
                         ['label' => 'Rusak Ringan', 'val' => $rumah->rusak_ringan ?? $rumah->rumah_rusak_ringan ?? 0, 'color' => 'yellow'],
                         ['label' => 'Terendam', 'val' => $rumah->terendam ?? $rumah->rumah_terendam ?? 0, 'color' => 'blue'],
+                        ['label' => 'Terancam', 'val' => $rumah->terancam ?? $rumah->rumah_terancam ?? 0, 'color' => 'purple'],
                     ];
                 @endphp
                 @foreach($rusak as $r)
@@ -203,6 +210,9 @@
                         ['label' => 'Tempat Ibadah', 'val' => $fasum?->ibadah ?? $infra?->tempat_ibadah_rusak ?? 0, 'icon' => 'bi-moon'],
                         ['label' => 'Kantor Pem.', 'val' => $fasum?->kantor ?? $infra?->kantor_pemerintah_rusak ?? 0, 'icon' => 'bi-bank'],
                         ['label' => 'Jembatan', 'val' => ($fasum?->jembatan ?? 0) + ($infra?->jembatan_putus ?? 0), 'icon' => 'bi-sign-turn-right'],
+                        ['label' => 'Sanitasi', 'val' => $fasum?->sanitasi ?? $infra?->sanitasi ?? 0, 'icon' => 'bi-droplet'],
+                        ['label' => 'Pasar', 'val' => $fasum?->pasar ?? $infra?->pasar ?? 0, 'icon' => 'bi-shop'],
+                        ['label' => 'SPBU', 'val' => $fasum?->spbu ?? $infra?->spbu ?? 0, 'icon' => 'bi-fuel-pump'],
                     ];
                 @endphp
                 @foreach($items as $item)
@@ -232,6 +242,22 @@
                     <span class="text-slate-500">Telekomunikasi</span>
                     <strong>{{ $vital?->telekomunikasi ?? 0 }}</strong>
                 </div>
+                <div class="flex justify-between p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-500">Irigasi</span>
+                    <strong>{{ $vital?->irigasi ?? $infra?->irigasi ?? 0 }} Ha</strong>
+                </div>
+                <div class="flex justify-between p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-500">Sawah</span>
+                    <strong>{{ $vital?->sawah_ha ?? $infra?->sawah_ha ?? 0 }} Ha</strong>
+                </div>
+                <div class="flex justify-between p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-500">Ternak Mati</span>
+                    <strong>{{ $vital?->ternak_ekor ?? $infra?->ternak_ekor ?? 0 }} ekor</strong>
+                </div>
+                <div class="flex justify-between p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-500">Hutan Rusak</span>
+                    <strong>{{ $vital?->hutan_ha ?? $infra?->hutan_ha ?? 0 }} Ha</strong>
+                </div>
             </div>
             @endif
         </div>
@@ -250,14 +276,16 @@
                     <div class="flex justify-between"><span class="text-slate-500">Lahan Pertanian Rusak</span><strong>{{ number_format($ling->lahan_pertanian_rusak_ha, 2) }} ha</strong></div>
                     <div class="flex justify-between"><span class="text-slate-500">Hutan Terdampak</span><strong>{{ number_format($ling->hutan_terdampak_ha, 2) }} ha</strong></div>
                     <div class="flex justify-between"><span class="text-slate-500">Lahan Tercemar</span><strong>{{ number_format($ling->lahan_tercemar_ha, 2) }} ha</strong></div>
-                    <div class="flex justify-between"><span class="text-slate-500">Tingkat Kerusakan</span><strong class="capitalize">{{ str_replace('_', ' ', $ling->tingkat_kerusakan_lingkungan) }}</strong></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Unggas Terdampak</span><strong>{{ number_format($ling->ternak_unggas_ekor ?? 0) }} ekor</strong></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Kaki Empat Terdampak</span><strong>{{ number_format($ling->ternak_kaki_empat_ekor ?? 0) }} ekor</strong></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Perikanan Kolam</span><strong>{{ number_format($ling->perikanan_kolam_ha ?? 0, 2) }} ha</strong></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Perikanan Nelayan</span><strong>{{ number_format($ling->perikanan_nelayan_unit ?? 0) }} unit</strong></div>
                     
                     <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t text-xs">
                         <div class="flex justify-between"><span class="text-slate-500">Pencemaran Tanah:</span><strong>{{ $ling->pencemaran_tanah ? 'Ya' : 'Tidak' }}</strong></div>
                         <div class="flex justify-between"><span class="text-slate-500">Erosi/Sedimentasi:</span><strong>{{ $ling->erosi_sedimentasi ? 'Ya' : 'Tidak' }}</strong></div>
                         <div class="flex justify-between"><span class="text-slate-500">Kerusakan DAS:</span><strong>{{ $ling->kerusakan_daerah_aliran_sungai ? 'Ya' : 'Tidak' }}</strong></div>
                         <div class="flex justify-between"><span class="text-slate-500">Kerusakan Pesisir:</span><strong>{{ $ling->kerusakan_ekosistem_pesisir ? 'Ya' : 'Tidak' }}</strong></div>
-                        <div class="flex justify-between"><span class="text-slate-500">Rehabilitasi Lahan:</span><strong>{{ $ling->butuh_rehabilitasi_lahan ? 'Ya' : 'Tidak' }}</strong></div>
                     </div>
                     @if($ling->sumber_air_tercemar)
                     <div class="p-2 bg-red-50 text-red-700 rounded-lg text-xs mt-2">⚠️ Sumber air tercemar</div>
@@ -277,24 +305,30 @@
                 </h3>
                 <div class="space-y-3 text-sm">
                     @php $eko = $assessment->dampakEkonomi; @endphp
-                    <div class="flex justify-between"><span class="text-slate-500">Perumahan</span><strong>Rp {{ number_format($eko->kerugian_perumahan) }}</strong></div>
-                    <div class="flex justify-between"><span class="text-slate-500">Pertanian</span><strong>Rp {{ number_format($eko->kerugian_pertanian) }}</strong></div>
-                    <div class="flex justify-between"><span class="text-slate-500">Peternakan</span><strong>Rp {{ number_format($eko->kerugian_peternakan ?? 0) }}</strong></div>
-                    <div class="flex justify-between"><span class="text-slate-500">Perikanan</span><strong>Rp {{ number_format($eko->kerugian_perikanan ?? 0) }}</strong></div>
-                    <div class="flex justify-between"><span class="text-slate-500">UMKM</span><strong>Rp {{ number_format($eko->kerugian_umkm ?? 0) }}</strong></div>
-                    <div class="flex justify-between"><span class="text-slate-500">Infrastruktur</span><strong>Rp {{ number_format($eko->kerugian_infrastruktur) }}</strong></div>
-                    <div class="flex justify-between"><span class="text-slate-500">Lainnya</span><strong>Rp {{ number_format($eko->kerugian_lainnya) }}</strong></div>
+                    <div class="flex justify-between items-center mb-2"><span class="text-slate-500 font-semibold">Persentase Ekonomi Terdampak:</span><span class="px-2 py-1 bg-violet-100 text-violet-700 rounded-md font-bold text-xs">{{ $eko->persentase_ekonomi_terdampak ?? '-' }}</span></div>
                     
-                    <div class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t text-xs">
-                        <div class="flex justify-between"><span class="text-slate-500">Pencaharian Hilang:</span><strong>{{ number_format($eko->mata_pencaharian_hilang ?? 0) }} orang</strong></div>
-                        <div class="flex justify-between"><span class="text-slate-500">Usaha Terdampak:</span><strong>{{ number_format($eko->usaha_terdampak ?? 0) }} unit</strong></div>
+                    <div class="mt-3">
+                        <div class="text-xs font-semibold text-slate-500 uppercase mb-2">3 Sektor Terbesar Terdampak</div>
+                        <div class="space-y-2">
+                            @for($i = 1; $i <= 3; $i++)
+                                @if($eko->{'sektor_pencaharian_'.$i})
+                                <div class="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                                    <div class="flex justify-between items-center">
+                                        <strong class="text-slate-700">{{ $eko->{'sektor_pencaharian_'.$i} }}</strong>
+                                        <span class="text-xs px-2 py-0.5 rounded-full {{ $eko->{'status_terdampak_'.$i} === 'permanen' ? 'bg-red-100 text-red-700' : ($eko->{'status_terdampak_'.$i} === 'sementara' ? 'bg-amber-100 text-amber-700' : 'bg-slate-200 text-slate-600') }}">
+                                            {{ ucfirst(str_replace('_', ' ', $eko->{'status_terdampak_'.$i})) }}
+                                        </span>
+                                    </div>
+                                    <div class="text-xs text-slate-500 mt-1">Kontribusi: {{ $eko->{'kontribusi_'.$i} }}%</div>
+                                </div>
+                                @endif
+                            @endfor
+                        </div>
                     </div>
-                    @if($eko->metodologi_estimasi)
-                    <div class="text-xs text-slate-500 mt-2">Metodologi: {{ $eko->metodologi_estimasi }}</div>
-                    @endif
-                    <div class="border-t pt-3 flex justify-between font-bold">
-                        <span>Total Estimasi</span>
-                        <span class="text-violet-700">Rp {{ number_format($eko->estimasi_kerugian_total ?? 0) }}</span>
+
+                    <div class="grid grid-cols-1 gap-2 mt-4 pt-3 border-t text-xs">
+                        <div class="flex justify-between"><span class="text-slate-500">Distribusi Hasil Panen:</span><strong class="capitalize">{{ str_replace('_', ' ', $eko->distribusi_hasil_panen ?? '-') }}</strong></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Fasilitas Pengolahan Kolektif:</span><strong class="capitalize">{{ str_replace('_', ' ', $eko->fasilitas_pengolahan_kolektif ?? '-') }}</strong></div>
                     </div>
                     @if($eko->catatan_ekonomi)
                     <div class="p-2 bg-slate-50 text-slate-700 rounded-lg text-xs mt-2"><strong>Catatan:</strong> {{ $eko->catatan_ekonomi }}</div>
@@ -328,9 +362,42 @@
                     <span class="px-2 py-0.5 text-xs bg-indigo-100 text-indigo-700 rounded-full uppercase">{{ str_replace('_', ' ', $narasi->fase) }}</span>
                     <strong class="text-slate-800">{{ $narasi->judul_narasi }}</strong>
                 </div>
-                <p class="text-sm text-slate-600 leading-relaxed">{{ $narasi->isi_narasi }}</p>
+                <p class="text-sm text-slate-600 leading-relaxed mb-3">{{ $narasi->isi_narasi }}</p>
             </div>
             @endforeach
+
+            @if($assessment->narasiDetail)
+            @php $nd = $assessment->narasiDetail; @endphp
+            <div class="grid grid-cols-1 gap-4 mt-4 text-sm">
+                @if($nd->sebaran_dampak)
+                    <div>
+                        <span class="font-bold text-slate-700 block mb-1">Sebaran Dampak</span>
+                        <p class="text-slate-600">{{ $nd->sebaran_dampak }}</p>
+                    </div>
+                @endif
+                @if($nd->upaya_penanganan)
+                    <div>
+                        <span class="font-bold text-slate-700 block mb-1">Upaya Penanganan</span>
+                        <p class="text-slate-600">{{ $nd->upaya_penanganan }}</p>
+                    </div>
+                @endif
+                @if($nd->kendala_lapangan || $nd->kendala_tambahan)
+                    <div class="bg-red-50 p-3 rounded-xl border border-red-100">
+                        <span class="font-bold text-red-700 block mb-1">Kendala Lapangan</span>
+                        <p class="text-slate-700 mb-1">{{ $nd->kendala_lapangan }}</p>
+                        @if($nd->kendala_tambahan)
+                            <p class="text-slate-700 text-xs italic mt-1">Tambahan: {{ $nd->kendala_tambahan }}</p>
+                        @endif
+                    </div>
+                @endif
+                @if($nd->rekomendasi_aksi)
+                    <div class="bg-green-50 p-3 rounded-xl border border-green-100">
+                        <span class="font-bold text-green-700 block mb-1">Rekomendasi Aksi</span>
+                        <p class="text-slate-700">{{ $nd->rekomendasi_aksi }}</p>
+                    </div>
+                @endif
+            </div>
+            @endif
         </div>
         @endif
 
@@ -344,7 +411,7 @@
             @if($assessment->kebutuhanLanjutan)
             @php $kb = $assessment->kebutuhanLanjutan; @endphp
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                @foreach(['dana' => 'Dana', 'relawan' => 'Relawan', 'logistik' => 'Logistik', 'peralatan' => 'Peralatan', 'medis' => 'Medis', 'pangan' => 'Pangan', 'lainnya' => 'Lainnya'] as $key => $label)
+                @foreach(['relawan' => 'Relawan', 'logistik' => 'Logistik', 'peralatan' => 'Peralatan', 'medis' => 'Medis', 'pangan' => 'Pangan', 'lainnya' => 'Lainnya'] as $key => $label)
                     @if($kb->{"kebutuhan_$key"})
                     <div class="p-3 bg-orange-50 rounded-xl">
                         <div class="text-xs font-semibold text-orange-700 uppercase mb-1">{{ $label }}</div>
@@ -442,7 +509,7 @@
 
         @can('update', $assessment)
             @if($statusReview === 'draft')
-                <form action="{{ route('insiden.assessment.submit', [$insiden->id_insiden, $assessment->id_assessment_utama]) }}" method="POST" class="inline">
+                <form action="{{ route('insiden.assessment.submit', [$insiden->kode_kejadian, $assessment->id_assessment_utama]) }}" method="POST" class="inline">
                     @csrf
                     <button type="submit"
                             class="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors">
@@ -456,7 +523,7 @@
             @if($statusReview === 'submitted')
             <div class="mt-4 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
                 <h4 class="text-sm font-semibold text-indigo-800 mb-3">Tindakan Review</h4>
-                <form action="{{ route('insiden.assessment.review', [$insiden->id_insiden, $assessment->id_assessment_utama]) }}" method="POST">
+                <form action="{{ route('insiden.assessment.review', [$insiden->kode_kejadian, $assessment->id_assessment_utama]) }}" method="POST">
                     @csrf
                     <div class="mb-3">
                         <textarea name="catatan_review" rows="3" placeholder="Catatan review (wajib jika ditolak)..."
@@ -464,7 +531,7 @@
                     </div>
                     <div class="flex gap-2">
                         <button type="submit" name="action" value="approved"
-                                class="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors">
+                                class="px-4 py-2 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 transition-colors">
                             <i class="bi bi-check-lg"></i> Setujui
                         </button>
                         <button type="submit" name="action" value="rejected"

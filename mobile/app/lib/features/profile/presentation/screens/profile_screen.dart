@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nurisk_mobile/core/error/dio_exception_mapper.dart';
 import 'package:nurisk_mobile/core/router/app_router.dart';
 import 'package:nurisk_mobile/core/runtime/runtime_initializer.dart';
-import '../../../auth/presentation/notifiers/auth_state_provider.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../notifiers/profile_notifier.dart';
 import '../../data/models/profile_data_model.dart';
 
@@ -176,10 +176,6 @@ class ProfileScreen extends ConsumerWidget {
           _buildIdentityCard(context, data.identity, data.activeMandate),
           const SizedBox(height: 16),
 
-          // Section 2: Mandate Card
-          _buildMandateCard(context, ref, data.activeMandate),
-          const SizedBox(height: 16),
-
           // Card Perlu Perhatian (Tindak Lanjut Validasi Laporan) untuk Admin PCNU/PWNU
           if (data.activeMandate['role'] == 'pcnu' || data.activeMandate['role'] == 'pwnu' || data.activeMandate['role'] == 'super_admin') ...[
             _buildAttentionCard(context, ref),
@@ -196,12 +192,6 @@ class ProfileScreen extends ConsumerWidget {
           // Section 4: Quick Action
           if (data.quickActions.isNotEmpty) ...[
             _buildQuickActionsSection(context, data.quickActions),
-            const SizedBox(height: 16),
-          ],
-
-          // Section 5: My Tasks
-          if (data.tasks.isNotEmpty) ...[
-            _buildTasksSection(context, data.tasks),
             const SizedBox(height: 16),
           ],
 
@@ -227,8 +217,8 @@ class ProfileScreen extends ConsumerWidget {
 
           // Section 10: Logout
           ElevatedButton.icon(
-            onPressed: () async {
-              await ref.read(authStateProvider.notifier).logout();
+            onPressed: () {
+              ref.read(authProvider.notifier).logout();
             },
             icon: const Icon(Icons.logout),
             label: const Text('Keluar (Logout)'),
@@ -321,44 +311,6 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
   }
-
-  Widget _buildMandateCard(BuildContext context, WidgetRef ref, Map<String, dynamic> mandate) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: Colors.green.shade50,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          children: [
-            const Icon(Icons.verified_user, color: Colors.green),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Mandat Aktif', style: TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.bold)),
-                  Text(
-                    mandate['position'] ?? '-',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                  ),
-                ],
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Membuka Pilihan Mandat.')),
-                );
-              },
-              child: const Text('Ganti Mandat', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
 
   Widget _buildAttentionCard(BuildContext context, WidgetRef ref) {
     return Card(
@@ -492,30 +444,6 @@ class ProfileScreen extends ConsumerWidget {
                 );
               },
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTasksSection(BuildContext context, List<dynamic> tasks) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Tugas Hari Ini', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            const SizedBox(height: 8),
-            ...tasks.map((task) => ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(Icons.assignment_turned_in_outlined, color: Colors.amber),
-                  title: Text(task['title'] ?? '-', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                  subtitle: Text('Kategori: ${task['category'] ?? '-'}', style: const TextStyle(fontSize: 11)),
-                  trailing: const Icon(Icons.chevron_right),
-                )),
           ],
         ),
       ),

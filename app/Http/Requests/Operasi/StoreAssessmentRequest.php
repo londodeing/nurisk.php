@@ -17,6 +17,20 @@ class StoreAssessmentRequest extends FormRequest
     public function rules(): array
     {
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
+        $minMeninggal = 0;
+
+        if ($this->uuid_insiden) {
+            $insiden = \App\Models\OperasiInsiden::where('uuid_insiden', $this->uuid_insiden)->first();
+            if ($insiden) {
+                // Find latest assessment for this incident
+                $latestAssessment = \App\Models\AssessmentUtama::where('id_insiden', $insiden->id_insiden)
+                    ->latest('id_assessment_utama')
+                    ->first();
+                if ($latestAssessment) {
+                    $minMeninggal = $latestAssessment->dampakManusiaV2?->meninggal ?? 0;
+                }
+            }
+        }
 
         return [
             'uuid_insiden'             => 'required|exists:operasi_insiden,uuid_insiden',
@@ -28,7 +42,7 @@ class StoreAssessmentRequest extends FormRequest
 
             // Dampak Manusia V1 (core) + V2 fields (extended)
             'dampak_manusia'                           => 'required|array',
-            'dampak_manusia.meninggal'                 => 'nullable|integer|min:0',
+            'dampak_manusia.meninggal'                 => 'nullable|integer|min:' . $minMeninggal,
             'dampak_manusia.hilang'                    => 'nullable|integer|min:0',
             'dampak_manusia.luka_berat'                => 'nullable|integer|min:0',
             'dampak_manusia.luka_ringan'               => 'nullable|integer|min:0',
@@ -41,29 +55,39 @@ class StoreAssessmentRequest extends FormRequest
             'dampak_manusia.pengungsi_disabilitas'     => 'nullable|integer|min:0',
             'dampak_manusia.pengungsi_ibu_hamil'       => 'nullable|integer|min:0',
 
-            // Kebutuhan Mendesak
-            'kebutuhan_mendesak'                       => 'nullable|array',
-            'kebutuhan_mendesak.*.nama_kebutuhan'      => 'required_with:kebutuhan_mendesak|string|max:255',
-            'kebutuhan_mendesak.*.jumlah'              => 'required_with:kebutuhan_mendesak|integer|min:1',
-            'kebutuhan_mendesak.*.satuan'              => 'required_with:kebutuhan_mendesak|string|max:50',
-            'kebutuhan_mendesak.*.catatan'             => 'nullable|string',
+            // Kebutuhan Numerik (V2)
+            'kebutuhan_numerik'                        => 'nullable|array',
+            'kebutuhan_numerik.*.id_item'              => 'required_with:kebutuhan_numerik|integer|exists:assessment_kebutuhan_numerik_master,id_item',
+            'kebutuhan_numerik.*.jumlah_dibutuhkan'    => 'required_with:kebutuhan_numerik|numeric|min:0',
+            'kebutuhan_numerik.*.jumlah_tersedia'      => 'nullable|numeric|min:0',
+            'kebutuhan_numerik.*.satuan'               => 'nullable|string|max:30',
+            'kebutuhan_numerik.*.prioritas'            => 'nullable|in:darurat,penting,normal',
+            'kebutuhan_numerik.*.keterangan'           => 'nullable|string|max:255',
 
-            // Dampak Infrastruktur
+            // Dampak Infrastruktur (V1 + V2)
             'dampak_infrastruktur'                                => 'nullable|array',
             'dampak_infrastruktur.rumah_rusak_berat'              => 'nullable|integer|min:0',
             'dampak_infrastruktur.rumah_rusak_sedang'             => 'nullable|integer|min:0',
             'dampak_infrastruktur.rumah_rusak_ringan'             => 'nullable|integer|min:0',
             'dampak_infrastruktur.rumah_terendam'                 => 'nullable|integer|min:0',
+            'dampak_infrastruktur.rumah_terancam'                 => 'nullable|integer|min:0',
             'dampak_infrastruktur.fasilitas_kesehatan_rusak'      => 'nullable|integer|min:0',
             'dampak_infrastruktur.fasilitas_pendidikan_rusak'     => 'nullable|integer|min:0',
             'dampak_infrastruktur.tempat_ibadah_rusak'            => 'nullable|integer|min:0',
             'dampak_infrastruktur.kantor_pemerintah_rusak'        => 'nullable|integer|min:0',
+            'dampak_infrastruktur.sanitasi'                       => 'nullable|integer|min:0',
+            'dampak_infrastruktur.pasar'                          => 'nullable|integer|min:0',
+            'dampak_infrastruktur.spbu'                           => 'nullable|integer|min:0',
             'dampak_infrastruktur.jalan_rusak_km'                 => 'nullable|numeric|min:0',
             'dampak_infrastruktur.jembatan_putus'                 => 'nullable|integer|min:0',
             'dampak_infrastruktur.jembatan_rusak'                 => 'nullable|integer|min:0',
             'dampak_infrastruktur.sarana_air_bersih_rusak'        => 'nullable|boolean',
             'dampak_infrastruktur.jaringan_listrik_padam_kk'      => 'nullable|integer|min:0',
             'dampak_infrastruktur.jaringan_komunikasi_putus'      => 'nullable|boolean',
+            'dampak_infrastruktur.irigasi'                        => 'nullable|numeric|min:0',
+            'dampak_infrastruktur.sawah_ha'                       => 'nullable|numeric|min:0',
+            'dampak_infrastruktur.ternak_ekor'                    => 'nullable|integer|min:0',
+            'dampak_infrastruktur.hutan_ha'                       => 'nullable|numeric|min:0',
             'dampak_infrastruktur.catatan_infrastruktur'          => 'nullable|string',
 
             // Dampak Lingkungan
@@ -76,24 +100,26 @@ class StoreAssessmentRequest extends FormRequest
             'dampak_lingkungan.erosi_sedimentasi'                 => 'nullable|boolean',
             'dampak_lingkungan.kerusakan_ekosistem_pesisir'       => 'nullable|boolean',
             'dampak_lingkungan.kerusakan_daerah_aliran_sungai'    => 'nullable|boolean',
-            'dampak_lingkungan.tingkat_kerusakan_lingkungan'      => 'nullable|in:tidak_ada,ringan,sedang,berat,sangat_berat',
-            'dampak_lingkungan.butuh_rehabilitasi_lahan'          => 'nullable|boolean',
             'dampak_lingkungan.catatan_lingkungan'                => 'nullable|string',
-            'dampak_lingkungan.ternak_terdampak_ekor'             => 'nullable|integer|min:0',
+            'dampak_lingkungan.unggas'                            => 'nullable|integer|min:0',
+            'dampak_lingkungan.kaki_empat'                        => 'nullable|integer|min:0',
+            'dampak_lingkungan.perikanan_kolam'                   => 'nullable|numeric|min:0',
+            'dampak_lingkungan.perikanan_nelayan'                 => 'nullable|integer|min:0',
 
             // Dampak Ekonomi
             'dampak_ekonomi'                                      => 'nullable|array',
-            'dampak_ekonomi.kerugian_perumahan'                   => 'nullable|numeric|min:0',
-            'dampak_ekonomi.kerugian_pertanian'                   => 'nullable|numeric|min:0',
-            'dampak_ekonomi.kerugian_peternakan'                  => 'nullable|numeric|min:0',
-            'dampak_ekonomi.kerugian_perikanan'                   => 'nullable|numeric|min:0',
-            'dampak_ekonomi.kerugian_umkm'                        => 'nullable|numeric|min:0',
-            'dampak_ekonomi.kerugian_infrastruktur'               => 'nullable|numeric|min:0',
-            'dampak_ekonomi.kerugian_lainnya'                     => 'nullable|numeric|min:0',
-            'dampak_ekonomi.estimasi_kerugian_total'              => 'nullable|numeric|min:0',
-            'dampak_ekonomi.mata_pencaharian_hilang'              => 'nullable|integer|min:0',
-            'dampak_ekonomi.usaha_terdampak'                      => 'nullable|integer|min:0',
-            'dampak_ekonomi.metodologi_estimasi'                  => 'nullable|string|max:255',
+            'dampak_ekonomi.persentase_ekonomi_terdampak'         => 'nullable|in:< 25%,25% - 50%,51% - 75%,> 75%',
+            'dampak_ekonomi.sektor_pencaharian_1'                 => 'nullable|string|max:255',
+            'dampak_ekonomi.kontribusi_1'                         => 'nullable|numeric|min:0|max:100',
+            'dampak_ekonomi.status_terdampak_1'                   => 'nullable|in:tidak_terdampak,sementara,permanen',
+            'dampak_ekonomi.sektor_pencaharian_2'                 => 'nullable|string|max:255',
+            'dampak_ekonomi.kontribusi_2'                         => 'nullable|numeric|min:0|max:100',
+            'dampak_ekonomi.status_terdampak_2'                   => 'nullable|in:tidak_terdampak,sementara,permanen',
+            'dampak_ekonomi.sektor_pencaharian_3'                 => 'nullable|string|max:255',
+            'dampak_ekonomi.kontribusi_3'                         => 'nullable|numeric|min:0|max:100',
+            'dampak_ekonomi.status_terdampak_3'                   => 'nullable|in:tidak_terdampak,sementara,permanen',
+            'dampak_ekonomi.distribusi_hasil_panen'               => 'nullable|in:berfungsi,rusak_sebagian,rusak_total',
+            'dampak_ekonomi.fasilitas_pengolahan_kolektif'        => 'nullable|in:berfungsi,rusak_sebagian,rusak_total',
             'dampak_ekonomi.catatan_ekonomi'                      => 'nullable|string',
 
             // Biodata Kejadian
@@ -110,6 +136,30 @@ class StoreAssessmentRequest extends FormRequest
             'narasi_kejadian.fase'                                => 'required_with:narasi_kejadian|in:pra_bencana,saat_bencana,pasca_bencana',
             'narasi_kejadian.judul_narasi'                        => 'required_with:narasi_kejadian|string|max:255',
             'narasi_kejadian.isi_narasi'                          => 'required_with:narasi_kejadian|string',
+
+            // Lokasi Detail (V2)
+            'lokasi_detail'                                       => 'nullable|array',
+            'lokasi_detail.id_kec'                                => 'nullable|exists:wilayah_kecamatan,id_kec',
+            'lokasi_detail.id_desa'                               => 'nullable|exists:wilayah_desa,id_desa',
+            'lokasi_detail.region_terdampak'                      => 'nullable|string|max:255',
+
+            // Narasi Detail (V2)
+            'narasi_detail'                                       => 'nullable|array',
+            'narasi_detail.sebaran_dampak'                        => 'nullable|string',
+            'narasi_detail.kondisi_umum'                          => 'nullable|string',
+            'narasi_detail.upaya_penanganan'                      => 'nullable|string',
+            'narasi_detail.kendala_lapangan'                      => 'nullable|string',
+            'narasi_detail.kendala_tambahan'                      => 'nullable|string',
+            'narasi_detail.rekomendasi_aksi'                      => 'nullable|string',
+
+            // Kebutuhan Lanjutan (V2)
+            'kebutuhan_lanjutan'                                  => 'nullable|array',
+            'kebutuhan_lanjutan.kebutuhan_relawan'                => 'nullable|string',
+            'kebutuhan_lanjutan.kebutuhan_logistik'               => 'nullable|string',
+            'kebutuhan_lanjutan.kebutuhan_peralatan'              => 'nullable|string',
+            'kebutuhan_lanjutan.kebutuhan_medis'                  => 'nullable|string',
+            'kebutuhan_lanjutan.kebutuhan_pangan'                 => 'nullable|string',
+            'kebutuhan_lanjutan.kebutuhan_lainnya'                => 'nullable|string',
         ];
     }
 

@@ -3,16 +3,24 @@ class InsidenModel {
   final String uuid;
   final String kode;
   final String status;
+  final String? statusOperasi;
   final String labelStatus;
   final String prioritas;
   final bool isLocked;
   final String? jenisBencana;
   final String? pcnu;
   final int? idPcnu;
+  final int? idMwc;
   final String? noSpkAssesment;
   final String? tglSpkAssesment;
+  final int? idPemberiSpk;
+  final int? idPenerimaSpk;
   final DateTime? waktuMulai;
   final DateTime? waktuSelesai;
+  final DateTime? waktuVerifikasi;
+  final DateTime? waktuResponDimulai;
+  final DateTime? waktuPemulihanDimulai;
+  final DateTime? waktuDitutup;
   final DateTime? dibuatPada;
   final List<RiwayatStatusModel> riwayatStatus;
   final LaporanAsalModel? laporanAsal;
@@ -25,16 +33,24 @@ class InsidenModel {
     required this.uuid,
     required this.kode,
     required this.status,
+    this.statusOperasi,
     required this.labelStatus,
     required this.prioritas,
     required this.isLocked,
     this.jenisBencana,
     this.pcnu,
     this.idPcnu,
+    this.idMwc,
     this.noSpkAssesment,
     this.tglSpkAssesment,
+    this.idPemberiSpk,
+    this.idPenerimaSpk,
     this.waktuMulai,
     this.waktuSelesai,
+    this.waktuVerifikasi,
+    this.waktuResponDimulai,
+    this.waktuPemulihanDimulai,
+    this.waktuDitutup,
     this.dibuatPada,
     this.riwayatStatus = const [],
     this.laporanAsal,
@@ -58,16 +74,24 @@ class InsidenModel {
       uuid: json['uuid'] ?? '',
       kode: json['kode'] ?? '',
       status: json['status'] ?? 'draft',
+      statusOperasi: json['status_operasi'],
       labelStatus: json['label_status'] ?? json['status'] ?? 'Draft',
       prioritas: json['prioritas'] ?? 'sedang',
       isLocked: json['is_locked'] == true || json['is_locked'] == 1,
       jenisBencana: jbNama,
       pcnu: pcnuNama,
       idPcnu: pcnuId ?? (json['id_pcnu'] is int ? json['id_pcnu'] : int.tryParse(json['id_pcnu']?.toString() ?? '')),
+      idMwc: json['id_mwc'] is int ? json['id_mwc'] : int.tryParse(json['id_mwc']?.toString() ?? ''),
       noSpkAssesment: json['no_spk_assesment'],
       tglSpkAssesment: json['tgl_spk_assesment'],
+      idPemberiSpk: json['id_pemberi_spk'] is int ? json['id_pemberi_spk'] : int.tryParse(json['id_pemberi_spk']?.toString() ?? ''),
+      idPenerimaSpk: json['id_penerima_spk'] is int ? json['id_penerima_spk'] : int.tryParse(json['id_penerima_spk']?.toString() ?? ''),
       waktuMulai: json['waktu_mulai'] != null ? DateTime.tryParse(json['waktu_mulai']) : null,
       waktuSelesai: json['waktu_selesai'] != null ? DateTime.tryParse(json['waktu_selesai']) : null,
+      waktuVerifikasi: json['waktu_verifikasi'] != null ? DateTime.tryParse(json['waktu_verifikasi']) : null,
+      waktuResponDimulai: json['waktu_respon_dimulai'] != null ? DateTime.tryParse(json['waktu_respon_dimulai']) : null,
+      waktuPemulihanDimulai: json['waktu_pemulihan_dimulai'] != null ? DateTime.tryParse(json['waktu_pemulihan_dimulai']) : null,
+      waktuDitutup: json['waktu_ditutup'] != null ? DateTime.tryParse(json['waktu_ditutup']) : null,
       dibuatPada: json['dibuat_pada'] != null ? DateTime.tryParse(json['dibuat_pada']) : null,
       riwayatStatus: (json['riwayat_status'] as List? ?? [])
           .map((e) => RiwayatStatusModel.fromJson(e))

@@ -42,12 +42,8 @@
                 </div>
                 <div class="tab-pane" id="stok">
                     <div class="bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl rounded-2xl">
-                        <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+                        <div class="p-6 border-b border-slate-200">
                             <strong>Stok Logistik</strong>
-                            <a href="{{ route('insiden.posaju.stok.create', [$insiden, $posaju]) }}"
-                                class="px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-1">
-                                <i class="bi bi-plus-lg"></i> Tambah Stok
-                            </a>
                         </div>
                         <div class="p-6">
                             <div class="overflow-x-auto">

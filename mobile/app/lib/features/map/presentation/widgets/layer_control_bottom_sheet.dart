@@ -42,8 +42,6 @@ class _LayerControlBottomSheetState extends ConsumerState<LayerControlBottomShee
           _groups = groups;
           _isLoading = false;
         });
-
-        _notifyLayersChanged();
       }
     } catch (e) {
       if (!mounted) return;

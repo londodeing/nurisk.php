@@ -3,7 +3,7 @@
 
     <div class="mb-6 p-4 bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center gap-4">
-            <a href="{{ route('insiden.show', $insiden->id_insiden) }}" class="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors">
+            <a href="{{ route('insiden.show', $insiden->kode_kejadian) }}" class="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors">
                 <i class="bi bi-arrow-left text-xl"></i>
             </a>
             <div class="p-3 bg-indigo-100 text-indigo-600 rounded-xl">
@@ -11,7 +11,7 @@
             </div>
             <div>
                 <h2 class="text-xl font-bold text-slate-800">Analitik Tingkat Keparahan</h2>
-                <p class="text-sm text-slate-500">Insiden #{{ $insiden->id_insiden }} &bull; Assessment ID: {{ $assessment->id_assessment_utama }}</p>
+                <p class="text-sm text-slate-500">Insiden #{{ $insiden->kode_kejadian }} &bull; Assessment ID: {{ $assessment->id_assessment_utama }}</p>
             </div>
         </div>
     </div>

@@ -17,7 +17,7 @@ class AssessmentDampakRumah extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'id_assessment', 'rusak_berat', 'rusak_sedang', 'rusak_ringan', 'terendam', 'terancam', 'estimasi_kerugian_juta'
+        'id_assessment', 'rusak_berat', 'rusak_sedang', 'rusak_ringan', 'terendam', 'terancam'
     ];
 
     protected $casts = [
@@ -26,7 +26,6 @@ class AssessmentDampakRumah extends Model
         'rusak_ringan' => 'integer',
         'terendam' => 'integer',
         'terancam' => 'integer',
-        'estimasi_kerugian_juta' => 'decimal:2',
     ];
 
     public function assessment(): BelongsTo

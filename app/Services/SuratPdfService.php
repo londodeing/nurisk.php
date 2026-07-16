@@ -61,6 +61,44 @@ class SuratPdfService
         return $path;
     }
 
+    public function generatePlenoPdf(\App\Models\OperasiPleno $pleno): string
+    {
+        $pleno->loadMissing([
+            'pimpinan.profil', 'notulis.profil', 'keputusan',
+            'insiden.pcnu', 'insiden.laporanAsal.jenisBencana',
+            'insiden.laporanAsal.kabupaten', 'insiden.laporanAsal.kecamatan',
+            'insiden.laporanAsal.desa'
+        ]);
+
+        $html = view('pdf.pleno', compact('pleno'))->render();
+
+        $dompdf = $this->createDompdf($html);
+        $path = 'pleno/' . now()->format('Y/m') . '/pleno-' . $pleno->id_pleno . '.pdf';
+
+        $this->storage->storeContents($path, $dompdf->output());
+
+        return $path;
+    }
+
+    public function generateAssessmentOnlyPdf(AssessmentUtama $assessment): string
+    {
+        $assessment->loadMissing([
+            'petugas.profil', 'lokasiDetail.kecamatan', 'lokasiDetail.desa',
+            'biodataKejadian', 'ringkasanSkor', 'dampakManusiaV2', 'dampakManusia',
+            'dampakInfrastruktur', 'dampakLingkungan', 'dampakEkonomi',
+            'kebutuhanMendesak', 'kebutuhanLanjutan', 'insiden.pcnu'
+        ]);
+
+        $html = view('pdf.assessment', compact('assessment'))->render();
+
+        $dompdf = $this->createDompdf($html);
+        $path = 'assessment/' . now()->format('Y/m') . '/assessment-' . $assessment->id_assessment_utama . '.pdf';
+
+        $this->storage->storeContents($path, $dompdf->output());
+
+        return $path;
+    }
+
     private function createDompdf(string $html): Dompdf
     {
         $options = new Options();

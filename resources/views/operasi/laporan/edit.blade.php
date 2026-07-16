@@ -84,7 +84,7 @@
 
             <div class="mt-6 flex justify-end gap-3">
                 <a href="{{ route('dashboard.laporan.show', $laporan) }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">Batal</a>
-                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Simpan Perubahan</button>
+                <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">Simpan Perubahan</button>
             </div>
         </form>
     </div>

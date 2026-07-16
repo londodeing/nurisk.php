@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nurisk_mobile/core/api/auth_api_client.dart';
 import 'package:nurisk_mobile/core/router/app_router.dart';
+import 'package:nurisk_mobile/core/utils/pdf_download_helper.dart';
 import 'package:nurisk_mobile/features/operasi/insiden/data/models/insiden_model.dart';
 import 'package:nurisk_mobile/features/operasi/insiden/presentation/providers/insiden_providers.dart';
 import 'package:nurisk_mobile/features/operasi/insiden/presentation/widgets/insiden_status_badge.dart';
 
 class InsidenDetailScreen extends ConsumerStatefulWidget {
-  final int insidenId;
-  const InsidenDetailScreen({super.key, required this.insidenId});
+  final String insidenUuid;
+  const InsidenDetailScreen({super.key, required this.insidenUuid});
 
   @override
   ConsumerState<InsidenDetailScreen> createState() => _InsidenDetailScreenState();
@@ -85,7 +87,7 @@ class _InsidenDetailScreenState extends ConsumerState<InsidenDetailScreen>
                   : () async {
                       Navigator.pop(ctx);
                       final ok = await ref
-                          .read(insidenDetailProvider(widget.insidenId).notifier)
+                          .read(insidenDetailProvider(widget.insidenUuid).notifier)
                           .ubahStatus(selectedStatus!, alasan: alasanCtrl.text.trim());
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -104,14 +106,17 @@ class _InsidenDetailScreenState extends ConsumerState<InsidenDetailScreen>
 
   @override
   Widget build(BuildContext context) {
-    final insidenAsync = ref.watch(insidenDetailProvider(widget.insidenId));
+    final state = ref.watch(insidenDetailProvider(widget.insidenUuid));
 
-    return insidenAsync.when(
-      loading: () => Scaffold(
+    if (state.isLoading) {
+      return Scaffold(
         appBar: AppBar(backgroundColor: const Color(0xFF166534), foregroundColor: Colors.white),
         body: const Center(child: CircularProgressIndicator(color: Color(0xFF166534))),
-      ),
-      error: (e, _) => Scaffold(
+      );
+    }
+    
+    if (state.error != null) {
+      return Scaffold(
         appBar: AppBar(backgroundColor: const Color(0xFF166534), foregroundColor: Colors.white, title: const Text('Error')),
         body: Center(
           child: Column(
@@ -119,66 +124,70 @@ class _InsidenDetailScreenState extends ConsumerState<InsidenDetailScreen>
             children: [
               const Icon(Icons.error_outline, size: 48, color: Colors.red),
               const SizedBox(height: 8),
-              Text(e.toString(), textAlign: TextAlign.center),
+              Text(state.error!, textAlign: TextAlign.center),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => ref.read(insidenDetailProvider(widget.insidenId).notifier).refresh(),
+                onPressed: () => ref.read(insidenDetailProvider(widget.insidenUuid).notifier).refresh(),
                 child: const Text('Coba Lagi'),
               ),
             ],
           ),
         ),
+      );
+    }
+    
+    final insiden = state.insiden;
+    if (insiden == null) return const SizedBox();
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF166534),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(insiden.kode, style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(
+              insiden.jenisBencana ?? 'Insiden',
+              style: const TextStyle(fontSize: 11, color: Colors.white70),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded),
+            onPressed: () => ref.read(insidenDetailProvider(widget.insidenUuid).notifier).refresh(),
+          ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white60,
+          labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          tabs: const [
+            Tab(text: 'Ringkasan'),
+            Tab(text: 'Assessment'),
+            Tab(text: 'Pleno'),
+            Tab(text: 'Personel'),
+            Tab(text: 'Jurnal'),
+          ],
+        ),
       ),
-      data: (insiden) {
-        return Scaffold(
-          backgroundColor: const Color(0xFFF9FAFB),
-          appBar: AppBar(
-            backgroundColor: const Color(0xFF166534),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(insiden.kode, style: const TextStyle(fontFamily: 'monospace', fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(
-                  insiden.jenisBencana ?? 'Insiden',
-                  style: const TextStyle(fontSize: 11, color: Colors.white70),
-                ),
-              ],
-            ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.refresh_rounded),
-                onPressed: () => ref.read(insidenDetailProvider(widget.insidenId).notifier).refresh(),
-              ),
-            ],
-            bottom: TabBar(
-              controller: _tabController,
-              indicatorColor: Colors.white,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white60,
-              labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-              isScrollable: true,
-              tabAlignment: TabAlignment.start,
-              tabs: const [
-                Tab(text: 'Ringkasan'),
-                Tab(text: 'Assessment'),
-                Tab(text: 'Personel'),
-                Tab(text: 'Jurnal'),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            controller: _tabController,
-            children: [
-              _RingkasanTab(insiden: insiden, onUbahStatus: () => _showUbahStatusDialog(insiden)),
-              _AssessmentTab(insiden: insiden),
-              _PersonelTab(insiden: insiden),
-              _JurnalTab(insiden: insiden),
-            ],
-          ),
-        );
-      },
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _RingkasanTab(insiden: insiden, onUbahStatus: () => _showUbahStatusDialog(insiden)),
+          _AssessmentTab(insiden: insiden),
+          _PlenoTab(insiden: insiden),
+          _PersonelTab(insiden: insiden),
+          _JurnalTab(insiden: insiden),
+        ],
+      ),
     );
   }
 }
@@ -451,27 +460,43 @@ class _AssessmentTab extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       children: [
         // SPK info
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFDCFCE7),
+        // SPK info
+        Material(
+          color: const Color(0xFFDCFCE7),
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF86EFAC)),
+            side: const BorderSide(color: Color(0xFF86EFAC)),
           ),
-          child: Row(
-            children: [
-              const Icon(Icons.assignment_turned_in_rounded, color: Color(0xFF166534), size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Surat Tugas Diterbitkan', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF166834))),
-                    Text('No: ${insiden.noSpkAssesment}', style: const TextStyle(fontSize: 11, color: Color(0xFF166834))),
-                  ],
-                ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {
+              final dio = ref.read(authApiClientProvider);
+              PdfDownloadHelper.downloadAndOpenPdf(
+                context: context,
+                dio: dio,
+                endpoint: 'v1/insiden/${insiden.uuid}/spk/pdf',
+                fileName: 'spk_${insiden.kode}.pdf',
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  const Icon(Icons.assignment_turned_in_rounded, color: Color(0xFF166534), size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Surat Tugas Diterbitkan', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF166834))),
+                        Text('No: ${insiden.noSpkAssesment}', style: const TextStyle(fontSize: 11, color: Color(0xFF166834))),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.download_rounded, color: Color(0xFF166534), size: 20),
+                ],
               ),
-            ],
+            ),
           ),
         ),
         const SizedBox(height: 16),
@@ -490,8 +515,11 @@ class _AssessmentTab extends ConsumerWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: () {
-                // Navigate to assessment form
-                context.push(RoutePaths.assessmentForm.replaceFirst(':uuidInsiden', insiden.uuid));
+                // Navigate to assessment form — pass insiden for auto-fill
+                context.push(
+                  RoutePaths.assessmentForm.replaceFirst(':uuidInsiden', insiden.uuid),
+                  extra: {'insiden': insiden},
+                );
               },
             ),
           ),
@@ -514,48 +542,71 @@ class _AssessmentTab extends ConsumerWidget {
             ),
           )
         else
-          ...insiden.assessments.map((a) => Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2))],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: a.isLatest ? const Color(0xFFDCFCE7) : const Color(0xFFF3F4F6),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    a.isLatest ? 'Terkini' : 'Lama',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: a.isLatest ? const Color(0xFF166534) : const Color(0xFF6B7280),
+          ...insiden.assessments.map((a) => InkWell(
+            onTap: () {
+               context.push(
+                 RoutePaths.assessmentForm.replaceFirst(':uuidInsiden', insiden.uuid),
+                 extra: {
+                   'insiden': insiden,
+                   'targetAssessmentId': a.id,
+                 },
+               );
+            },
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE5E7EB)),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2))],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: a.isLatest ? const Color(0xFFDCFCE7) : const Color(0xFFF3F4F6),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      a.isLatest ? 'Terkini' : 'Lama',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: a.isLatest ? const Color(0xFF166534) : const Color(0xFF6B7280),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        a.waktuAssesment != null ? _formatDateTime(a.waktuAssesment!) : '-',
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                      ),
-                      if (a.namaPetugas != null)
-                        Text(a.namaPetugas!, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
-                    ],
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          a.waktuAssesment != null ? _formatDateTime(a.waktuAssesment!) : '-',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                        ),
+                        if (a.namaPetugas != null)
+                          Text(a.namaPetugas!, style: const TextStyle(fontSize: 11, color: Color(0xFF6B7280))),
+                      ],
+                    ),
                   ),
-                ),
-                const Icon(Icons.chevron_right_rounded, color: Color(0xFF9CA3AF)),
-              ],
+                  IconButton(
+                    icon: const Icon(Icons.download_rounded, color: Colors.blue, size: 20),
+                    onPressed: () {
+                      final dio = ref.read(authApiClientProvider);
+                      PdfDownloadHelper.downloadAndOpenPdf(
+                        context: context,
+                        dio: dio,
+                        endpoint: 'v1/assessment/${a.id}/pdf',
+                        fileName: 'assessment_${a.id}.pdf',
+                      );
+                    },
+                  ),
+                  const Icon(Icons.chevron_right_rounded, color: Color(0xFF9CA3AF)),
+                ],
+              ),
             ),
           )),
       ],
@@ -565,6 +616,57 @@ class _AssessmentTab extends ConsumerWidget {
   static String _formatDateTime(DateTime dt) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
     return '${dt.day} ${months[dt.month - 1]} ${dt.year}, ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TAB: PLENO
+// ─────────────────────────────────────────────────────────────────────────────
+class _PlenoTab extends ConsumerWidget {
+  final InsidenModel insiden;
+
+  const _PlenoTab({required this.insiden});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _SectionCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.gavel, color: Color(0xFF166534), size: 20),
+                  SizedBox(width: 8),
+                  Text('Rapat Pleno Keputusan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF1F2937))),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Akses modul Pleno untuk melihat daftar rapat keputusan, menambah draft pleno, merekam hasil kesepakatan, dan mengeksekusi automasi (Surat Tugas, Posko).',
+                style: TextStyle(fontSize: 13, color: Color(0xFF4B5563), height: 1.4),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => context.push('/insiden/${insiden.uuid}/pleno'),
+                  icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                  label: const Text('Buka Modul Pleno'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF166534),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 

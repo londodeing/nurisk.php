@@ -76,8 +76,9 @@ class WilayahApiController extends Controller
         $pcnu = $this->masterDataService->getPcnuList();
         return response()->json([
             'data' => $pcnu->map(fn($p) => [
-                'id'   => $p->id_pcnu,
-                'nama' => $p->nama_pcnu,
+                'id'       => $p->id_pcnu,
+                'nama'     => $p->nama_pcnu,
+                'kode_sni' => $p->kode_sni,
             ]),
         ]);
     }

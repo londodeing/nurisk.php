@@ -3,7 +3,7 @@
 
     <div class="mb-6 p-4 bg-white/80 backdrop-blur-xl border border-white/40 shadow-xl rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center gap-4">
-            <a href="{{ route('insiden.show', $insiden->id_insiden) }}" class="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors">
+            <a href="{{ route('insiden.show', $insiden->kode_kejadian) }}" class="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors">
                 <i class="bi bi-arrow-left text-xl"></i>
             </a>
             <div class="p-3 bg-indigo-100 text-indigo-600 rounded-xl">
@@ -11,7 +11,7 @@
             </div>
             <div>
                 <h2 class="text-xl font-bold text-slate-800">Form Assessment Komprehensif</h2>
-                <p class="text-sm text-slate-500">Isi data assessment untuk Insiden #{{ $insiden->id_insiden }}</p>
+                <p class="text-sm text-slate-500">Isi data assessment untuk Insiden #{{ $insiden->kode_kejadian }}</p>
             </div>
         </div>
     </div>
@@ -27,7 +27,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('insiden.assessment.store', $insiden->id_insiden) }}" id="assessment-form" onsubmit="return validateFormBypass()" x-data="wizard" novalidate>
+    <form method="POST" action="{{ route('insiden.assessment.store', $insiden->kode_kejadian) }}" id="assessment-form" onsubmit="return validateEditForm()" x-data="wizard" novalidate>
         @csrf
         <input type="hidden" name="uuid_insiden" value="{{ $insiden->uuid_insiden }}">
 

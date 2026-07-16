@@ -30,11 +30,11 @@ class GenericGeoJsonPlugin implements MapLayerPlugin {
   Future<void> renderLayer(dynamic mapController, Map<String, dynamic> geoJsonData) async {
     final MapLibreMapController controller = mapController;
 
-    // Check geometry types dynamically based on GeoJSON or metadata
-    // For this generic plugin, we will rely on style_json from config to know how to render it,
-    // or we can infer it. For MVP, we add source and let metadata decide layer types.
+    try { await controller.removeLayer(_layerId + '_line'); } catch (_) {}
+    try { await controller.removeLayer(_layerId + '_polygon'); } catch (_) {}
+    try { await controller.removeLayer(_layerId); } catch (_) {}
+    try { await controller.removeSource(_layerId); } catch (_) {}
 
-    // Using basic cluster for points if enabled via metadata
     final isCluster = geoJsonData['metadata']?['cluster'] ?? false;
 
     await controller.addSource(
@@ -47,7 +47,6 @@ class GenericGeoJsonPlugin implements MapLayerPlugin {
       ),
     );
 
-    // Render Point Geometries
     await controller.addLayer(
       _layerId,
       _layerId,
@@ -60,7 +59,6 @@ class GenericGeoJsonPlugin implements MapLayerPlugin {
       filter: ['==', ['geometry-type'], 'Point'],
     );
 
-    // Render Polygon Geometries (e.g., Flood zones)
     await controller.addLayer(
       _layerId,
       _layerId + '_polygon',
@@ -71,7 +69,6 @@ class GenericGeoJsonPlugin implements MapLayerPlugin {
       filter: ['==', ['geometry-type'], 'Polygon'],
     );
     
-    // Render LineString Geometries (e.g., Evacuation routes)
     await controller.addLayer(
       _layerId,
       _layerId + '_line',
@@ -86,9 +83,9 @@ class GenericGeoJsonPlugin implements MapLayerPlugin {
   @override
   Future<void> removeLayer(dynamic mapController) async {
     final MapLibreMapController controller = mapController;
-    await controller.removeLayer(_layerId);
-    await controller.removeLayer(_layerId + '_polygon');
-    await controller.removeLayer(_layerId + '_line');
-    await controller.removeSource(_layerId);
+    try { await controller.removeLayer(_layerId + '_line'); } catch (_) {}
+    try { await controller.removeLayer(_layerId + '_polygon'); } catch (_) {}
+    try { await controller.removeLayer(_layerId); } catch (_) {}
+    try { await controller.removeSource(_layerId); } catch (_) {}
   }
 }

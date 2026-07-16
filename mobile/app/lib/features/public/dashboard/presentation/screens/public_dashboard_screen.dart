@@ -1,105 +1,98 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nurisk_mobile/features/public/config/config_module.dart';
-import 'package:nurisk_mobile/core/sdui/sdui_screen.dart';
-import 'package:nurisk_mobile/core/sdui/sdui_node.dart';
-import 'package:nurisk_mobile/core/sdui/sdui_renderer.dart';
-import 'package:nurisk_mobile/core/sdui/sdui_error_boundary.dart';
-import 'package:nurisk_mobile/core/sdui/sdui_remote_screen.dart';
-
-/// Feature flag: use NSS 1.0 Runtime pipeline for the dashboard.
-/// Set to true to enable the new SduiRemoteScreen-based implementation.
-/// Once visual parity and behavior parity are confirmed, this flag
-/// becomes the default and the legacy provider-based path is removed.
-const bool kUseRuntimeDashboard = false;
+import '../notifiers/dashboard_orchestrator_provider.dart';
+import '../widgets/kpi_row_section.dart';
+import '../widgets/early_warning_section.dart';
+import '../widgets/weather_strip_section.dart';
+import '../widgets/incident_section.dart';
+import '../widgets/donation_qr_card.dart';
 
 class PublicDashboardScreen extends ConsumerWidget {
   const PublicDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Runtime mode: use SduiRemoteScreen with NSS 1.0 endpoint
-    if (kUseRuntimeDashboard) {
-      return SduiRemoteScreen(
-        endpoint: 'public/dashboard/config?runtime=1',
-        title: 'Dashboard Publik',
-      );
-    }
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? const Color(0xFF0D1110) : const Color(0xFFF5F6F8);
+    final surface = isDark ? const Color(0xFF121614) : Colors.white;
 
-    // Legacy mode: use provider-based config fetching
-    final configState = ref.watch(configProvider);
-
-    final appBar = AppBar(
-      title: const Text('Dashboard Publik'),
-      centerTitle: true,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined),
-          onPressed: () {},
-        ),
-      ],
-    );
-
-    return RefreshIndicator(
-      onRefresh: () async {
-        await ref.read(configProvider.notifier).refresh();
-      },
-      child: configState.when(
-        data: (config) {
-          final nodesJson = config.rawJson['nodes'] as List<dynamic>? ?? [];
-
-          return SduiSafeBuilder(
-            parser: () {
-              return nodesJson.map((e) => SduiNode.fromJson(e)).toList();
-            },
-            builder: (data) {
-              final nodes = data as List<SduiNode>;
-              final rootNode = nodes.isNotEmpty
-                  ? nodes.first
-                  : const SduiNode(
-                      id: 'fallback',
-                      type: 'Container',
-                      props: {'background': 'surface'},
-                    );
-
-              if (config.layoutType == 'scene') {
-                return Scaffold(
-                  appBar: appBar,
-                  body: SduiRenderer(node: rootNode),
-                );
-              }
-
-              return SduiScreen(
-                title: 'Dashboard Publik',
-                rootNode: rootNode,
-                appBar: appBar,
-              );
-            },
-          );
-        },
-        loading: () => Scaffold(
-          appBar: appBar,
-          body: const Center(child: CircularProgressIndicator()),
-        ),
-        error: (error, stack) => Scaffold(
-          appBar: appBar,
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, color: Colors.red, size: 48),
-                const SizedBox(height: 16),
-                const Text('Gagal memuat konfigurasi SDUI dashboard.'),
-                TextButton(
-                  onPressed: () =>
-                      ref.read(configProvider.notifier).refresh(),
-                  child: const Text('Coba Lagi'),
-                ),
-              ],
+    return Scaffold(
+      backgroundColor: bg,
+      appBar: AppBar(
+        title: const Text('NURISK'),
+        centerTitle: true,
+        elevation: 0,
+        scrolledUnderElevation: 1,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              color: (isDark ? const Color(0xFF121614) : const Color(0xFFF8F9FA)).withValues(alpha: 0.6),
             ),
           ),
         ),
+        surfaceTintColor: Colors.transparent,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.notifications_outlined,
+              color: isDark ? Colors.white60 : Colors.black45,
+              size: 22,
+            ),
+            onPressed: () {},
+            tooltip: 'Notifikasi',
+            splashRadius: 20,
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => ref.read(dashboardOrchestratorProvider).refreshAll(),
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
+                      blurRadius: 12,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 24),
+                    EarlyWarningSection(),
+                    _SectionGap(),
+                    KpiRowSection(),
+                    _SectionGap(),
+                    WeatherStripSection(),
+                    IncidentSection(),
+                    DonationQrCard(),
+                    SizedBox(height: 32),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+}
+
+class _SectionGap extends StatelessWidget {
+  const _SectionGap();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(height: 8);
   }
 }

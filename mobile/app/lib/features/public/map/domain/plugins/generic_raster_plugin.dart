@@ -33,10 +33,13 @@ class GenericRasterPlugin implements MapLayerPlugin {
   Future<void> renderLayer(dynamic mapController, Map<String, dynamic> config) async {
     final MapLibreMapController controller = mapController;
     
-    // In a generic plugin, source_url and metadata (like TileSize) should come from config
+    try { await controller.removeLayer(_layerId); } catch (_) {}
+    try { await controller.removeSource(_layerId); } catch (_) {}
+
     final url = config['source_url'] ?? _sourceUrl;
-    final metadata = config['metadata'] ?? {};
-    final tileSize = metadata['tile_size'] ?? 256;
+    final meta = config['metadata'];
+    final tileSize = (meta is Map ? (meta['tile_size'] as num?)?.toDouble() : null) ?? 256.0;
+    final opacity = (meta is Map ? (meta['opacity'] as num?)?.toDouble() : null) ?? 0.7;
 
     await controller.addSource(
       _layerId,
@@ -50,7 +53,7 @@ class GenericRasterPlugin implements MapLayerPlugin {
       _layerId,
       _layerId,
       RasterLayerProperties(
-        rasterOpacity: metadata['opacity'] ?? 0.7,
+        rasterOpacity: opacity,
       ),
     );
   }
@@ -58,7 +61,7 @@ class GenericRasterPlugin implements MapLayerPlugin {
   @override
   Future<void> removeLayer(dynamic mapController) async {
     final MapLibreMapController controller = mapController;
-    await controller.removeLayer(_layerId);
-    await controller.removeSource(_layerId);
+    try { await controller.removeLayer(_layerId); } catch (_) {}
+    try { await controller.removeSource(_layerId); } catch (_) {}
   }
 }

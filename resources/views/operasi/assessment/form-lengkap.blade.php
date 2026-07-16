@@ -149,7 +149,10 @@
                         <div><label class="block text-xs font-semibold text-slate-600 mb-1">Telekomunikasi Rusak</label><input type="number" min="0" name="dampak_vital[telkom]" value="0" class="w-full rounded-xl border-slate-200 focus:border-indigo-500 transition-all"></div>
                         <div><label class="block text-xs font-semibold text-slate-600 mb-1">Jalan Rusak (Km)</label><input type="number" step="any" min="0" name="dampak_vital[jalan]" value="0" class="w-full rounded-xl border-slate-200 focus:border-indigo-500 transition-all"></div>
                         <div><label class="block text-xs font-semibold text-slate-600 mb-1">Sawah Rusak (Ha)</label><input type="number" step="any" min="0" name="dampak_lingkungan[sawah]" value="0" class="w-full rounded-xl border-slate-200 focus:border-indigo-500 transition-all"></div>
-                        <div><label class="block text-xs font-semibold text-slate-600 mb-1">Ternak Terdampak (Ekor)</label><input type="number" min="0" name="dampak_lingkungan[ternak]" value="0" class="w-full rounded-xl border-slate-200 focus:border-indigo-500 transition-all"></div>
+                        <div><label class="block text-xs font-semibold text-slate-600 mb-1">Unggas (Ekor)</label><input type="number" min="0" name="dampak_lingkungan[unggas]" value="0" class="w-full rounded-xl border-slate-200 focus:border-indigo-500 transition-all"></div>
+                        <div><label class="block text-xs font-semibold text-slate-600 mb-1">Kaki Empat (Ekor)</label><input type="number" min="0" name="dampak_lingkungan[kaki_empat]" value="0" class="w-full rounded-xl border-slate-200 focus:border-indigo-500 transition-all"></div>
+                        <div><label class="block text-xs font-semibold text-slate-600 mb-1">Perikanan Kolam (Ha)</label><input type="number" step="any" min="0" name="dampak_lingkungan[perikanan_kolam]" value="0" class="w-full rounded-xl border-slate-200 focus:border-indigo-500 transition-all"></div>
+                        <div><label class="block text-xs font-semibold text-slate-600 mb-1">Perikanan Nelayan (Unit)</label><input type="number" min="0" name="dampak_lingkungan[perikanan_nelayan]" value="0" class="w-full rounded-xl border-slate-200 focus:border-indigo-500 transition-all"></div>
                     </div>
                 </div>
             </div>

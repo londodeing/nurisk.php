@@ -96,8 +96,8 @@
         font-size: 14px; font-weight: 600; cursor: pointer;
         transition: all 0.2s; border: none; text-align: center;
     }
-    .step-actions .btn-primary { background: var(--nu-green); color: #fff; }
-    .step-actions .btn-primary:hover { background: var(--nu-green-dark); }
+    .step-actions .btn-primary { background: var(--nu-green, #0F6B3C); color: #fff; }
+    .step-actions .btn-primary:hover { background: var(--nu-green-dark, #0B5730); }
     .step-actions .btn-secondary { background: #f0f0f0; color: #666; }
     .step-actions .btn-secondary:hover { background: #e0e0e0; }
     .step-actions .btn:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nurisk_mobile/core/theme/nurisk_colors.dart';
 import '../../domain/entities/incident_entity.dart';
 
 class IncidentFeedCard extends StatelessWidget {
@@ -22,8 +23,8 @@ class IncidentFeedCard extends StatelessWidget {
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) => Container(
                 height: 140,
-                color: Colors.grey.shade300,
-                child: const Icon(Icons.broken_image, color: Colors.grey),
+                color: NuriskColors.neutral300,
+                child: const Icon(Icons.broken_image, color: NuriskColors.neutral500),
               ),
             ),
           Padding(
@@ -44,9 +45,9 @@ class IncidentFeedCard extends StatelessWidget {
                     if (incident.isVerified)
                       const Row(
                         children: [
-                          Icon(Icons.verified, size: 14, color: Colors.green),
+                          Icon(Icons.verified, size: 14, color: NuriskColors.safeGreen),
                           SizedBox(width: 4),
-                          Text('Tervalidasi', style: TextStyle(fontSize: 10, color: Colors.green)),
+                          Text('Tervalidasi', style: TextStyle(fontSize: 10, color: NuriskColors.safeGreen)),
                         ],
                       ),
                   ],
@@ -61,12 +62,12 @@ class IncidentFeedCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.location_on, size: 14, color: Colors.grey),
+                    const Icon(Icons.location_on, size: 14, color: NuriskColors.neutral500),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         incident.district,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey.shade700),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: NuriskColors.neutral700),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -76,11 +77,11 @@ class IncidentFeedCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.access_time, size: 14, color: Colors.grey),
+                    const Icon(Icons.access_time, size: 14, color: NuriskColors.neutral500),
                     const SizedBox(width: 4),
                     Text(
                       incident.occurredAt.toLocal().toString().split('.')[0],
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey.shade700),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: NuriskColors.neutral700),
                     ),
                   ],
                 ),

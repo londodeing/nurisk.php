@@ -72,12 +72,18 @@ class InsidenFullController extends Controller
                 'uuid' => $i->uuid_insiden,
                 'kode' => $i->kode_kejadian,
                 'status' => $i->status_insiden,
+                'status_operasi' => $i->status_operasi,
                 'label_status' => $i->labelStatus(),
                 'prioritas' => $i->prioritas,
                 'jenis_bencana' => $i->jenisBencana?->nama_bencana,
                 'pcnu' => $i->pcnu?->nama_pcnu,
                 'is_locked' => $i->is_locked,
                 'waktu_mulai' => $i->waktu_mulai?->toIso8601String(),
+                'waktu_selesai' => $i->waktu_selesai?->toIso8601String(),
+                'waktu_verifikasi' => $i->waktu_verifikasi?->toIso8601String(),
+                'waktu_respon_dimulai' => $i->waktu_respon_dimulai?->toIso8601String(),
+                'waktu_pemulihan_dimulai' => $i->waktu_pemulihan_dimulai?->toIso8601String(),
+                'waktu_ditutup' => $i->waktu_ditutup?->toIso8601String(),
                 'dibuat_pada' => $i->dibuat_pada?->toIso8601String(),
             ]),
             'meta' => ['total' => $items->total(), 'current_page' => $items->currentPage()],
@@ -116,7 +122,7 @@ class InsidenFullController extends Controller
 
         $insiden->load([
             'jenisBencana', 'pcnu', 'laporanAsal',
-            'posaju', 'riwayatStatus.pengubah.profil',
+            'posaju', 'riwayatStatus.pengguna.profil',
             'penugasan.pengguna.profil',
             'assessments.petugas.profil',
         ]);
@@ -131,15 +137,23 @@ class InsidenFullController extends Controller
             'uuid'         => $insiden->uuid_insiden,
             'kode'         => $insiden->kode_kejadian,
             'status'       => $insiden->status_insiden,
+            'status_operasi' => $insiden->status_operasi,
             'label_status' => $insiden->labelStatus(),
             'prioritas'    => $insiden->prioritas,
             'is_locked'    => $insiden->is_locked,
             'no_spk_assesment' => $insiden->no_spk_assesment,
             'tgl_spk_assesment' => $insiden->tgl_spk_assesment?->toDateString(),
+            'id_pemberi_spk' => $insiden->id_pemberi_spk,
+            'id_penerima_spk' => $insiden->id_penerima_spk,
             'jenis_bencana' => $insiden->jenisBencana?->nama_bencana,
             'pcnu'          => $insiden->pcnu ? ['id' => $insiden->pcnu->id_pcnu, 'nama' => $insiden->pcnu->nama_pcnu] : null,
+            'id_mwc'        => $insiden->id_mwc,
             'waktu_mulai'   => $insiden->waktu_mulai?->toIso8601String(),
             'waktu_selesai' => $insiden->waktu_selesai?->toIso8601String(),
+            'waktu_verifikasi' => $insiden->waktu_verifikasi?->toIso8601String(),
+            'waktu_respon_dimulai' => $insiden->waktu_respon_dimulai?->toIso8601String(),
+            'waktu_pemulihan_dimulai' => $insiden->waktu_pemulihan_dimulai?->toIso8601String(),
+            'waktu_ditutup' => $insiden->waktu_ditutup?->toIso8601String(),
             'dibuat_pada'   => $insiden->dibuat_pada?->toIso8601String(),
 
             // Laporan Asal
@@ -160,8 +174,8 @@ class InsidenFullController extends Controller
 
             // Riwayat Status
             'riwayat_status' => $insiden->riwayatStatus->map(fn($r) => [
-                'status'   => $r->status_baru,
-                'pengubah' => $r->pengubah?->profil?->nama_lengkap ?? $r->pengubah?->no_hp,
+                'status'   => $r->status_terbaru,
+                'pengubah' => $r->pengguna?->profil?->nama_lengkap ?? $r->pengguna?->no_hp,
                 'waktu'    => $r->dibuat_pada?->toIso8601String(),
                 'alasan'   => $r->alasan,
             ]),
@@ -177,7 +191,7 @@ class InsidenFullController extends Controller
 
             // Assessments Summary
             'assessments' => $insiden->assessments->map(fn($a) => [
-                'id'              => $a->id_assessment,
+                'id'              => $a->id_assessment_utama,
                 'uuid'            => $a->uuid_assessment ?? '',
                 'is_latest'       => (bool) $a->is_latest,
                 'waktu_assesment' => $a->waktu_assesment?->toIso8601String(),
@@ -264,6 +278,27 @@ class InsidenFullController extends Controller
     {
         $this->authorize('update', $insiden);
         $insiden->update(['is_locked' => false]);
-        return response()->json(['message' => 'Insiden dibuka.']);
+        return response()->json(['message' => 'Insiden berhasil di-unlock.']);
+    }
+
+    public function downloadSpkPdf(OperasiInsiden $insiden)
+    {
+        $this->authorize('view', $insiden);
+
+        $surat = \App\Models\DokumenSuratUtama::where('id_insiden', $insiden->id_insiden)
+            ->whereHas('jenisSurat', function($q) {
+                $q->where('kode_jenis', 'ST')->orWhere('nama_jenis', 'like', '%tugas%');
+            })
+            ->latest('id_surat')
+            ->first();
+
+        if (!$surat) {
+            return response()->json(['message' => 'Surat tugas tidak ditemukan'], 404);
+        }
+
+        $pdfService = app(\App\Services\SuratPdfService::class);
+        $path = $pdfService->generate($surat);
+
+        return \Illuminate\Support\Facades\Storage::download($path);
     }
 }

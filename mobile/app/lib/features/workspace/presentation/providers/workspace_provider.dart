@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/workspace_dto.dart';
 import '../../data/datasources/workspace_remote_datasource.dart';
 import '../../data/repositories/workspace_repository.dart';
+import '../../../auth/presentation/notifiers/auth_state_provider.dart';
 
 final workspaceRepositoryProvider = Provider<WorkspaceRepository>((ref) {
   return WorkspaceRepository(WorkspaceRemoteDatasource());
@@ -10,6 +11,13 @@ final workspaceRepositoryProvider = Provider<WorkspaceRepository>((ref) {
 class WorkspaceNotifier extends AsyncNotifier<WorkspaceDto> {
   @override
   Future<WorkspaceDto> build() async {
+    // Watch authState so workspace rebuilds when login/logout happens
+    final authState = ref.watch(authStateProvider);
+    
+    if (!authState.isAuthenticated || authState.token == null) {
+      return const WorkspaceDto(profil: null, keahlian: [], penugasan: [], version: 0);
+    }
+
     final repository = ref.watch(workspaceRepositoryProvider);
     return await repository.fetchWorkspace();
   }

@@ -5,6 +5,7 @@ import 'models/master_data.dart';
 import 'models/surat.dart';
 import 'models/assessment.dart';
 import 'models/display.dart';
+import 'models/kebutuhan_numerik.dart';
 
 abstract class MasterRepository {
   Future<List<JenisBencana>> getJenisBencana();
@@ -34,6 +35,7 @@ abstract class MasterRepository {
   Future<List<Kabupaten>> getKabupaten();
   Future<List<Kecamatan>> getKecamatan(String idKab);
   Future<List<Desa>> getDesa(String idKec);
+  Future<List<KebutuhanNumerikMaster>> getKebutuhanNumerikMaster();
 
   Future<List<Pcnu>> getPcnuList();
   Future<List<Keahlian>> getKeahlian();

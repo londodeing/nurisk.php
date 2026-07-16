@@ -40,7 +40,7 @@
             </span>
             <span class="inline-flex items-center gap-1 text-xs font-medium bg-green-50 text-green-700 px-3 py-1 rounded-full border border-green-200">
                 TTD
-                <span class="bg-green-600 text-white rounded-full px-1.5 py-0.5 text-xs" id="badge-ttd">
+                <span class="bg-primary-600 text-white rounded-full px-1.5 py-0.5 text-xs" id="badge-ttd">
                     {{ $suratMenungguTtd->count() }}
                 </span>
             </span>
@@ -81,7 +81,7 @@
                     {{-- Tombol Setujui Paraf --}}
                     <button
                         onclick="prosesParaf({{ $paraf->id_paraf }}, 'disetujui')"
-                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 transition-colors">
+                        class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 transition-colors">
                         ✓ Setujui
                     </button>
                     {{-- Tombol Tolak — buka modal --}}
@@ -147,7 +147,7 @@
                             class="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 transition-colors">
                             🔒 Finalisasi
                         </button>
-                        <a href="{{ route('insiden.pleno.show', [$pleno->id_insiden, $pleno->id_pleno]) }}"
+                        <a href="{{ route('insiden.pleno.show', [$pleno->insiden->kode_kejadian, $pleno->id_pleno]) }}"
                            class="text-xs text-blue-600 hover:underline self-center">Detail</a>
                     </div>
                 </div>
@@ -199,7 +199,7 @@
                         {{-- Tanda tangan langsung --}}
                         <button
                             onclick="tandatanganiSurat({{ $surat->id_surat }}, '{{ $surat->nomor_surat_resmi }}')"
-                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 transition-colors">
+                            class="inline-flex items-center gap-1 px-3 py-1.5 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 transition-colors">
                             ✍ Tandatangani
                         </button>
                     </div>
@@ -286,7 +286,7 @@
                 Tutup
             </button>
             <button onclick="tandatanganiDariPreview()" id="btn-ttd-dari-preview"
-                class="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700">
+                class="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700">
                 ✍ Tandatangani
             </button>
         </div>
@@ -483,13 +483,13 @@ function updateBadge(badgeId, delta) {
     if (next === 0) {
         badge.classList.replace('bg-blue-600', 'bg-gray-300');
         badge.classList.replace('bg-purple-600', 'bg-gray-300');
-        badge.classList.replace('bg-green-600', 'bg-gray-300');
+        badge.classList.replace('bg-primary-600', 'bg-gray-300');
     }
 }
 
 function showToast(type, message) {
     const colors = {
-        success: 'bg-green-600',
+        success: 'bg-primary-600',
         error:   'bg-red-600',
         info:    'bg-blue-600',
     };

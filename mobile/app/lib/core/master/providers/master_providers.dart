@@ -12,6 +12,7 @@ import '../models/master_data.dart';
 import '../models/surat.dart';
 import '../models/assessment.dart';
 import '../models/display.dart';
+import '../models/kebutuhan_numerik.dart';
 
 // === Core Repository Providers ===
 
@@ -140,6 +141,27 @@ final kecamatanProvider = FutureProvider.family<List<Kecamatan>, String>((ref, i
 final desaProvider = FutureProvider.family<List<Desa>, String>((ref, idKec) async {
   await ref.read(sqliteMasterInitProvider.future);
   return ref.read(masterRepositoryProvider).getDesa(idKec);
+});
+
+final kebutuhanNumerikMasterProvider = FutureProvider<List<KebutuhanNumerikMaster>>((ref) async {
+  return [
+    KebutuhanNumerikMaster(idItem: 1, kodeItem: 'sembako', namaItem: 'Paket Sembako', satuanDefault: 'paket', kategori: 'pangan', urutan: 1),
+    KebutuhanNumerikMaster(idItem: 2, kodeItem: 'beras', namaItem: 'Beras', satuanDefault: 'kg', kategori: 'pangan', urutan: 2),
+    KebutuhanNumerikMaster(idItem: 3, kodeItem: 'mie_instan', namaItem: 'Mie Instan', satuanDefault: 'dus', kategori: 'pangan', urutan: 3),
+    KebutuhanNumerikMaster(idItem: 4, kodeItem: 'air_bersih', namaItem: 'Air Bersih', satuanDefault: 'liter', kategori: 'pangan', urutan: 4),
+    KebutuhanNumerikMaster(idItem: 5, kodeItem: 'selimut', namaItem: 'Selimut', satuanDefault: 'lembar', kategori: 'sandang', urutan: 5),
+    KebutuhanNumerikMaster(idItem: 6, kodeItem: 'pakaian', namaItem: 'Pakaian Layak Pakai', satuanDefault: 'set', kategori: 'sandang', urutan: 6),
+    KebutuhanNumerikMaster(idItem: 7, kodeItem: 'matras', namaItem: 'Matras / Tikar', satuanDefault: 'lembar', kategori: 'papan', urutan: 7),
+    KebutuhanNumerikMaster(idItem: 8, kodeItem: 'tenda', namaItem: 'Tenda Pengungsian', satuanDefault: 'unit', kategori: 'papan', urutan: 8),
+    KebutuhanNumerikMaster(idItem: 9, kodeItem: 'terpal', namaItem: 'Terpal', satuanDefault: 'lembar', kategori: 'papan', urutan: 9),
+    KebutuhanNumerikMaster(idItem: 10, kodeItem: 'obat_obatan', namaItem: 'Paket Obat-obatan', satuanDefault: 'paket', kategori: 'kesehatan', urutan: 10),
+    KebutuhanNumerikMaster(idItem: 11, kodeItem: 'masker', namaItem: 'Masker', satuanDefault: 'lusin', kategori: 'kesehatan', urutan: 11),
+    KebutuhanNumerikMaster(idItem: 12, kodeItem: 'pampers', namaItem: 'Popok / Pampers', satuanDefault: 'dus', kategori: 'kesehatan', urutan: 12),
+    KebutuhanNumerikMaster(idItem: 13, kodeItem: 'susu_bayi', namaItem: 'Susu Bayi / Formula', satuanDefault: 'kaleng', kategori: 'kesehatan', urutan: 13),
+    KebutuhanNumerikMaster(idItem: 14, kodeItem: 'perahu', namaItem: 'Perahu Karet', satuanDefault: 'unit', kategori: 'peralatan', urutan: 14),
+    KebutuhanNumerikMaster(idItem: 15, kodeItem: 'pompa_air', namaItem: 'Pompa Air', satuanDefault: 'unit', kategori: 'peralatan', urutan: 15),
+    KebutuhanNumerikMaster(idItem: 16, kodeItem: 'genset', namaItem: 'Genset Portabel', satuanDefault: 'unit', kategori: 'peralatan', urutan: 16),
+  ];
 });
 
 // === Data Providers — Tier C (Organization + TTL) ===

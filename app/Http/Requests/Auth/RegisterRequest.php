@@ -28,6 +28,12 @@ class RegisterRequest extends FormRequest
             'nik'                 => ['nullable', 'string', 'size:16', 'unique:auth_pengguna_profil,nik'],
             'email'               => ['nullable', 'email', 'max:150', 'unique:auth_pengguna_profil,email'],
 
+            'tanggal_lahir'        => ['nullable', 'date'],
+            'jenis_kelamin'       => ['nullable', 'string', 'in:L,P'],
+            'tempat_lahir'        => ['nullable', 'string', 'max:150'],
+            'profesi'             => ['nullable', 'string', 'max:150'],
+            'pengalaman_kebencanaan' => ['nullable', 'string'],
+
             'alamat_deskriptif'   => ['required', 'string', 'max:500'],
 
             'id_kabupaten'        => ['required', 'string', 'size:4', 'exists:wilayah_kabupaten,id_kab'],
@@ -59,6 +65,10 @@ class RegisterRequest extends FormRequest
             'nik.size'                => 'NIK harus tepat 16 digit.',
             'nik.unique'              => 'NIK ini sudah terdaftar.',
             'email.unique'            => 'Email ini sudah terdaftar.',
+            'tanggal_lahir.date'       => 'Format tanggal lahir tidak valid.',
+            'jenis_kelamin.in'        => 'Jenis kelamin harus L atau P.',
+            'tempat_lahir.max'        => 'Tempat lahir maksimal 150 karakter.',
+            'profesi.max'             => 'Profesi maksimal 150 karakter.',
             'alamat_deskriptif.required' => 'Alamat lengkap (RT/RW, Dusun) wajib diisi.',
 
             'id_kabupaten.required'   => 'Pilih kabupaten/kota domisili.',

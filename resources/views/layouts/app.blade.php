@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -23,7 +23,7 @@
 
     <aside id="sidebar" x-show="sidebarOpen" x-cloak class="w-64 flex-none bg-gray-900 h-screen overflow-y-auto flex flex-col fixed lg:static inset-y-0 left-0 z-30 transition-all duration-200">
         <div class="h-16 flex-none bg-gray-950 flex items-center px-4 gap-3">
-            <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <i class="bi bi-shield-check text-white text-sm"></i>
             </div>
             <div class="flex-1 min-w-0">

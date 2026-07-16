@@ -34,8 +34,9 @@ class AssessmentApiController extends Controller
         if (!$user) {
             throw new AuthorizationException('Authentication required.');
         }
+        
         $assessment = $this->assessmentService->simpanLengkap(
-            $request->validated(), $insiden, $user
+            $request->all(), $insiden, $user
         );
         return (new AssessmentLengkapResource($assessment))->response()->setStatusCode(201);
     }
@@ -62,7 +63,7 @@ class AssessmentApiController extends Controller
     {
         $this->authorize('update', $assessment);
         $assessment = $this->assessmentService->updateLengkap(
-            $request->validated(), $assessment
+            $request->all(), $assessment
         );
         return response()->json(new AssessmentLengkapResource($assessment));
     }

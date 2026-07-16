@@ -44,7 +44,7 @@
                                             <div class="flex gap-2 justify-center">
                                                 <form action="{{ route('governance.role-approval.approve', $app->id_application) }}" method="POST">
                                                     @csrf
-                                                    <button type="submit" class="px-3 py-1.5 text-xs bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors" onclick="return confirm('Setujui aplikasi ini?')">
+                                                    <button type="submit" class="px-3 py-1.5 text-xs bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors" onclick="return confirm('Setujui aplikasi ini?')">
                                                         <i class="fa-solid fa-check"></i> Setujui
                                                     </button>
                                                 </form>

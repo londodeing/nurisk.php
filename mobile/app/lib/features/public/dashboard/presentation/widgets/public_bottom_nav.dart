@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nurisk_mobile/core/router/app_router.dart';
 import 'package:nurisk_mobile/core/runtime/runtime_initializer.dart';
+import 'package:nurisk_mobile/shared/widgets/navigation/nurisk_bottom_nav.dart';
 
 class PublicBottomNav extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -72,37 +73,11 @@ class _PublicBottomNavState extends State<PublicBottomNav> {
         _handleBack(context);
       },
       child: Scaffold(
+        extendBody: true,
         body: widget.navigationShell,
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: widget.navigationShell.currentIndex,
-          onDestinationSelected: _onItemTapped,
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined),
-              selectedIcon: Icon(Icons.dashboard),
-              label: 'Beranda',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.map_outlined),
-              selectedIcon: Icon(Icons.map),
-              label: 'Peta',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.add_alert_outlined),
-              selectedIcon: Icon(Icons.add_alert),
-              label: 'Lapor',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.info_outline),
-              selectedIcon: Icon(Icons.info),
-              label: 'Info',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
-              label: 'Akun',
-            ),
-          ],
+        bottomNavigationBar: NuriskBottomNav(
+          currentIndex: widget.navigationShell.currentIndex,
+          onItemTapped: _onItemTapped,
         ),
       ),
     );

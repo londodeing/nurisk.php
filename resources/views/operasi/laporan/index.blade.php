@@ -3,7 +3,7 @@
     <x-slot name="breadcrumb"><a href="{{ route('dashboard.pwnu') }}" class="text-gray-500 hover:text-gray-700">Home</a> <span class="text-gray-400 mx-1">/</span> Laporan Kejadian</x-slot>
     <x-slot name="actions">
         @can('create', App\Models\LaporanKejadian::class)
-        <a href="{{ route('public.lapor') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">
+        <a href="{{ route('public.lapor') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700">
             <i class="bi bi-plus-lg"></i> Laporan Baru
         </a>
         @endcan
@@ -13,7 +13,7 @@
         <form method="GET" action="{{ route('dashboard.laporan.index') }}" class="bg-white rounded-xl border border-gray-200 p-4 flex flex-wrap items-end gap-3">
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-                <select name="status" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500">
+                <select name="status" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500">
                     <option value="">Semua Status</option>
                     <option value="menunggu" {{ request('status') === 'menunggu' ? 'selected' : '' }}>Menunggu</option>
                     <option value="ya" {{ request('status') === 'ya' ? 'selected' : '' }}>Valid</option>
@@ -22,7 +22,7 @@
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Jenis Bencana</label>
-                <select name="id_jenis_bencana" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500">
+                <select name="id_jenis_bencana" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500">
                     <option value="">Semua Jenis</option>
                     @foreach($jenisBencanaList as $jb)
                     <option value="{{ $jb->id_jenis_bencana }}" {{ request('id_jenis_bencana') == $jb->id_jenis_bencana ? 'selected' : '' }}>{{ $jb->nama_bencana }}</option>
@@ -31,11 +31,11 @@
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Dari Tanggal</label>
-                <input type="date" name="dari" value="{{ request('dari') }}" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500">
+                <input type="date" name="dari" value="{{ request('dari') }}" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500">
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Sampai Tanggal</label>
-                <input type="date" name="sampai" value="{{ request('sampai') }}" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500">
+                <input type="date" name="sampai" value="{{ request('sampai') }}" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500">
             </div>
             <button type="submit" class="px-4 py-2 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-700">Filter</button>
             <a href="{{ route('dashboard.laporan.index') }}" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Reset</a>

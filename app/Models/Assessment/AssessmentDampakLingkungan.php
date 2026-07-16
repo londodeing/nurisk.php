@@ -19,7 +19,8 @@ class AssessmentDampakLingkungan extends Model
         'lahan_pertanian_rusak_ha', 'hutan_terdampak_ha', 'lahan_tercemar_ha',
         'sumber_air_tercemar', 'pencemaran_tanah', 'erosi_sedimentasi',
         'kerusakan_ekosistem_pesisir', 'kerusakan_daerah_aliran_sungai',
-        'tingkat_kerusakan_lingkungan', 'butuh_rehabilitasi_lahan',
-        'catatan_lingkungan', 'ternak_terdampak_ekor',
+        'ternak_unggas_ekor', 'ternak_kaki_empat_ekor',
+        'perikanan_kolam_ha', 'perikanan_nelayan_unit',
+        'catatan_lingkungan',
     ];
 }

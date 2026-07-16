@@ -1,0 +1,50 @@
+:root {
+  --nurisk-primary-50: #E6F3EC;
+  --nurisk-primary-100: #C2E4D2;
+  --nurisk-primary-200: #99D3B5;
+  --nurisk-primary-300: #6FC297;
+  --nurisk-primary-400: #4CB47F;
+  --nurisk-primary-500: #2CA368;
+  --nurisk-primary-600: #0F6B3C;
+  --nurisk-primary-700: #0B5730;
+  --nurisk-primary-800: #084325;
+  --nurisk-primary-900: #052E19;
+
+  --nurisk-neutral-50: #F8F9FA;
+  --nurisk-neutral-100: #F1F3F5;
+  --nurisk-neutral-200: #E9ECEF;
+  --nurisk-neutral-300: #DEE2E6;
+  --nurisk-neutral-400: #CED4DA;
+  --nurisk-neutral-500: #ADB5BD;
+  --nurisk-neutral-600: #6C757D;
+  --nurisk-neutral-700: #495057;
+  --nurisk-neutral-800: #343A40;
+  --nurisk-neutral-900: #212529;
+
+  --nurisk-red: #D7263D;
+  --nurisk-orange: #F2994A;
+  --nurisk-green-safe: #27AE60;
+  --nurisk-blue: #2F80ED;
+  --nurisk-text: #1A1D1F;
+  --nurisk-bg: #FFFFFF;
+
+  --nurisk-radius-xs: 4px;
+  --nurisk-radius-sm: 8px;
+  --nurisk-radius-md: 12px;
+  --nurisk-radius-lg: 16px;
+  --nurisk-radius-full: 999px;
+
+  --nurisk-space-xs: 4px;
+  --nurisk-space-sm: 8px;
+  --nurisk-space-md: 12px;
+  --nurisk-space-lg: 16px;
+  --nurisk-space-xl: 24px;
+  --nurisk-space-2xl: 32px;
+  --nurisk-space-3xl: 48px;
+}
+
+[data-theme='dark'] {
+  --nurisk-bg: #121614;
+  --nurisk-text: #F1F3F5;
+  --nurisk-primary-600: #4CB47F;
+}

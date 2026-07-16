@@ -144,6 +144,20 @@ class MasterExportCommand extends Command
             $stmt->execute([$d->id_desa, $d->id_kec, $d->nama_desa]);
         }
 
+        // Kebutuhan Numerik Master
+        $pdo->exec("CREATE TABLE IF NOT EXISTS kebutuhan_numerik_master (
+            id_item INTEGER PRIMARY KEY,
+            kategori TEXT NOT NULL,
+            kode_item TEXT NOT NULL,
+            nama_item TEXT NOT NULL,
+            satuan_default TEXT NOT NULL,
+            urutan INTEGER NOT NULL
+        )");
+        $stmt = $pdo->prepare("INSERT OR REPLACE INTO kebutuhan_numerik_master (id_item, kategori, kode_item, nama_item, satuan_default, urutan) VALUES (?, ?, ?, ?, ?, ?)");
+        foreach (\App\Models\Assessment\AssessmentKebutuhanNumerikMaster::where('aktif', 1)->get() as $n) {
+            $stmt->execute([$n->id_item, $n->kategori, $n->kode_item, $n->nama_item, $n->satuan_default, $n->urutan]);
+        }
+
         // Indexes
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_kecamatan_id_kab ON kecamatan(id_kab)");
         $pdo->exec("CREATE INDEX IF NOT EXISTS idx_desa_id_kec ON desa(id_kec)");

@@ -34,7 +34,7 @@
         @if(!$pleno->isFinal())
         <form action="{{ route('insiden.pleno.finalize', [$insiden, $pleno]) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin? Pleno yang difinalisasi tidak dapat diubah lagi.')">
             @csrf
-            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 shadow-sm flex items-center gap-2">
+            <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 shadow-sm flex items-center gap-2">
                 <i class="bi bi-check-circle"></i> Sahkan & Kunci Pleno
             </button>
         </form>
@@ -105,7 +105,7 @@
                         </div>
                         <div class="flex items-center justify-between">
                             <label class="flex items-center gap-2 text-sm text-gray-600">
-                                <input type="checkbox" name="hak_suara" class="rounded text-green-600 focus:ring-green-500" value="1" checked>
+                                <input type="checkbox" name="hak_suara" class="rounded text-green-600 focus:ring-primary-500" value="1" checked>
                                 Hak Suara
                             </label>
                             <button type="submit" class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">Tambah</button>

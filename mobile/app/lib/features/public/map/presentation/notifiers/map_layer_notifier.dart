@@ -33,6 +33,11 @@ class MapLayerNotifier extends Notifier<MapLayerState> {
   MapLayerState build() => MapLayerState();
 
   Future<void> toggleLayer(String layerId, dynamic mapController) async {
+    if (mapController == null) {
+      log('toggleLayer skipped: mapController is null for $layerId');
+      return;
+    }
+
     final repository = ref.read(mapLayerRepositoryProvider);
     final registry = ref.read(layerRegistryProvider);
 
@@ -42,26 +47,47 @@ class MapLayerNotifier extends Notifier<MapLayerState> {
       return;
     }
 
-    final isCurrentlyActive = state.activeLayerIds.contains(layerId);
-    
-    if (isCurrentlyActive) {
-      // Deactivate layer
-      await plugin.removeLayer(mapController);
-      final newActiveIds = Set<String>.from(state.activeLayerIds)..remove(layerId);
-      state = state.copyWith(activeLayerIds: newActiveIds);
-    } else {
-      // Activate layer
-      state = state.copyWith(isLoading: true, error: null);
-      try {
+    try {
+      final isCurrentlyActive = state.activeLayerIds.contains(layerId);
+
+      if (isCurrentlyActive) {
+        await plugin.removeLayer(mapController);
+        final newActiveIds = Set<String>.from(state.activeLayerIds)..remove(layerId);
+        state = state.copyWith(activeLayerIds: newActiveIds);
+      } else {
+        state = state.copyWith(isLoading: true, error: null);
         final geoJsonData = await repository.getLayerData(layerId);
         await plugin.renderLayer(mapController, geoJsonData);
-        
+
         final newActiveIds = Set<String>.from(state.activeLayerIds)..add(layerId);
         state = state.copyWith(activeLayerIds: newActiveIds, isLoading: false);
-      } catch (e) {
-        state = state.copyWith(isLoading: false, error: DioExceptionMapper.toUserMessage(e));
-        log('Error activating layer $layerId: $e');
       }
+      } catch (e, stack) {
+      log('Error toggling layer $layerId: $e\n$stack');
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString().length > 120
+            ? '${e.runtimeType}: ${e.toString().substring(0, 120)}...'
+            : '${e.runtimeType}: $e',
+      );
+    }
+  }
+
+  Future<void> refreshLayer(String layerId, dynamic mapController) async {
+    if (mapController == null) return;
+    if (!state.activeLayerIds.contains(layerId)) return;
+
+    final registry = ref.read(layerRegistryProvider);
+    final plugin = registry.getPlugin(layerId);
+    if (plugin == null) return;
+
+    try {
+      final repository = ref.read(mapLayerRepositoryProvider);
+      final geoJsonData = await repository.getLayerData(layerId);
+      await plugin.removeLayer(mapController);
+      await plugin.renderLayer(mapController, geoJsonData);
+    } catch (e, stack) {
+      log('Error refreshing layer $layerId: $e\n$stack');
     }
   }
 }

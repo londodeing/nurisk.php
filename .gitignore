@@ -24,3 +24,7 @@ Homestead.yaml
 Thumbs.db
 rr
 .rr.yaml
+
+# Large database files
+mariadb_data/
+nurisk-sync-poc/

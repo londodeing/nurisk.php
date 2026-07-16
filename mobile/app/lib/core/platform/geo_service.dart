@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geolocator_android/geolocator_android.dart';
 import 'package:permission_handler/permission_handler.dart' as ph;
 import 'package:nurisk_mobile/core/diagnostics/runtime_logger.dart';
 import 'package:nurisk_mobile/core/services/permission_service.dart';
@@ -73,11 +75,26 @@ class GeoService {
       }
 
       RuntimeLogger.i('Getting current position', screen: 'geo', feature: 'location');
-      final position = await Geolocator.getCurrentPosition(
-        locationSettings: LocationSettings(
+      
+      late LocationSettings locationSettings;
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        locationSettings = AndroidSettings(
+          accuracy: LocationAccuracy.high,
+          forceLocationManager: true, // Fix untuk FusedLocationProvider ANR (Signal 3)
+          timeLimit: timeout,
+        );
+      } else {
+        locationSettings = LocationSettings(
           accuracy: LocationAccuracy.high,
           timeLimit: timeout,
-        ),
+        );
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: locationSettings,
+      ).timeout(
+        timeout + const Duration(seconds: 2),
+        onTimeout: () => throw TimeoutException('Native GPS timeout fail-safe triggered'),
       );
 
       if (position.isMocked) {

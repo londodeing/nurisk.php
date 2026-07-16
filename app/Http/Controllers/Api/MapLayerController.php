@@ -56,18 +56,12 @@ class MapLayerController extends Controller
                     'name' => 'Hazard & Ancaman',
                     'layers' => [
                         ['id' => 'flood', 'name' => 'Banjir', 'type' => 'raster', 'color' => '#3b82f6', 'default_visible' => false],
+                        ['id' => 'banjir_bandang', 'name' => 'Banjir Bandang', 'type' => 'raster', 'color' => '#6366f1', 'default_visible' => false],
+                        ['id' => 'longsor', 'name' => 'Tanah Longsor', 'type' => 'raster', 'color' => '#f59e0b', 'default_visible' => false],
+                        ['id' => 'cuaca_ekstrim', 'name' => 'Cuaca Ekstrim', 'type' => 'raster', 'color' => '#ef4444', 'default_visible' => false],
+                        ['id' => 'kekeringan', 'name' => 'Kekeringan', 'type' => 'raster', 'color' => '#92400e', 'default_visible' => false],
+                        ['id' => 'gunung_api', 'name' => 'Gunung Api', 'type' => 'raster', 'color' => '#dc2626', 'default_visible' => false],
                         ['id' => 'hotspot', 'name' => 'Titik Panas', 'type' => 'geojson', 'color' => '#ef4444', 'default_visible' => false]
-                    ]
-                ],
-                [
-                    'id' => 'operational',
-                    'name' => 'Operasional',
-                    'layers' => [
-                        ['id' => 'incident', 'name' => 'Insiden', 'type' => 'operational', 'color' => '#f97316', 'icon' => 'warning', 'default_visible' => true],
-                        ['id' => 'ambulance', 'name' => 'Ambulans', 'type' => 'operational', 'color' => '#ef4444', 'icon' => 'local_hospital', 'default_visible' => true],
-                        ['id' => 'posko', 'name' => 'Posko', 'type' => 'operational', 'color' => '#10b981', 'icon' => 'home', 'default_visible' => true],
-                        ['id' => 'shelter', 'name' => 'Shelter', 'type' => 'operational', 'color' => '#8b5cf6', 'icon' => 'house', 'default_visible' => true],
-                        ['id' => 'volunteer', 'name' => 'Relawan', 'type' => 'operational', 'color' => '#06b6d4', 'icon' => 'person', 'default_visible' => false]
                     ]
                 ]
             ]

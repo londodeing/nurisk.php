@@ -40,7 +40,7 @@
                             <dt class="text-slate-500">Progres</dt>
                             <dd>
                                 <div class="w-full bg-slate-200 rounded-full h-2">
-                                    <div class="bg-green-500 h-2 rounded-full" style="width: {{ $klaster->progres_persen ?? 0 }}%"></div>
+                                    <div class="bg-primary-500 h-2 rounded-full" style="width: {{ $klaster->progres_persen ?? 0 }}%"></div>
                                 </div>
                                 <small class="text-slate-500">{{ $klaster->progres_persen ?? 0 }}%</small>
                             </dd>

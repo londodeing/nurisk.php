@@ -31,20 +31,20 @@ class InsidenDatasource {
   }
 
   /// Detail insiden lengkap (riwayat, penugasan, dll)
-  Future<InsidenModel> getInsidenDetail(int id) async {
-    final response = await _client.get('v1/insiden/$id');
+  Future<InsidenModel> getInsidenDetail(String uuid) async {
+    final response = await _client.get('v1/insiden/$uuid');
     final data = response.data['data'] as Map<String, dynamic>;
     return InsidenModel.fromJson(data);
   }
 
   /// Ubah status insiden
   Future<Map<String, dynamic>> ubahStatus({
-    required int id,
+    required String uuid,
     required String statusBaru,
     String? alasan,
   }) async {
     final response = await _client.patch(
-      'v1/insiden/$id/status',
+      'v1/insiden/$uuid/status',
       data: {
         'status': statusBaru,
         if (alasan != null && alasan.isNotEmpty) 'alasan': alasan,

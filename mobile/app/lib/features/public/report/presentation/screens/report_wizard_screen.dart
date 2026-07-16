@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nurisk_mobile/core/error/dio_exception_mapper.dart';
@@ -331,7 +332,19 @@ class _ReportWizardScreenState extends ConsumerState<ReportWizardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lapor Bencana'),
+        centerTitle: true,
         elevation: 0,
+        scrolledUnderElevation: 1,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              color: const Color(0xFFF8F9FA).withValues(alpha: 0.6),
+            ),
+          ),
+        ),
+        surfaceTintColor: Colors.transparent,
       ),
       body: Stepper(
         type: StepperType.vertical,

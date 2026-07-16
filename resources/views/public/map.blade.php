@@ -253,7 +253,7 @@
                     var popupHtml = '<div class="p-1 w-64 font-sans">' +
                         '<div class="flex justify-between items-start mb-2">' +
                         '<h4 class="font-black text-[#006432] uppercase text-xs leading-tight">' + (inc.jenis || '') + '</h4>' +
-                        '<span class="text-[7px] bg-green-600 text-white px-2 py-0.5 rounded font-black uppercase">' + (inc.status || '') + '</span>' +
+                        '<span class="text-[7px] bg-primary-600 text-white px-2 py-0.5 rounded font-black uppercase">' + (inc.status || '') + '</span>' +
                         '</div>' +
                         '<div class="space-y-2 border-t pt-2">' +
                         '<div class="flex items-center gap-2 text-slate-500">' +

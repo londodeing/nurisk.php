@@ -216,7 +216,7 @@ class _InsidenListScreenState extends ConsumerState<InsidenListScreen> {
                                 return InsidenCard(
                                   insiden: insiden,
                                   onTap: () => context.push(
-                                    RoutePaths.insidenDetail.replaceFirst(':id', insiden.id.toString()),
+                                    RoutePaths.insidenDetail.replaceFirst(':id', insiden.uuid),
                                   ),
                                 );
                               },

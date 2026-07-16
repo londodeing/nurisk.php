@@ -18,7 +18,16 @@ class InsidenService
     public function buatInsiden(array $data): OperasiInsiden
     {
         if (empty($data['kode_kejadian'])) {
-            $data['kode_kejadian'] = $this->generateKodeKejadian((int) $data['id_jenis_bencana']);
+            if (!empty($data['id_laporan_asal'])) {
+                $laporanAsal = \App\Models\LaporanKejadian::find($data['id_laporan_asal']);
+                if ($laporanAsal) {
+                    $data['kode_kejadian'] = $laporanAsal->kode_kejadian;
+                }
+            }
+            
+            if (empty($data['kode_kejadian'])) {
+                $data['kode_kejadian'] = $this->generateKodeKejadian((int) ($data['id_jenis_bencana'] ?? 0), $data['id_pcnu'] ?? null);
+            }
         }
         if (empty($data['waktu_mulai'])) {
             $data['waktu_mulai'] = now();
@@ -201,13 +210,32 @@ class InsidenService
      * Format: INS-[TAHUN][BULAN]-[ID Jenis 2 digit]-[5 digit random]
      * Contoh: INS-2606-01-00123
      */
-    private function generateKodeKejadian(int $idJenisBencana): string
+    private function generateKodeKejadian(int $idJenisBencana, ?int $idPcnu = null): string
     {
-        $prefix = 'INS-' . now()->format('ym') . '-' . str_pad($idJenisBencana, 2, '0', STR_PAD_LEFT) . '-';
-        do {
-            $kode = $prefix . str_pad(random_int(1, 99999), 5, '0', STR_PAD_LEFT);
-        } while (OperasiInsiden::where('kode_kejadian', $kode)->exists());
-        return $kode;
+        $prefixStr = 'INS';
+        if ($idPcnu) {
+            $pcnu = \App\Models\OrganisasiPcnu::find($idPcnu);
+            if ($pcnu && $pcnu->kode_sni) {
+                $prefixStr = $pcnu->kode_sni;
+            }
+        }
+
+        $prefix = $prefixStr . '-' . now()->format('ymd');
+
+        return DB::transaction(function () use ($prefix) {
+            $last = OperasiInsiden::where('kode_kejadian', 'like', $prefix . '-%')
+                ->lockForUpdate()
+                ->orderBy('kode_kejadian', 'desc')
+                ->value('kode_kejadian');
+
+            $next = 1;
+            if ($last) {
+                $parts = explode('-', $last);
+                $next = (int) end($parts) + 1;
+            }
+
+            return $prefix . '-' . str_pad($next, 3, '0', STR_PAD_LEFT);
+        });
     }
 
     /**

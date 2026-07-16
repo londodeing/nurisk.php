@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nurisk_mobile/core/router/app_router.dart';
 import 'package:nurisk_mobile/core/api/public_api_client.dart';
+import 'package:nurisk_mobile/core/theme/nurisk_colors.dart';
 import 'package:nurisk_mobile/features/public/report/presentation/notifiers/laporan_validation_provider.dart';
 import 'package:nurisk_mobile/features/public/report/data/models/laporan_kejadian_model.dart';
 import 'package:nurisk_mobile/features/auth/presentation/notifiers/auth_state_provider.dart';
@@ -157,7 +158,7 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                             Navigator.pop(context);
                             if (success) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Laporan ${laporan.kodeKejadian} berhasil divalidasi.'), backgroundColor: Colors.green),
+                                SnackBar(content: Text('Laporan ${laporan.kodeKejadian} berhasil divalidasi.'), backgroundColor: NuriskColors.safeGreen),
                               );
                               // Laporan sudah dinyatakan valid, arahkan ke halaman assignment TRC.
                               // Setelah kembali, refresh daftar agar laporan yang sudah terproses tidak muncul lagi.
@@ -185,13 +186,13 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                               }
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Gagal memvalidasi laporan.'), backgroundColor: Colors.red),
+                                const SnackBar(content: Text('Gagal memvalidasi laporan.'), backgroundColor: NuriskColors.emergencyRed),
                               );
                             }
                           }
                         },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
-                  child: isSubmitting ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Valid & Buat'),
+                  style: ElevatedButton.styleFrom(backgroundColor: NuriskColors.primary600, foregroundColor: NuriskColors.bgWhite),
+                  child: isSubmitting ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: NuriskColors.bgWhite)) : const Text('Valid & Buat'),
                 )
               ],
             );
@@ -263,13 +264,13 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                                 content: Text(success
                                     ? 'Laporan ${laporan.kodeKejadian} berhasil ditolak.'
                                     : 'Gagal menolak laporan.'),
-                                backgroundColor: success ? Colors.orange : Colors.red,
+                                backgroundColor: success ? NuriskColors.warningOrange : NuriskColors.emergencyRed,
                               ),
                             );
                           }
                         },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-                  child: isSubmitting ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Tolak Laporan'),
+                  style: ElevatedButton.styleFrom(backgroundColor: NuriskColors.emergencyRed, foregroundColor: NuriskColors.bgWhite),
+                  child: isSubmitting ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: NuriskColors.bgWhite)) : const Text('Tolak Laporan'),
                 )
               ],
             );
@@ -302,7 +303,7 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: const BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black12)),
+                    border: Border(bottom: BorderSide(color: NuriskColors.neutral200)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -336,40 +337,40 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => Container(
                               height: 200,
-                              color: Colors.grey.shade200,
-                              child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                              color: NuriskColors.neutral200,
+                              child: const Icon(Icons.broken_image, size: 50, color: NuriskColors.neutral500),
                             ),
                           ),
                         ),
                         const SizedBox(height: 16),
                       ],
-                      const Text('Kode Laporan', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const Text('Kode Laporan', style: TextStyle(color: NuriskColors.neutral500, fontSize: 12)),
                       Text(laporan.kodeKejadian, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'monospace')),
                       const Divider(height: 24),
-                      const Text('Informasi Pelapor', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const Text('Informasi Pelapor', style: TextStyle(color: NuriskColors.neutral500, fontSize: 12)),
                       Text(laporan.namaPelapor, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       Text(laporan.hpPelapor, style: const TextStyle(fontSize: 14)),
                       const Divider(height: 24),
-                      const Text('Waktu Kejadian', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const Text('Waktu Kejadian', style: TextStyle(color: NuriskColors.neutral500, fontSize: 12)),
                       Text(laporan.waktuKejadian.toString(), style: const TextStyle(fontSize: 14)),
                       const Divider(height: 24),
-                      const Text('Lokasi Kejadian', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const Text('Lokasi Kejadian', style: TextStyle(color: NuriskColors.neutral500, fontSize: 12)),
                       Text(laporan.titikKenal ?? 'Tidak ada titik kenal', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                       const SizedBox(height: 4),
                       Text(laporan.alamatLengkap ?? 'Alamat lengkap tidak tersedia', style: const TextStyle(fontSize: 14)),
                       const SizedBox(height: 4),
-                      Text('Koordinat: ${laporan.latitude}, ${laporan.longitude}', style: const TextStyle(fontSize: 12, color: Colors.blue)),
+                      Text('Koordinat: ${laporan.latitude}, ${laporan.longitude}', style: const TextStyle(fontSize: 12, color: NuriskColors.infoBlue)),
                       const Divider(height: 24),
-                      const Text('Keterangan Situasi', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      const Text('Keterangan Situasi', style: TextStyle(color: NuriskColors.neutral500, fontSize: 12)),
                       Text(laporan.keteranganSituasi, style: const TextStyle(fontSize: 14)),
                     ],
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border(top: BorderSide(color: Colors.black12)),
+decoration: const BoxDecoration(
+                    color: NuriskColors.bgWhite,
+                    border: Border(top: BorderSide(color: NuriskColors.neutral200)),
                   ),
                   child: Row(
                     children: [
@@ -380,8 +381,8 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                               _showValidationDialog(laporan);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
+                              backgroundColor: NuriskColors.primary600,
+                              foregroundColor: NuriskColors.bgWhite,
                             ),
                             child: const Text('VALIDASI'),
                           ),
@@ -393,7 +394,7 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                             Navigator.pop(context);
                             _showRejectDialog(laporan);
                           },
-                          style: OutlinedButton.styleFrom(foregroundColor: Colors.red, side: const BorderSide(color: Colors.red)),
+                                        style: OutlinedButton.styleFrom(foregroundColor: NuriskColors.emergencyRed, side: const BorderSide(color: NuriskColors.emergencyRed)),
                           child: const Text('TOLAK', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ),
@@ -415,11 +416,11 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
     return Scaffold(
       appBar: AppBar(
         title: const Text('Validasi Laporan Pending'),
-        backgroundColor: Colors.green.shade700,
-        foregroundColor: Colors.white,
+        backgroundColor: NuriskColors.primary700,
+        foregroundColor: NuriskColors.bgWhite,
       ),
       body: validationState.isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: NuriskColors.primary600))
           : RefreshIndicator(
               onRefresh: () => ref.read(laporanValidationProvider.notifier).fetchPendingLaporan(),
               child: validationState.error != null
@@ -431,7 +432,7 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                             children: [
                               const Text('❌', style: TextStyle(fontSize: 48)),
                               const SizedBox(height: 8),
-                              Text(validationState.error!, style: const TextStyle(color: Colors.red, fontStyle: FontStyle.italic)),
+                              Text(validationState.error!, style: const TextStyle(color: NuriskColors.emergencyRed, fontStyle: FontStyle.italic)),
                             ],
                           ),
                         ),
@@ -446,7 +447,7 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                                 children: [
                                   Text('✅', style: TextStyle(fontSize: 48)),
                                   SizedBox(height: 8),
-                                  Text('Semua bersih. Tidak ada laporan pending.', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)),
+                                  Text('Semua bersih. Tidak ada laporan pending.', style: TextStyle(color: NuriskColors.neutral500, fontStyle: FontStyle.italic)),
                                 ],
                               ),
                             ),
@@ -476,8 +477,8 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                      decoration: BoxDecoration(color: Colors.amber.shade100, borderRadius: BorderRadius.circular(12)),
-                                      child: const Text('MENUNGGU', style: TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.bold)),
+                                      decoration: BoxDecoration(color: NuriskColors.warningOrange.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
+                                      child: const Text('MENUNGGU', style: TextStyle(color: NuriskColors.warningOrange, fontSize: 10, fontWeight: FontWeight.bold)),
                                     )
                                   ],
                                 ),
@@ -486,17 +487,17 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                                 const SizedBox(height: 4),
                                 Text('Jenis Bencana ID: ${laporan.idJenisBencana}', style: const TextStyle(fontSize: 13)),
                                 const SizedBox(height: 4),
-                                Text('Lokasi: ${laporan.titikKenal ?? '-'}', style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                                Text('Lokasi: ${laporan.titikKenal ?? '-'}', style: const TextStyle(fontSize: 13, color: NuriskColors.neutral500)),
 
                                 const SizedBox(height: 8),
-                                Text(laporan.keteranganSituasi, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+                                Text(laporan.keteranganSituasi, style: const TextStyle(fontSize: 13, color: NuriskColors.darkText)),
                                 const SizedBox(height: 16),
                                 Row(
                                   children: [
                                     Expanded(
                                       child: ElevatedButton(
                                         onPressed: () => _showValidationDialog(laporan),
-                                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white, elevation: 0),
+                                        style: ElevatedButton.styleFrom(backgroundColor: NuriskColors.primary600, foregroundColor: NuriskColors.bgWhite, elevation: 0),
                                         child: const Text('VALIDASI', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                                       ),
                                     ),
@@ -504,7 +505,7 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
                                     Expanded(
                                       child: OutlinedButton(
                                         onPressed: () => _showRejectDialog(laporan),
-                                        style: OutlinedButton.styleFrom(foregroundColor: Colors.red, side: const BorderSide(color: Colors.red)),
+                          style: OutlinedButton.styleFrom(foregroundColor: NuriskColors.emergencyRed, side: const BorderSide(color: NuriskColors.emergencyRed)),
                                         child: const Text('TOLAK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                                       ),
                                     ),

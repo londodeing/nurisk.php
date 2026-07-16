@@ -103,11 +103,11 @@ $posaju = DB::transaction(function () use ($validated, $insiden) {
         return redirect($route)->with('success', 'Pos Aju berhasil dibuat.');
     }
 
-    public function show(OperasiPosaju $posaju, ?OperasiInsiden $insiden = null)
+    public function show(OperasiInsiden $insiden, OperasiPosaju $posaju)
     {
         $this->authorize('view', $posaju);
 
-$posaju->load([
+        $posaju->load([
             'insiden', 'pj',
             'stok.katalog',
             'stok.gudang',
@@ -127,7 +127,7 @@ $posaju->load([
         return view('operasi.posaju.show', compact('posaju'));
     }
 
-    public function activate(Request $request, OperasiPosaju $posaju, ?OperasiInsiden $insiden = null)
+    public function activate(Request $request, OperasiInsiden $insiden, OperasiPosaju $posaju)
     {
         $this->authorize('activate', $posaju);
 
@@ -135,17 +135,14 @@ $posaju->load([
             $posaju = $this->posajuService->activate($posaju);
             $this->jurnal->catat('posaju_diaktifkan', $posaju);
 
-            $route = $insiden
-                ? route('insiden.posaju.show', [$insiden, $posaju])
-                : route('posaju.show', $posaju);
-
-            return redirect($route)->with('success', 'Pos Aju berhasil diaktifkan.');
+            return redirect()->route('insiden.posaju.show', [$insiden, $posaju])
+                ->with('success', 'Pos Aju berhasil diaktifkan.');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal mengaktifkan Pos Aju: ' . $e->getMessage());
         }
     }
 
-    public function close(Request $request, OperasiPosaju $posaju, ?OperasiInsiden $insiden = null)
+    public function close(Request $request, OperasiInsiden $insiden, OperasiPosaju $posaju)
     {
         $this->authorize('close', $posaju);
 
@@ -186,7 +183,7 @@ $posaju->load([
         }
     }
 
-    public function extend(Request $request, OperasiPosaju $posaju, ?OperasiInsiden $insiden = null)
+    public function extend(Request $request, OperasiInsiden $insiden, OperasiPosaju $posaju)
     {
         $this->authorize('extend', $posaju);
 
@@ -203,11 +200,8 @@ $posaju->load([
             );
             $this->jurnal->catat('posaju_diperpanjang', $posaju);
 
-            $route = $insiden
-                ? route('insiden.posaju.show', [$insiden, $posaju])
-                : route('posaju.show', $posaju);
-
-            return redirect($route)->with('success', 'Pos Aju berhasil diperpanjang.');
+            return redirect()->route('insiden.posaju.show', [$insiden, $posaju])
+                ->with('success', 'Pos Aju berhasil diperpanjang.');
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal memperpanjang Pos Aju: ' . $e->getMessage());
         }

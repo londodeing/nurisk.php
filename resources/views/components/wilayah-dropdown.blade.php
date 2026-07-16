@@ -3,7 +3,7 @@
 <div class="space-y-3">
     <div>
         <label class="block text-xs font-medium text-gray-700 mb-1">Kabupaten/Kota</label>
-        <select name="id_kabupaten" id="kabupaten-select" class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500">
+        <select name="id_kabupaten" id="kabupaten-select" class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500">
             <option value="">Pilih Kabupaten</option>
             @foreach($kabupatenList as $kab)
             <option value="{{ $kab->id_kab }}" {{ $selectedKab == $kab->id_kab ? 'selected' : '' }}>
@@ -14,13 +14,13 @@
     </div>
     <div>
         <label class="block text-xs font-medium text-gray-700 mb-1">Kecamatan</label>
-        <select name="id_kecamatan" id="kecamatan-select" class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500" {{ !$selectedKab ? 'disabled' : '' }}>
+        <select name="id_kecamatan" id="kecamatan-select" class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500" {{ !$selectedKab ? 'disabled' : '' }}>
             <option value="">Pilih Kecamatan</option>
         </select>
     </div>
     <div>
         <label class="block text-xs font-medium text-gray-700 mb-1">Desa/Kelurahan</label>
-        <select name="id_desa" id="desa-select" class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500" {{ !$selectedKec ? 'disabled' : '' }}>
+        <select name="id_desa" id="desa-select" class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500" {{ !$selectedKec ? 'disabled' : '' }}>
             <option value="">Pilih Desa</option>
         </select>
     </div>

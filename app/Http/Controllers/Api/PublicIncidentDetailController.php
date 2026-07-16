@@ -37,11 +37,7 @@ class PublicIncidentDetailController extends Controller
                 $gap = max(0, (float)$n->jumlah_dibutuhkan - (float)$n->jumlah_tersedia);
                 if ($gap > 0) {
                     $key = $n->item?->nama_item ?? 'item_'.$n->id_item;
-                    $needsNumeric[$key] = [
-                        'dibutuhkan' => (int) $n->jumlah_dibutuhkan,
-                        'tersedia'   => (int) $n->jumlah_tersedia,
-                        'gap'        => (int) ceil($gap),
-                    ];
+                    $needsNumeric[$key] = (int) ceil($gap);
                 }
             }
         }

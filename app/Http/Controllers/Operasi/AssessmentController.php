@@ -8,6 +8,7 @@ use App\Models\OperasiInsiden;
 use App\Models\AssessmentUtama;
 use App\Models\WilayahKecamatan;
 use App\Models\WilayahDesa;
+use App\Models\Assessment\AssessmentKebutuhanNumerikMaster;
 use App\Services\Operasi\AssessmentService;
 use Illuminate\Http\Request;
 
@@ -24,7 +25,50 @@ class AssessmentController extends Controller
     {
         $this->authorize('create', [AssessmentUtama::class, $insiden]);
         $kecamatanList = WilayahKecamatan::orderBy('nama_kec')->get(['id_kec', 'nama_kec']);
-        return view('operasi.assessment.create', compact('insiden', 'kecamatanList'));
+        $kebutuhanMaster = AssessmentKebutuhanNumerikMaster::where('aktif', 1)->orderBy('urutan')->get();
+
+        $latestAssessment = AssessmentUtama::where('id_insiden', $insiden->id_insiden)
+                                ->latest('id_assessment_utama')
+                                ->first();
+
+        if ($latestAssessment) {
+            $latestAssessment->load([
+                'dampakManusia', 'dampakManusiaV2', 'dampakInfrastruktur', 'dampakLingkungan',
+                'dampakEkonomi', 'biodataKejadian', 'narasiKejadian', 'kebutuhanMendesak',
+                'lokasiDetail', 'kebutuhanLanjutan', 'kebutuhanNumerik', 'dampakRumah', 'dampakFasum', 'dampakVital'
+            ]);
+            $assessment = $latestAssessment;
+            $desaList = $assessment->lokasiDetail?->id_kec ? WilayahDesa::where('id_kec', $assessment->lokasiDetail->id_kec)->orderBy('nama_desa')->get(['id_desa', 'nama_desa']) : [];
+        } else {
+            $assessment = new AssessmentUtama();
+            $laporan = $insiden->laporanAsal;
+            
+            if ($laporan) {
+                // Populate Utama
+                $assessment->cakupan_wilayah_deskripsi = $laporan->alamat_lengkap;
+                $assessment->latitude = $laporan->latitude;
+                $assessment->longitude = $laporan->longitude;
+
+                // Populate Lokasi
+                $assessment->setRelation('lokasiDetail', new \App\Models\Assessment\AssessmentLokasiDetail([
+                    'id_kec' => $laporan->id_kec,
+                    'id_desa' => $laporan->id_desa,
+                ]));
+
+                // Populate Biodata
+                $assessment->setRelation('biodataKejadian', new \App\Models\Assessment\AssessmentBiodataKejadian([
+                    'tanggal_mulai_kejadian' => $laporan->waktu_kejadian ? $laporan->waktu_kejadian->format('Y-m-d') : null,
+                    'jam_mulai_kejadian' => $laporan->waktu_kejadian ? $laporan->waktu_kejadian->format('H:i') : null,
+                    'kronologi_singkat' => $laporan->keterangan_situasi,
+                ]));
+                
+                $desaList = $laporan->id_kec ? WilayahDesa::where('id_kec', $laporan->id_kec)->orderBy('nama_desa')->get(['id_desa', 'nama_desa']) : [];
+            } else {
+                $desaList = [];
+            }
+        }
+
+        return view('operasi.assessment.create', compact('insiden', 'kecamatanList', 'kebutuhanMaster', 'assessment', 'desaList'));
     }
 
     public function store(StoreAssessmentRequest $request, OperasiInsiden $insiden)
@@ -39,7 +83,7 @@ class AssessmentController extends Controller
 
 
 
-        return redirect()->route('insiden.assessment.show', [$insiden->id_insiden, $assessment->id_assessment_utama])
+        return redirect()->route('insiden.assessment.show', [$insiden, $assessment])
             ->with('success', 'Assessment berhasil disimpan.');
     }
 
@@ -66,7 +110,9 @@ class AssessmentController extends Controller
             'dampakEkonomi', 'biodataKejadian', 'narasiKejadian', 'kebutuhanMendesak',
         ]);
         $kecamatanList = WilayahKecamatan::orderBy('nama_kec')->get(['id_kec', 'nama_kec']);
-        return view('operasi.assessment.edit', compact('insiden', 'assessment', 'kecamatanList'));
+        $desaList = $assessment->lokasiDetail?->id_kec ? WilayahDesa::where('id_kec', $assessment->lokasiDetail->id_kec)->orderBy('nama_desa')->get(['id_desa', 'nama_desa']) : [];
+        $kebutuhanMaster = AssessmentKebutuhanNumerikMaster::where('aktif', 1)->orderBy('urutan')->get();
+        return view('operasi.assessment.edit', compact('insiden', 'assessment', 'kecamatanList', 'desaList', 'kebutuhanMaster'));
     }
 
     public function update(StoreAssessmentRequest $request, OperasiInsiden $insiden, AssessmentUtama $assessment)
@@ -76,7 +122,7 @@ class AssessmentController extends Controller
         $data = $request->validated();
         $this->service->updateAssessment($assessment, $data);
 
-        return redirect()->route('insiden.assessment.show', [$insiden->id_insiden, $assessment->id_assessment_utama])
+        return redirect()->route('insiden.assessment.show', [$insiden, $assessment])
             ->with('success', 'Assessment berhasil diperbarui.');
     }
 
@@ -138,7 +184,7 @@ class AssessmentController extends Controller
             'dampakInfrastruktur', 'dampakLingkungan', 'dampakEkonomi',
             'dampakRumah', 'dampakFasum', 'dampakVital',
             'biodataKejadian', 'kebutuhanLanjutan', 'kebutuhanMendesak',
-            'kebutuhanNumerik.itemMaster', 'lokasiDetail.kecamatan', 'lokasiDetail.desa',
+            'kebutuhanNumerik.item', 'lokasiDetail.kecamatan', 'lokasiDetail.desa',
             'narasiDetail', 'narasiKejadian',
         ]);
 

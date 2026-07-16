@@ -111,12 +111,17 @@ class RegistrationService
             ]);
 
             AuthPenggunaProfil::create([
-                'id_pengguna'      => $user->id_pengguna,
-                'nama_lengkap'     => $data['nama_lengkap'],
-                'nik'              => $data['nik'] ?? null,
-                'email'            => $data['email'] ?? null,
-                'id_desa_domisili' => $data['id_desa'],
-                'alamat'           => $data['alamat_deskriptif'] ?? null,
+                'id_pengguna'              => $user->id_pengguna,
+                'nama_lengkap'             => $data['nama_lengkap'],
+                'nik'                      => $data['nik'] ?? null,
+                'email'                    => $data['email'] ?? null,
+                'id_desa_domisili'         => $data['id_desa'],
+                'alamat'                   => $data['alamat_deskriptif'] ?? null,
+                'tanggal_lahir'            => $data['tanggal_lahir'] ?? null,
+                'jenis_kelamin'            => $data['jenis_kelamin'] ?? null,
+                'tempat_lahir'             => $data['tempat_lahir'] ?? null,
+                'profesi'                  => $data['profesi'] ?? null,
+                'pengalaman_kebencanaan'   => $data['pengalaman_kebencanaan'] ?? null,
             ]);
 
             if (!empty($data['keahlian']) && is_array($data['keahlian'])) {

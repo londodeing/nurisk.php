@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nurisk_mobile/core/error/dio_exception_mapper.dart';
 import 'package:nurisk_mobile/core/runtime/app_lifecycle_service.dart';
 import 'package:nurisk_mobile/core/runtime/runtime_initializer.dart';
+import 'package:nurisk_mobile/core/theme/nurisk_colors.dart';
 import '../../data/datasources/laporan_remote_datasource.dart';
 import '../../data/models/tracking_step_model.dart';
 import 'dart:async';
@@ -88,24 +89,24 @@ class _ReportTrackingScreenState extends ConsumerState<ReportTrackingScreen> wit
     }
   }
 
-  Color _getStatusColor(String status) {
+Color _getStatusColor(String status) {
     switch (status) {
       case 'DITERIMA':
-        return Colors.grey;
+        return NuriskColors.neutral500;
       case 'VERIFIED':
-        return Colors.orange;
+        return NuriskColors.warningOrange;
       case 'ASSESSMENT':
-        return Colors.blue;
+        return NuriskColors.infoBlue;
       case 'RESPONSE':
-        return Colors.red;
+        return NuriskColors.emergencyRed;
       case 'RECOVERY':
-        return Colors.green;
+        return NuriskColors.safeGreen;
       case 'REJECTED':
-        return Colors.redAccent;
+        return NuriskColors.emergencyRed;
       default:
-        return Colors.grey;
-    }
-  }
+        return NuriskColors.neutral500;
+}
+}
 
   String _formatTime(DateTime? time) {
     if (time == null) return '';
@@ -133,12 +134,12 @@ class _ReportTrackingScreenState extends ConsumerState<ReportTrackingScreen> wit
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('Pelacakan: ${widget.ticketId}'),
-            if (_isPolling) ...[
+if (_isPolling) ...[
               const SizedBox(width: 8),
               const SizedBox(
                 width: 12,
                 height: 12,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(strokeWidth: 2, color: NuriskColors.bgWhite),
               ),
             ]
           ],
@@ -151,15 +152,15 @@ class _ReportTrackingScreenState extends ConsumerState<ReportTrackingScreen> wit
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
-                    child: Column(
+child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.search_off, size: 64, color: Colors.grey),
+                        const Icon(Icons.search_off, size: 64, color: NuriskColors.neutral500),
                         const SizedBox(height: 16),
                         Text(
                           _errorMessage,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 16, color: Colors.grey),
+                          style: const TextStyle(fontSize: 16, color: NuriskColors.neutral500),
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton.icon(
@@ -201,13 +202,13 @@ class _ReportTrackingScreenState extends ConsumerState<ReportTrackingScreen> wit
                                         color: color,
                                         shape: BoxShape.circle,
                                       ),
-                                      child: const Icon(Icons.check, size: 14, color: Colors.white),
+                                      child: const Icon(Icons.check, size: 14, color: NuriskColors.bgWhite),
                                     ),
-                                    if (!isLast)
+if (!isLast)
                                       Expanded(
                                         child: Container(
                                           width: 2,
-                                          color: Colors.grey[300],
+                                          color: NuriskColors.neutral300,
                                         ),
                                       ),
                                   ],
@@ -232,7 +233,7 @@ class _ReportTrackingScreenState extends ConsumerState<ReportTrackingScreen> wit
                                             ),
                                             Text(
                                               _formatTime(step.time),
-                                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                              style: const TextStyle(fontSize: 12, color: NuriskColors.neutral500),
                                             ),
                                           ],
                                         ),

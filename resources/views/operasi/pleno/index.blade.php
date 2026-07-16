@@ -16,7 +16,7 @@
             <p class="text-sm text-gray-500">Semua riwayat rapat pleno terkait operasi ini.</p>
         </div>
         @can('create', [App\Models\OperasiPleno::class, $insiden])
-        <a href="{{ route('insiden.pleno.create', $insiden) }}" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-lg font-semibold text-xs text-white hover:bg-green-700">
+        <a href="{{ route('insiden.pleno.create', $insiden) }}" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-lg font-semibold text-xs text-white hover:bg-primary-700">
             <i class="bi bi-plus-lg mr-2"></i> Buat Pleno Baru
         </a>
         @endcan

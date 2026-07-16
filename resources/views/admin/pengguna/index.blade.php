@@ -11,11 +11,11 @@
         <form method="GET" class="bg-white rounded-xl border border-gray-200 p-4 flex flex-wrap items-end gap-3">
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Cari</label>
-                <input type="text" name="search" value="{{ request('search') }}" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500" placeholder="Nama / No HP...">
+                <input type="text" name="search" value="{{ request('search') }}" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500" placeholder="Nama / No HP...">
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Status</label>
-                <select name="status_akun" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500">
+                <select name="status_akun" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500">
                     <option value="">Semua Status</option>
                     <option value="aktif" {{ request('status_akun') === 'aktif' ? 'selected' : '' }}>Aktif</option>
                     <option value="menunggu" {{ request('status_akun') === 'menunggu' ? 'selected' : '' }}>Menunggu</option>
@@ -25,7 +25,7 @@
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Role</label>
-                <select name="id_peran" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500">
+                <select name="id_peran" class="rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500">
                     <option value="">Semua Role</option>
                     @foreach($rolesList ?? [] as $role)
                     <option value="{{ $role->id_peran }}" {{ request('id_peran') == $role->id_peran ? 'selected' : '' }}>{{ $role->nama_peran }}</option>

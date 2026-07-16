@@ -417,9 +417,10 @@ document.getElementById('no_hp').addEventListener('input', function() {
         noHpError.style.display = 'block';
     } else {
         noHpError.style.display = 'none';
-        noHpError.style.display = 'none';
     }
-}function loadKecamatan() {
+});
+
+function loadKecamatan() {
     var idKab = document.getElementById('id_kab').value;
     var selectKec = document.getElementById('id_kec');
     var selectDesa = document.getElementById('id_desa');

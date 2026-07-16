@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -6,14 +8,12 @@ import 'package:nurisk_mobile/core/error/dio_exception_mapper.dart';
 import 'package:nurisk_mobile/core/runtime/app_lifecycle_service.dart';
 import 'package:nurisk_mobile/core/runtime/runtime_initializer.dart';
 
-import '../providers/selected_operational_object_provider.dart';
-import '../providers/operational_filter_provider.dart';
 import '../notifiers/map_layer_notifier.dart';
 import '../../data/datasources/map_layer_datasource.dart';
-import '../widgets/operational_bottom_sheet.dart';
 import 'package:nurisk_mobile/features/map/presentation/widgets/layer_control_bottom_sheet.dart';
-import '../widgets/filter_control_bottom_sheet.dart';
-import 'dart:async';
+import '../../domain/services/incident_geo_json_bridge.dart';
+import 'package:nurisk_mobile/features/public/incident/presentation/notifiers/incident_provider.dart';
+import 'package:nurisk_mobile/features/public/incident/domain/entities/incident_entity.dart';
 
 class CopMapScreen extends ConsumerStatefulWidget {
   const CopMapScreen({super.key});
@@ -25,6 +25,8 @@ class CopMapScreen extends ConsumerStatefulWidget {
 class _CopMapScreenState extends ConsumerState<CopMapScreen> with AppLifecycleObserver {
   MapLibreMapController? mapController;
   Timer? _liveUpdateTimer;
+  final Set<String> _attachedSources = {};
+  LatLng? _lastUserLocation;
 
   @override
   void initState() {
@@ -36,9 +38,10 @@ class _CopMapScreenState extends ConsumerState<CopMapScreen> with AppLifecycleOb
   void _startLiveUpdates() {
     _liveUpdateTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       if (mapController != null) {
+        final notifier = ref.read(mapLayerNotifierProvider.notifier);
         final activeLayers = ref.read(mapLayerNotifierProvider).activeLayerIds;
         for (var layerId in activeLayers) {
-          ref.read(mapLayerNotifierProvider.notifier).toggleLayer(layerId, mapController);
+          notifier.refreshLayer(layerId, mapController);
         }
       }
     });
@@ -67,9 +70,57 @@ class _CopMapScreenState extends ConsumerState<CopMapScreen> with AppLifecycleOb
 
   Future<void> _refreshActiveLayers() async {
     if (mapController == null) return;
+    final notifier = ref.read(mapLayerNotifierProvider.notifier);
     final activeLayers = ref.read(mapLayerNotifierProvider).activeLayerIds;
     for (var layerId in activeLayers) {
-      ref.read(mapLayerNotifierProvider.notifier).toggleLayer(layerId, mapController);
+      await notifier.refreshLayer(layerId, mapController);
+    }
+  }
+
+  Future<void> _updateIncidentMarkers() async {
+    final feedState = ref.read(incidentFeedProvider).asData?.value;
+    if (feedState == null || mapController == null) return;
+
+    final geoJson = incidentsToGeoJson(feedState.incidents);
+    try {
+      if (_attachedSources.contains('feed_incidents')) {
+        await mapController!.removeLayer('feed_incidents');
+        await mapController!.removeSource('feed_incidents');
+        _attachedSources.remove('feed_incidents');
+      }
+      await mapController!.addSource(
+        'feed_incidents',
+        GeojsonSourceProperties(data: geoJson),
+      );
+      await mapController!.addLayer(
+        'feed_incidents',
+        'feed_incidents',
+        CircleLayerProperties(
+          circleRadius: 6,
+          circleColor: ['get', 'color'],
+          circleStrokeWidth: 2,
+          circleStrokeColor: '#ffffff',
+        ),
+      );
+      _attachedSources.add('feed_incidents');
+    } catch (e) {
+      RuntimeLogger.w('Failed to update incident markers: $e', screen: 'cop_map');
+    }
+  }
+
+  Future<void> _goToMyLocation() async {
+    if (mapController == null) return;
+    final loc = _lastUserLocation;
+    if (loc != null) {
+      await mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(loc, 14.0),
+      );
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Lokasi belum tersedia. Pastikan GPS aktif.')),
+        );
+      }
     }
   }
 
@@ -79,6 +130,8 @@ class _CopMapScreenState extends ConsumerState<CopMapScreen> with AppLifecycleOb
     controller.onFeatureTapped.add((point, coordinates, id, layerId, annotation) {
       _handleFeatureTapped(id, coordinates);
     });
+
+    await _updateIncidentMarkers();
 
     try {
       final datasource = ref.read(mapLayerDatasourceProvider);
@@ -104,23 +157,132 @@ class _CopMapScreenState extends ConsumerState<CopMapScreen> with AppLifecycleOb
     }
   }
 
-  void _handleFeatureTapped(dynamic id, LatLng coordinates) async {
+  void _handleFeatureTapped(String id, LatLng coordinates) async {
     if (mapController == null) return;
 
-    mapController!.animateCamera(
+    await mapController!.animateCamera(
       CameraUpdate.newLatLngZoom(coordinates, 14.0),
     );
+
+    if (!mounted) return;
+
+    final feedState = ref.read(incidentFeedProvider).asData?.value;
+    if (feedState == null) return;
+
+    final incident = feedState.incidents.where((i) => i.id == id).firstOrNull;
+    if (incident == null || !mounted) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => SafeArea(
+        child: _buildIncidentSummary(incident),
+      ),
+    );
+  }
+
+  Widget _buildIncidentSummary(IncidentEntity inc) {
+    final needs = inc.needsNumeric.entries.toList();
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade400,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          Text(inc.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 12),
+          _summaryRow(Icons.category, 'Jenis', inc.category),
+          if (inc.kode != null && inc.kode!.isNotEmpty)
+            _summaryRow(Icons.tag, 'Kode', inc.kode!),
+          _summaryRow(Icons.info_outline, 'Status', inc.status),
+          _summaryRow(Icons.location_on, 'Lokasi', inc.district),
+          _summaryRow(Icons.access_time, 'Mulai', _formatDate(inc.occurredAt)),
+          if (inc.korbanSummary > 0)
+            _summaryRow(Icons.people, 'Korban', '$inc.korbanSummary jiwa terdampak'),
+          if (needs.isNotEmpty) ...[
+            const Divider(height: 20),
+            const Text('Gap Kebutuhan:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+            const SizedBox(height: 4),
+            ...needs.map((e) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+              child: Row(
+                children: [
+                  Expanded(child: Text(e.key, style: const TextStyle(fontSize: 13))),
+                  Text('${e.value}', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                ],
+              ),
+            )),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _summaryRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: Colors.grey.shade600),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 60,
+            child: Text(label, style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
+          ),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 14))),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime dt) {
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    return '${dt.day} ${months[dt.month - 1]} ${dt.year}, ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(operationalFilterProvider, (previous, next) {
-      if (mapController != null) {
-        // Apply MapLibre micro-filters based on next.status, next.severity etc
+    ref.listen(incidentFeedProvider, (previous, next) {
+      if (next.asData?.value != null && mapController != null) {
+        _updateIncidentMarkers();
       }
     });
 
-    final selectedObject = ref.watch(selectedOperationalObjectProvider);
+    ref.listen<MapLayerState>(mapLayerNotifierProvider, (previous, current) {
+      if (current.error != null && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(current.error!),
+            backgroundColor: Colors.red.shade700,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    });
 
     return Scaffold(
       body: Stack(
@@ -128,13 +290,16 @@ class _CopMapScreenState extends ConsumerState<CopMapScreen> with AppLifecycleOb
           MapLibreMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: const CameraPosition(
-              target: LatLng(-6.200000, 106.816666),
-              zoom: 12.0,
+              target: LatLng(-7.250000, 110.400000),
+              zoom: 9.0,
             ),
             styleString: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
             myLocationEnabled: true,
             myLocationRenderMode: MyLocationRenderMode.compass,
             trackCameraPosition: true,
+            onUserLocationUpdated: (location) {
+              _lastUserLocation = location.position;
+            },
           ),
 
           Positioned(
@@ -145,95 +310,47 @@ class _CopMapScreenState extends ConsumerState<CopMapScreen> with AppLifecycleOb
                 FloatingActionButton.small(
                   heroTag: 'layer_selector',
                   onPressed: () {
+                    final currentActive = Set<String>.from(
+                      ref.read(mapLayerNotifierProvider).activeLayerIds,
+                    );
                     showModalBottomSheet(
                       context: context,
                       backgroundColor: Colors.transparent,
                       builder: (ctx) => LayerControlBottomSheet(
                         onLayersChanged: (activeLayers) {
-                          for (var layerId in activeLayers) {
+                          final newActive = activeLayers.toSet();
+                          final toAdd = newActive.difference(currentActive);
+                          final toRemove = currentActive.difference(newActive);
+                          for (var layerId in toRemove) {
                             ref.read(mapLayerNotifierProvider.notifier).toggleLayer(layerId, mapController);
                           }
+                          for (var layerId in toAdd) {
+                            ref.read(mapLayerNotifierProvider.notifier).toggleLayer(layerId, mapController);
+                          }
+                          currentActive
+                            ..clear()
+                            ..addAll(newActive);
                         },
                       ),
                     );
                   },
                   child: const Icon(Icons.layers),
                 ),
-                const SizedBox(height: 8),
-                FloatingActionButton.small(
-                  heroTag: 'filter',
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      backgroundColor: Colors.transparent,
-                      builder: (ctx) => const FilterControlBottomSheet(),
-                    );
-                  },
-                  child: const Icon(Icons.filter_list),
-                ),
               ],
             ),
           ),
 
-          if (selectedObject != null)
-            const OperationalBottomSheet()
-          else
-            _buildPlaceholderBottomSheet(),
+          Positioned(
+            right: 16,
+            bottom: MediaQuery.of(context).padding.bottom + 80,
+            child: FloatingActionButton(
+              heroTag: 'my_location',
+              onPressed: _goToMyLocation,
+              child: const Icon(Icons.my_location),
+            ),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildPlaceholderBottomSheet() {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.15,
-      minChildSize: 0.1,
-      maxChildSize: 0.9,
-      builder: (BuildContext context, ScrollController scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 10,
-                spreadRadius: 2,
-              )
-            ],
-          ),
-          child: CustomScrollView(
-            controller: scrollController,
-            slivers: [
-              SliverToBoxAdapter(
-                child: Center(
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 12),
-                    width: 40,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade400,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    'Situational Awareness',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

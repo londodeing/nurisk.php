@@ -122,7 +122,7 @@
                             @csrf
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-0.5">PCNU Tujuan</label>
-                                <select name="id_pcnu" id="pcnu-select" required class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500">
+                                <select name="id_pcnu" id="pcnu-select" required class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500">
                                     <option value="">-- Pilih PCNU --</option>
                                     @foreach($pcnuList as $pcnu)
                                     <option value="{{ $pcnu->id_pcnu }}" {{ old('id_pcnu', $laporan->id_pcnu) == $pcnu->id_pcnu ? 'selected' : '' }}>{{ $pcnu->nama_pcnu }}</option>
@@ -131,7 +131,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-0.5">Prioritas</label>
-                                <select name="prioritas" required class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500">
+                                <select name="prioritas" required class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500">
                                     <option value="rendah">Rendah</option>
                                     <option value="sedang" selected>Sedang</option>
                                     <option value="tinggi">Tinggi</option>
@@ -140,13 +140,13 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-0.5">Status Insiden</label>
-                                <select name="status_insiden" required class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-green-500">
+                                <select name="status_insiden" required class="w-full rounded-lg border-gray-300 text-sm focus:border-green-500 focus:ring-primary-500">
                                     <option value="terverifikasi">Terverifikasi</option>
                                     <option value="respon">Respon (Langsung turun)</option>
                                 </select>
                             </div>
 
-                            <button type="submit" class="w-full px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700">
+                            <button type="submit" class="w-full px-3 py-1.5 bg-primary-600 text-white text-xs font-medium rounded-lg hover:bg-primary-700">
                                 ✓ Valid & Buat Insiden
                             </button>
                         </form>

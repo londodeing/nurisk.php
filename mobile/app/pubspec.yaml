@@ -36,6 +36,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   flutter_secure_storage: ^10.3.1
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.17
+  open_filex: ^4.5.0
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
@@ -98,6 +102,8 @@ flutter:
 
   assets:
     - .env
+    - assets/profil/
+    - assets/login/
     - assets/master/version.json
     - assets/master/bencana/jenis.json
     - assets/master/status/laporan.json

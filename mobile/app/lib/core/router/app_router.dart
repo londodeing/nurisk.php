@@ -19,6 +19,9 @@ import 'package:nurisk_mobile/features/public/resource/presentation/screens/reso
 import 'package:nurisk_mobile/features/public/report/presentation/screens/report_tracking_screen.dart';
 import 'package:nurisk_mobile/features/public/report/presentation/screens/report_validation_list_screen.dart';
 import 'package:nurisk_mobile/features/operasi/assessment/presentation/screens/assessment_wizard_screen.dart';
+import 'package:nurisk_mobile/features/operasi/pleno/presentation/screens/pleno_list_screen.dart';
+import 'package:nurisk_mobile/features/operasi/pleno/presentation/screens/pleno_form_screen.dart';
+import 'package:nurisk_mobile/features/operasi/pleno/presentation/screens/pleno_detail_screen.dart';
 import 'package:nurisk_mobile/features/operasi/assignment/presentation/screens/trc_assignment_screen.dart';
 import 'package:nurisk_mobile/features/public/report/data/models/laporan_kejadian_model.dart';
 import 'package:nurisk_mobile/features/operasi/insiden/presentation/screens/insiden_list_screen.dart';
@@ -101,20 +104,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isAuthenticated = auth.value != null;
 
       if (isAuthenticated) {
-        if (RoutePaths.isAuthPage(location) || location == RoutePaths.splash) {
-          debugPrint('[ROUTER_DEBUG] redirecting to home because isAuthenticated on auth page');
-          return RoutePaths.home; 
+        if (location == RoutePaths.splash) {
+          return RoutePaths.home;
         }
         return null;
       }
 
       if (location == RoutePaths.splash) {
-        debugPrint('[ROUTER_DEBUG] redirecting to home because unauthenticated on splash');
-        return RoutePaths.home; 
+        return RoutePaths.home;
       }
 
       if (RoutePaths.isProtected(location)) {
-        debugPrint('[ROUTER_DEBUG] redirecting to login because unauthenticated on protected route');
         return RoutePaths.login;
       }
 
@@ -172,8 +172,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'insidenDetail',
         path: RoutePaths.insidenDetail,
         builder: (context, state) {
-          final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
-          return InsidenDetailScreen(insidenId: id);
+          final uuid = state.pathParameters['id'] ?? '';
+          return InsidenDetailScreen(insidenUuid: uuid);
         },
       ),
 
@@ -228,7 +228,50 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.assessmentForm,
         builder: (context, state) {
           final uuid = state.pathParameters['uuidInsiden'] ?? '';
-          return AssessmentWizardScreen(uuidInsiden: uuid);
+          final extra = state.extra;
+          // extra dapat berupa Map dengan kunci 'insiden' dan 'targetAssessmentId',
+          // atau langsung InsidenModel (untuk backward compat), atau null
+          dynamic insidenObj;
+          int? targetAssessmentId;
+          if (extra is Map) {
+            insidenObj = extra['insiden'];
+            targetAssessmentId = extra['targetAssessmentId'] is int
+                ? extra['targetAssessmentId'] as int
+                : null;
+          } else {
+            insidenObj = extra;
+          }
+          return AssessmentWizardScreen(
+            uuidInsiden: uuid,
+            insiden: insidenObj,
+            targetAssessmentId: targetAssessmentId,
+          );
+        },
+      ),
+
+      GoRoute(
+        name: 'plenoList',
+        path: '/insiden/:uuid/pleno',
+        builder: (context, state) {
+          final uuid = state.pathParameters['uuid']!;
+          return PlenoListScreen(uuidInsiden: uuid);
+        },
+      ),
+      GoRoute(
+        name: 'plenoCreate',
+        path: '/insiden/:uuid/pleno/create',
+        builder: (context, state) {
+          final uuid = state.pathParameters['uuid']!;
+          return PlenoFormScreen(uuidInsiden: uuid);
+        },
+      ),
+      GoRoute(
+        name: 'plenoDetail',
+        path: '/insiden/:uuid/pleno/:idPleno',
+        builder: (context, state) {
+          final uuid = state.pathParameters['uuid']!;
+          final idPleno = int.parse(state.pathParameters['idPleno']!);
+          return PlenoDetailScreen(uuidInsiden: uuid, idPleno: idPleno);
         },
       ),
 

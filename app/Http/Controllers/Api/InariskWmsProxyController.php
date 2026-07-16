@@ -39,8 +39,8 @@ class InariskWmsProxyController extends Controller
                 $imageContent = $response->body();
                 $contentType = $response->header('Content-Type') ?? 'image/png';
 
-                // Cache for 7 days (604800 seconds) as hazard layers are mostly static
-                Cache::put($cacheKey, ['content' => $imageContent, 'type' => $contentType], 604800);
+                // Cache for 30 days (2592000 seconds) as hazard layers are mostly static
+                Cache::put($cacheKey, ['content' => $imageContent, 'type' => $contentType], 2592000);
 
                 return response($imageContent, 200)
                     ->header('Content-Type', $contentType)
@@ -58,5 +58,70 @@ class InariskWmsProxyController extends Controller
             $transparentTile = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
             return response($transparentTile, 200)->header('Content-Type', 'image/png');
         }
+    }
+
+    /**
+     * Convert {z}/{x}/{y} tile coordinates to WMS bbox and proxy to inaRISK.
+     * MapLibre GL (Flutter) → WMS 1.3.0 GetMap → 256×256 PNG tile.
+     * Cache: 30 days (2592000s).
+     */
+    public function tile(Request $request, int $z, int $x, int $y)
+    {
+        $layers = $request->query('layers', 'raster:INDEKS_BAHAYA_BANJIR1');
+
+        $n = pow(2, $z);
+        $lonWest = ($x / $n) * 360.0 - 180.0;
+        $lonEast = (($x + 1) / $n) * 360.0 - 180.0;
+        $latSouth = atan(sinh(M_PI * (1 - 2 * ($y + 1) / $n))) * 180.0 / M_PI;
+        $latNorth = atan(sinh(M_PI * (1 - 2 * $y / $n))) * 180.0 / M_PI;
+
+        $cacheKey = 'inarisk_tile_' . md5("{$z}_{$x}_{$y}_{$layers}");
+        $cached = Cache::get($cacheKey);
+        if ($cached) {
+            return response($cached, 200)
+                ->header('Content-Type', 'image/png')
+                ->header('X-Cache', 'HIT');
+        }
+
+        try {
+            $baseUrl = env('INARISK_WMS_URL', 'https://inarisk1.bnpb.go.id:8443/geoserver/raster/wms');
+
+            $response = Http::retry(2, 1000)->timeout(20)->get($baseUrl, [
+                'SERVICE' => 'WMS',
+                'VERSION' => '1.3.0',
+                'REQUEST' => 'GetMap',
+                'LAYERS' => $layers,
+                'STYLES' => 'index_bahaya',
+                'FORMAT' => 'image/png',
+                'TRANSPARENT' => 'TRUE',
+                'WIDTH' => 256,
+                'HEIGHT' => 256,
+                'CRS' => 'EPSG:4326',
+                'BBOX' => "{$latSouth},{$lonWest},{$latNorth},{$lonEast}",
+            ]);
+
+            if ($response->successful()) {
+                Cache::put($cacheKey, $response->body(), 2592000);
+                return response($response->body(), 200)
+                    ->header('Content-Type', 'image/png')
+                    ->header('X-Cache', 'MISS');
+            }
+
+            Log::error('Inarisk tile proxy failed', [
+                'z' => $z, 'x' => $x, 'y' => $y,
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'layers' => $layers,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Inarisk tile proxy exception', [
+                'z' => $z, 'x' => $x, 'y' => $y,
+                'layers' => $layers,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        $transparentTile = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=');
+        return response($transparentTile, 200)->header('Content-Type', 'image/png');
     }
 }

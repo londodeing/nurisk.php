@@ -98,25 +98,32 @@ class InsidenDetailState {
   }
 }
 
-class InsidenDetailNotifier extends AsyncNotifier<InsidenModel> {
-  final int id;
-  InsidenDetailNotifier(this.id);
+class InsidenDetailNotifier extends Notifier<InsidenDetailState> {
+  final String uuid;
+  InsidenDetailNotifier(this.uuid);
 
   @override
-  Future<InsidenModel> build() async {
-    return _fetch();
+  InsidenDetailState build() {
+    _fetch();
+    return const InsidenDetailState(isLoading: true);
   }
 
-  Future<InsidenModel> _fetch() async {
-    final ds = ref.read(insidenDatasourceProvider);
-    return ds.getInsidenDetail(id);
+  Future<void> _fetch() async {
+    state = const InsidenDetailState(isLoading: true);
+    try {
+      final ds = ref.read(insidenDatasourceProvider);
+      final insiden = await ds.getInsidenDetail(uuid);
+      state = InsidenDetailState(isLoading: false, insiden: insiden);
+    } catch (e) {
+      state = InsidenDetailState(isLoading: false, error: e.toString());
+    }
   }
 
   Future<bool> ubahStatus(String statusBaru, {String? alasan}) async {
     try {
       final ds = ref.read(insidenDatasourceProvider);
-      await ds.ubahStatus(id: id, statusBaru: statusBaru, alasan: alasan);
-      ref.invalidateSelf();
+      await ds.ubahStatus(uuid: uuid, statusBaru: statusBaru, alasan: alasan);
+      _fetch();
       ref.invalidate(insidenListProvider);
       return true;
     } catch (e) {
@@ -125,18 +132,18 @@ class InsidenDetailNotifier extends AsyncNotifier<InsidenModel> {
   }
 
   Future<void> refresh() async {
-    ref.invalidateSelf();
+    _fetch();
   }
 }
 
-/// Provider factory — create one per insiden ID
-final insidenDetailFamily = <int, AsyncNotifierProvider<InsidenDetailNotifier, InsidenModel>>{};
+/// Provider factory — create one per insiden UUID
+final insidenDetailFamily = <String, NotifierProvider<InsidenDetailNotifier, InsidenDetailState>>{};
 
-AsyncNotifierProvider<InsidenDetailNotifier, InsidenModel> insidenDetailProvider(int id) {
+NotifierProvider<InsidenDetailNotifier, InsidenDetailState> insidenDetailProvider(String uuid) {
   return insidenDetailFamily.putIfAbsent(
-    id,
-    () => AsyncNotifierProvider<InsidenDetailNotifier, InsidenModel>(
-      () => InsidenDetailNotifier(id),
+    uuid,
+    () => NotifierProvider<InsidenDetailNotifier, InsidenDetailState>(
+      () => InsidenDetailNotifier(uuid),
     ),
   );
 }

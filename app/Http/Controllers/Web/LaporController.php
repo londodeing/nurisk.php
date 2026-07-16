@@ -100,7 +100,7 @@ class LaporController extends Controller
 
         $laporan = DB::transaction(function () use ($validated, $lat, $lng, $titikKenal, $alamatLengkap, $idPcnu) {
             return LaporanKejadian::create([
-                'kode_kejadian'      => LaporanKejadian::generateKodeKejadian(),
+                'kode_kejadian'      => LaporanKejadian::generateKodeKejadian($idPcnu),
                 'id_pengguna'        => null,
                 'id_jenis_bencana'   => (int) $validated['id_jenis_bencana'],
                 'nama_pelapor'       => $validated['nama'],

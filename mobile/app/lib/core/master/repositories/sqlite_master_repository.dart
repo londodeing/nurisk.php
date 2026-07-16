@@ -4,6 +4,7 @@ import 'package:drift/native.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/wilayah.dart';
+import '../models/kebutuhan_numerik.dart';
 
 /// User kosong untuk membuka NativeDatabase secara mandiri (tanpa GeneratedDatabase).
 class _MasterDbUser implements QueryExecutorUser {
@@ -82,6 +83,21 @@ class SQLiteMasterRepository {
       idDesa: row['id_desa'] as String,
       idKec: row['id_kec'] as String,
       namaDesa: row['nama_desa'] as String,
+    )).toList();
+  }
+
+  Future<List<KebutuhanNumerikMaster>> getKebutuhanNumerik() async {
+    final result = await _executor.runSelect(
+      'SELECT id_item, kategori, kode_item, nama_item, satuan_default, urutan FROM kebutuhan_numerik_master ORDER BY urutan',
+      [],
+    );
+    return result.map((row) => KebutuhanNumerikMaster(
+      idItem: row['id_item'] as int,
+      kategori: row['kategori'] as String,
+      kodeItem: row['kode_item'] as String,
+      namaItem: row['nama_item'] as String,
+      satuanDefault: row['satuan_default'] as String,
+      urutan: row['urutan'] as int,
     )).toList();
   }
 

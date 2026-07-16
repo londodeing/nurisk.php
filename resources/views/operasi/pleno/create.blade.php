@@ -20,7 +20,7 @@
                 <!-- Jenis Pleno -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Pleno <span class="text-red-500">*</span></label>
-                    <select name="jenis_pleno" required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500">
+                    <select name="jenis_pleno" required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-primary-500">
                         <option value="">-- Pilih Jenis Pleno --</option>
                         <option value="aktivasi_operasi">Aktivasi Operasi</option>
                         <option value="evaluasi_rutin">Evaluasi Rutin</option>
@@ -34,13 +34,13 @@
                 <!-- Waktu Pleno -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Waktu Pleno <span class="text-red-500">*</span></label>
-                    <input type="datetime-local" name="waktu_pleno" required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500" value="{{ now()->format('Y-m-d\TH:i') }}">
+                    <input type="datetime-local" name="waktu_pleno" required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-primary-500" value="{{ now()->format('Y-m-d\TH:i') }}">
                 </div>
 
                 <!-- Pimpinan Pleno -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Pimpinan Pleno <span class="text-red-500">*</span></label>
-                    <select name="pimpinan_pleno" required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500">
+                    <select name="pimpinan_pleno" required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-primary-500">
                         <option value="">-- Pilih Pimpinan (Ketua) --</option>
                         @foreach($pimpinanList as $pimpinan)
                         <option value="{{ $pimpinan->id_pengguna }}">{{ $pimpinan->profil?->nama_lengkap ?? $pimpinan->no_hp }}</option>
@@ -52,13 +52,13 @@
                 <!-- Lokasi -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi Pleno</label>
-                    <input type="text" name="lokasi_pleno" class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500" placeholder="Contoh: Gedung PCNU">
+                    <input type="text" name="lokasi_pleno" class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-primary-500" placeholder="Contoh: Gedung PCNU">
                 </div>
             </div>
 
             <div class="mt-8 pt-5 border-t border-gray-200 flex justify-end gap-3">
                 <a href="{{ route('insiden.pleno.index', $insiden) }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</a>
-                <button type="submit" class="px-4 py-2 bg-green-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-green-700">Simpan sebagai Draft</button>
+                <button type="submit" class="px-4 py-2 bg-primary-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-primary-700">Simpan sebagai Draft</button>
             </div>
         </form>
     </div>

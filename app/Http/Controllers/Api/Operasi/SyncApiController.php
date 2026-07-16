@@ -302,8 +302,12 @@ class SyncApiController extends Controller
                 
                 $eagerLoads = ['insiden'];
                 if ($entityType === 'assessment') {
-                    $eagerLoads[] = 'dampakManusia';
-                    $eagerLoads[] = 'kebutuhanMendesak';
+                    $eagerLoads = array_merge($eagerLoads, [
+                        'dampakManusia', 'kebutuhanMendesak',
+                        'dampakManusiaV2', 'kebutuhanNumerik', 'lokasiDetail', 'narasiDetail',
+                        'dampakInfrastruktur', 'dampakRumah', 'dampakFasum', 'dampakVital',
+                        'dampakLingkungan', 'dampakEkonomi', 'biodataKejadian', 'narasiKejadian'
+                    ]);
                 }
 
                 $entities = $modelClass::with($eagerLoads)
@@ -530,8 +534,12 @@ class SyncApiController extends Controller
 
             $eagerLoads = ['insiden'];
             if ($entityType === 'assessment') {
-                $eagerLoads[] = 'dampakManusia';
-                $eagerLoads[] = 'kebutuhanMendesak';
+                $eagerLoads = array_merge($eagerLoads, [
+                    'dampakManusia', 'kebutuhanMendesak',
+                    'dampakManusiaV2', 'kebutuhanNumerik', 'lokasiDetail', 'narasiDetail',
+                    'dampakInfrastruktur', 'dampakRumah', 'dampakFasum', 'dampakVital',
+                    'dampakLingkungan', 'dampakEkonomi', 'biodataKejadian', 'narasiKejadian'
+                ]);
             }
 
             $query = $modelClass::with($eagerLoads);

@@ -6,6 +6,7 @@ import 'models/master_data.dart';
 import 'models/surat.dart';
 import 'models/assessment.dart';
 import 'models/display.dart';
+import 'models/kebutuhan_numerik.dart';
 import 'repositories/json_master_repository.dart';
 import 'repositories/sqlite_master_repository.dart';
 import 'repositories/organization_repository.dart';
@@ -48,6 +49,7 @@ class MasterRepositoryImpl implements MasterRepository {
   @override Future<List<Kabupaten>> getKabupaten() => sqliteRepo.getKabupaten();
   @override Future<List<Kecamatan>> getKecamatan(String idKab) => sqliteRepo.getKecamatan(idKab);
   @override Future<List<Desa>> getDesa(String idKec) => sqliteRepo.getDesa(idKec);
+  @override Future<List<KebutuhanNumerikMaster>> getKebutuhanNumerikMaster() => jsonRepo.getKebutuhanNumerikMaster();
 
   @override Future<List<Pcnu>> getPcnuList() => orgRepo.getPcnuList();
   @override Future<List<Keahlian>> getKeahlian() => jsonRepo.getKeahlian();

@@ -17,7 +17,7 @@ class AssessmentKebutuhanLanjutan extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'id_assessment', 'kebutuhan_dana', 'kebutuhan_relawan', 'kebutuhan_logistik',
+        'id_assessment', 'kebutuhan_relawan', 'kebutuhan_logistik',
         'kebutuhan_peralatan', 'kebutuhan_medis', 'kebutuhan_pangan', 'kebutuhan_lainnya'
     ];
 

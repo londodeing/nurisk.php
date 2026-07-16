@@ -2,14 +2,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../datasources/map_layer_datasource.dart';
 
 class MapLayerRepository {
+  static const Set<String> _rasterLayerIds = {
+    'flood', 'banjir_bandang', 'longsor', 'cuaca_ekstrim', 'kekeringan', 'gunung_api',
+  };
+
   final MapLayerDatasource _datasource;
 
   MapLayerRepository(this._datasource);
 
-  /// Fetches GeoJSON for a specific layer.
-  /// According to the Spatial API Contract (M1.5), 
-  /// all layers return a standardized GeoJSON FeatureCollection.
   Future<Map<String, dynamic>> getLayerData(String layerId) async {
+    if (_rasterLayerIds.contains(layerId)) {
+      return {};
+    }
     return await _datasource.fetchLayerGeoJson(layerId);
   }
 }

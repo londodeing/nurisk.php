@@ -101,9 +101,18 @@ class LaporanKejadian extends Model
         return $query->where('is_valid', 'menunggu');
     }
 
-    public static function generateKodeKejadian(): string
+    public static function generateKodeKejadian($idPcnu = null): string
     {
-        $prefix = 'LAP-' . now()->format('Ymd');
+        $prefixStr = 'LAP';
+
+        if ($idPcnu) {
+            $pcnu = \App\Models\OrganisasiPcnu::find($idPcnu);
+            if ($pcnu && $pcnu->kode_sni) {
+                $prefixStr = $pcnu->kode_sni;
+            }
+        }
+
+        $prefix = $prefixStr . '-' . now()->format('ymd');
 
         return DB::transaction(function () use ($prefix) {
             $last = self::where('kode_kejadian', 'like', $prefix . '-%')
@@ -117,7 +126,7 @@ class LaporanKejadian extends Model
                 $next = (int) end($parts) + 1;
             }
 
-            return $prefix . '-' . str_pad($next, 4, '0', STR_PAD_LEFT);
+            return $prefix . '-' . str_pad($next, 3, '0', STR_PAD_LEFT);
         });
     }
 }

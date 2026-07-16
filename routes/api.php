@@ -114,6 +114,7 @@ Route::prefix('wilayah')->name('api.wilayah.')->group(function () {
 // ============================================================
 Route::prefix('public')->name('api.public.')->group(function () {
     // Dashboard Publik & COP
+    Route::get('dashboard', [\App\Http\Controllers\Api\PublicDashboardWebController::class, 'index'])->name('dashboard.index');
     Route::get('dashboard/config', [\App\Http\Controllers\Api\PublicDashboardApiController::class, 'config'])->name('dashboard.config');
     Route::get('incident/list', [\App\Http\Controllers\Api\PublicListApiController::class, 'incidentList'])->name('incident.list');
     Route::get('mission/list', [\App\Http\Controllers\Api\PublicListApiController::class, 'missionList'])->name('mission.list');
@@ -140,6 +141,7 @@ Route::prefix('public/map')->name('api.public.map.')->group(function () {
     Route::get('operational/{type}', [\App\Http\Controllers\Api\MapLayerController::class, 'operationalObjects'])->name('operational');
     Route::get('live-update', [\App\Http\Controllers\Api\MapLiveUpdateController::class, 'stream'])->name('live_update');
     Route::get('proxy/inarisk/wms', [\App\Http\Controllers\Api\InariskWmsProxyController::class, 'proxy'])->name('proxy.inarisk.wms');
+    Route::get('tiles/{z}/{x}/{y}.png', [\App\Http\Controllers\Api\InariskWmsProxyController::class, 'tile'])->name('tiles.xyz');
 });
 
 // ============================================================
@@ -254,7 +256,7 @@ Route::middleware(['auth:sanctum', 'role:super_admin,pwnu,pcnu,relawan,trc'])->g
     // Operasi
     Route::prefix('operasi')->name('api.operasi.')->group(function () {
         Route::apiResource('posaju', OperasiPosajuController::class)->except(['destroy']);
-        Route::get('insiden/{insiden}/posaju/aktif', [OperasiPosajuController::class, 'activeByInsiden'])->name('posaju.active-by-insiden');
+        Route::get('insiden/{insiden:uuid_insiden}/posaju/aktif', [OperasiPosajuController::class, 'activeByInsiden'])->name('posaju.active-by-insiden');
         Route::post('posaju/{posaju}/activate', [OperasiPosajuController::class, 'activate'])->name('posaju.activate');
         Route::post('posaju/{posaju}/extend', [OperasiPosajuController::class, 'extend'])->name('posaju.extend');
         Route::post('posaju/{posaju}/close', [OperasiPosajuController::class, 'close'])->name('posaju.close');
@@ -304,6 +306,7 @@ Route::middleware(['auth:sanctum', 'role:super_admin,pwnu,pcnu,relawan,trc'])->g
         Route::get('assessment/{assessment}', [App\Http\Controllers\Api\Operasi\AssessmentApiController::class, 'show'])->name('assessment.show');
         Route::put('assessment/{assessment}', [App\Http\Controllers\Api\Operasi\AssessmentApiController::class, 'update'])->name('assessment.update');
         Route::delete('assessment/{assessment}', [App\Http\Controllers\Api\Operasi\AssessmentApiController::class, 'destroy'])->name('assessment.destroy');
+        Route::get('assessment/{assessment}/pdf', [App\Http\Controllers\Api\Operasi\AssessmentApiController::class, 'downloadPdf'])->name('assessment.pdf');
         // Assessment — nested children
         Route::get('assessment/{assessment}/dampak', [App\Http\Controllers\Api\Operasi\AssessmentApiController::class, 'dampakIndex'])->name('assessment.dampak.index');
         Route::post('assessment/{assessment}/dampak', [App\Http\Controllers\Api\Operasi\AssessmentApiController::class, 'dampakStore'])->name('assessment.dampak.store');
@@ -333,12 +336,13 @@ Route::middleware(['auth:sanctum', 'role:super_admin,pwnu,pcnu,relawan,trc'])->g
         // Insiden — CRUD lengkap + status lifecycle
         Route::get('insiden', [InsidenFullController::class, 'index'])->name('insiden.index');
         Route::post('insiden', [InsidenFullController::class, 'store'])->name('insiden.store');
-        Route::get('insiden/{insiden}', [InsidenFullController::class, 'show'])->name('insiden.show');
-        Route::put('insiden/{insiden}', [InsidenFullController::class, 'update'])->name('insiden.update');
-        Route::delete('insiden/{insiden}', [InsidenFullController::class, 'destroy'])->name('insiden.destroy');
-        Route::patch('insiden/{insiden}/status', [InsidenFullController::class, 'ubahStatus'])->name('insiden.ubah-status');
-        Route::post('insiden/{insiden}/lock', [InsidenFullController::class, 'lock'])->name('insiden.lock');
-        Route::post('insiden/{insiden}/unlock', [InsidenFullController::class, 'unlock'])->name('insiden.unlock');
+        Route::get('insiden/{insiden:uuid_insiden}', [InsidenFullController::class, 'show'])->name('insiden.show');
+        Route::put('insiden/{insiden:uuid_insiden}', [InsidenFullController::class, 'update'])->name('insiden.update');
+        Route::delete('insiden/{insiden:uuid_insiden}', [InsidenFullController::class, 'destroy'])->name('insiden.destroy');
+        Route::patch('insiden/{insiden:uuid_insiden}/status', [InsidenFullController::class, 'ubahStatus'])->name('insiden.ubah-status');
+        Route::post('insiden/{insiden:uuid_insiden}/lock', [InsidenFullController::class, 'lock'])->name('insiden.lock');
+        Route::post('insiden/{insiden:uuid_insiden}/unlock', [InsidenFullController::class, 'unlock'])->name('insiden.unlock');
+        Route::get('insiden/{insiden:uuid_insiden}/spk/pdf', [InsidenFullController::class, 'downloadSpkPdf'])->name('insiden.spk.pdf');
 
         // Eskalasi
         Route::get('eskalasi', [EskalasiApiController::class, 'index'])->name('eskalasi.index');
@@ -383,16 +387,17 @@ Route::middleware(['auth:sanctum', 'role:super_admin,pwnu,pcnu,relawan,trc'])->g
         Route::delete('klaster/{uuid}', [KlasterApiController::class, 'destroy'])->name('klaster.destroy');
 
         // Governance — Pleno
-        Route::get('insiden/{insiden}/pleno', [PlanoApiController::class, 'index'])->name('insiden.pleno.index');
-        Route::post('insiden/{insiden}/pleno', [PlanoApiController::class, 'store'])->name('insiden.pleno.store');
-        Route::get('insiden/{insiden}/pleno/{pleno}', [PlanoApiController::class, 'show'])->name('insiden.pleno.show');
-        Route::put('insiden/{insiden}/pleno/{pleno}', [PlanoApiController::class, 'update'])->name('insiden.pleno.update');
-        Route::delete('insiden/{insiden}/pleno/{pleno}', [PlanoApiController::class, 'destroy'])->name('insiden.pleno.destroy');
-        Route::post('insiden/{insiden}/pleno/{pleno}/finalisasi', [PlanoApiController::class, 'finalisasi'])->name('insiden.pleno.finalisasi');
-        Route::post('insiden/{insiden}/pleno/{pleno}/keputusan', [PlanoApiController::class, 'tambahKeputusan'])->name('insiden.pleno.keputusan.store');
-        Route::delete('insiden/{insiden}/pleno/{pleno}/keputusan/{keputusan}', [PlanoApiController::class, 'hapusKeputusan'])->name('insiden.pleno.keputusan.destroy');
-        Route::post('insiden/{insiden}/pleno/{pleno}/peserta', [PlanoApiController::class, 'tambahPeserta'])->name('insiden.pleno.peserta.store');
-        Route::delete('insiden/{insiden}/pleno/{pleno}/peserta/{peserta}', [PlanoApiController::class, 'hapusPeserta'])->name('insiden.pleno.peserta.destroy');
+        Route::get('insiden/{insiden:uuid_insiden}/pleno', [PlanoApiController::class, 'index'])->name('insiden.pleno.index');
+        Route::post('insiden/{insiden:uuid_insiden}/pleno', [PlanoApiController::class, 'store'])->name('insiden.pleno.store');
+        Route::get('insiden/{insiden:uuid_insiden}/pleno/{pleno}', [PlanoApiController::class, 'show'])->name('insiden.pleno.show');
+        Route::put('insiden/{insiden:uuid_insiden}/pleno/{pleno}', [PlanoApiController::class, 'update'])->name('insiden.pleno.update');
+        Route::delete('insiden/{insiden:uuid_insiden}/pleno/{pleno}', [PlanoApiController::class, 'destroy'])->name('insiden.pleno.destroy');
+        Route::post('insiden/{insiden:uuid_insiden}/pleno/{pleno}/finalisasi', [PlanoApiController::class, 'finalisasi'])->name('insiden.pleno.finalisasi');
+        Route::post('insiden/{insiden:uuid_insiden}/pleno/{pleno}/keputusan', [PlanoApiController::class, 'tambahKeputusan'])->name('insiden.pleno.keputusan.store');
+        Route::delete('insiden/{insiden:uuid_insiden}/pleno/{pleno}/keputusan/{keputusan}', [PlanoApiController::class, 'hapusKeputusan'])->name('insiden.pleno.keputusan.destroy');
+        Route::post('insiden/{insiden:uuid_insiden}/pleno/{pleno}/peserta', [PlanoApiController::class, 'tambahPeserta'])->name('insiden.pleno.peserta.store');
+        Route::delete('insiden/{insiden:uuid_insiden}/pleno/{pleno}/peserta/{peserta}', [PlanoApiController::class, 'hapusPeserta'])->name('insiden.pleno.peserta.destroy');
+        Route::get('insiden/{insiden:uuid_insiden}/pleno/{pleno}/pdf', [PlanoApiController::class, 'downloadPdf'])->name('insiden.pleno.pdf');
 
         // Governance — Surat
         Route::get('surat', [SuratApiController::class, 'index'])->name('surat.index');
@@ -464,8 +469,9 @@ Route::middleware(['auth:sanctum', 'role:super_admin,pwnu,pcnu,relawan,trc'])->g
     Route::post('laporan/{laporan}/eskalasi-insiden', [LaporanKejadianApiController::class, 'eskalasiInsiden'])->name('api.laporan.eskalasi');
 
     // Admin — Manajemen Pengguna
+    Route::get('admin/pengguna', [PenggunaApiController::class, 'index'])->middleware('role:super_admin,pwnu,pcnu,trc,relawan')->name('api.admin.pengguna.index');
+
     Route::prefix('admin')->name('api.admin.')->middleware('role:super_admin,pwnu')->group(function () {
-        Route::get('pengguna', [PenggunaApiController::class, 'index'])->name('pengguna.index');
         Route::get('pengguna/menunggu', [PenggunaApiController::class, 'menunggu'])->name('pengguna.menunggu');
         Route::get('pengguna/{pengguna}', [PenggunaApiController::class, 'show'])->name('pengguna.show');
         Route::put('pengguna/{pengguna}', [PenggunaApiController::class, 'update'])->name('pengguna.update');

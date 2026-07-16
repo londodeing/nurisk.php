@@ -63,12 +63,13 @@ class AssessmentExtendedTest extends TestCase
             'sebaran_dampak' => 'Menggenangi 3 RT',
             'kendala_lapangan' => 'Arus deras',
             'rekomendasi_aksi' => 'Distribusi logistik makanan siap saji',
-            'kebutuhan' => [
-                'dana' => 'Butuh dana darurat Rp 50 juta',
-                'relawan' => 'Dibutuhkan 10 personil dapur umum',
-                'logistik' => 'Butuh selimut dan sembako',
-                'peralatan' => 'Butuh 2 unit genset',
-                'medis' => 'Butuh obat diare dan salep kulit',
+            'kebutuhan_lanjutan' => [
+                'kebutuhan_relawan' => 'Relawan medis 10 orang',
+                'kebutuhan_logistik' => 'Tenda dan selimut',
+                'kebutuhan_peralatan' => 'Genset dan pompa air',
+                'kebutuhan_medis' => 'Obat-obatan dasar',
+                'kebutuhan_pangan' => 'Makanan siap saji',
+                'kebutuhan_lainnya' => 'Dukungan psikososial',
             ],
             'needs_numeric' => [
                 'sembako' => 150,
@@ -104,17 +105,33 @@ class AssessmentExtendedTest extends TestCase
             ],
             'dampak_lingkungan' => [
                 'sawah' => 10.5,
-                'ternak' => 0,
+                'hutan' => 0,
+                'unggas' => 50,
+                'kaki_empat' => 5,
+                'perikanan_kolam' => 2.5,
+                'perikanan_nelayan' => 3
+            ],
+            'dampak_ekonomi' => [
+                'persentase' => '25% - 50%',
+                'sektor_1' => 'Pertanian',
+                'kontribusi_1' => 60,
+                'status_1' => 'sementara',
+                'sektor_2' => 'Perdagangan',
+                'kontribusi_2' => 30,
+                'status_2' => 'tidak_terdampak',
+                'distribusi' => 'rusak_sebagian',
+                'fasilitas' => 'berfungsi',
             ],
         ];
 
         // 1. Store
-        $response = $this->postJson("/api/insiden/{$insiden->id_insiden}/assessment", $payload);
+        $response = $this->postJson("/api/insiden/{$insiden->uuid_insiden}/assessment", $payload);
 
         $response->assertStatus(201);
         $response->assertJsonPath('data.narasi.kondisi_mutakhir', 'Banjir setinggi 1 meter');
 
         $assessmentId = $response->json('data.id');
+        $utama = AssessmentUtama::where('id_assessment_utama', $assessmentId)->first();
 
         $this->assertDatabaseHas('assessment_lokasi_detail', [
             'id_assessment' => $assessmentId,
@@ -128,9 +145,12 @@ class AssessmentExtendedTest extends TestCase
             'upaya_penanganan' => 'Evakuasi warga menggunakan perahu karet'
         ]);
 
+        $utama = AssessmentUtama::where('id_assessment_utama', $assessmentId)->first();
+        if (!$utama) dd("AssessmentUtama is null!");
+        
         $this->assertDatabaseHas('assessment_kebutuhan_lanjutan', [
             'id_assessment' => $assessmentId,
-            'kebutuhan_dana' => 'Butuh dana darurat Rp 50 juta'
+            'kebutuhan_relawan' => 'Relawan medis 10 orang',
         ]);
 
         $this->assertDatabaseHas('assessment_dampak_manusia_v2', [
@@ -139,8 +159,27 @@ class AssessmentExtendedTest extends TestCase
             'terdampak_jiwa' => 450
         ]);
 
+        $this->assertDatabaseHas('assessment_dampak_lingkungan', [
+            'id_assessment' => $assessmentId,
+            'lahan_pertanian_rusak_ha' => 10.50,
+            'ternak_unggas_ekor' => 50,
+            'ternak_kaki_empat_ekor' => 5,
+            'perikanan_kolam_ha' => 2.50,
+            'perikanan_nelayan_unit' => 3
+        ]);
+
+        $this->assertDatabaseHas('assessment_dampak_ekonomi', [
+            'id_assessment' => $assessmentId,
+            'persentase_ekonomi_terdampak' => '25% - 50%',
+            'sektor_pencaharian_1' => 'Pertanian',
+            'kontribusi_1' => 60.00,
+            'status_terdampak_1' => 'sementara',
+            'distribusi_hasil_panen' => 'rusak_sebagian',
+            'fasilitas_pengolahan_kolektif' => 'berfungsi'
+        ]);
+
         // 2. Show
-        $showResponse = $this->getJson("/api/insiden/{$insiden->id_insiden}/assessment/{$assessmentId}");
+        $showResponse = $this->getJson("/api/insiden/{$insiden->uuid_insiden}/assessment/{$assessmentId}");
         $showResponse->assertStatus(200);
         $showResponse->assertJsonStructure([
             'data',
@@ -153,7 +192,7 @@ class AssessmentExtendedTest extends TestCase
         $payload['needs_numeric']['sembako'] = 100;
         $payload['needs_numeric']['selimut'] = 0; // should delete/remove
 
-        $updateResponse = $this->putJson("/api/insiden/{$insiden->id_insiden}/assessment/{$assessmentId}", $payload);
+        $updateResponse = $this->putJson("/api/insiden/{$insiden->uuid_insiden}/assessment/{$assessmentId}", $payload);
         $updateResponse->assertStatus(200);
 
         $this->assertDatabaseHas('assessment_narasi_detail', [

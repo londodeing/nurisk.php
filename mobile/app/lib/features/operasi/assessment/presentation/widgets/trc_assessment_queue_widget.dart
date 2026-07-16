@@ -86,7 +86,7 @@ class TrcAssessmentQueueWidget extends ConsumerWidget {
                     },
                   ),
                 );
-              }).toList(),
+              }),
             ],
           ),
         );

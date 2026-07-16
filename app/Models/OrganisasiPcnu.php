@@ -21,6 +21,7 @@ class OrganisasiPcnu extends Model
     protected $fillable = [
         'id_unit',
         'nama_pcnu',
+        'kode_sni',
     ];
 
     /**

@@ -46,7 +46,7 @@ class PlanoPolicy
 
         $hasApprovedAssessment = AssessmentUtama::where('id_insiden', $insiden->id_insiden)
             ->where('is_latest', true)
-            ->whereIn('status_review', ['in_review', 'approved'])
+            ->whereIn('status_review', ['draft', 'submitted', 'in_review', 'approved'])
             ->exists();
 
         if (!$hasApprovedAssessment) {
@@ -69,7 +69,13 @@ class PlanoPolicy
         if ($pleno->isFinal()) {
             return false;
         }
-        return $this->authCtx()->hasAnyRole(['super_admin', 'pwnu']);
+        if ($this->authCtx()->hasAnyRole(['super_admin', 'pwnu'])) {
+            return true;
+        }
+        if ($this->authCtx()->hasRole('pcnu')) {
+            return $this->authCtx()->getScopeId() === $pleno->insiden->id_pcnu;
+        }
+        return false;
     }
 
     public function tambahPeserta(AuthUser $user, OperasiPleno $pleno): bool
@@ -108,7 +114,13 @@ class PlanoPolicy
         if ($pleno->isFinal()) {
             return false;
         }
-        return $this->authCtx()->hasAnyRole(['super_admin', 'pwnu']);
+        if ($this->authCtx()->hasAnyRole(['super_admin', 'pwnu'])) {
+            return true;
+        }
+        if ($this->authCtx()->hasRole('pcnu')) {
+            return $this->authCtx()->getScopeId() === $pleno->insiden->id_pcnu;
+        }
+        return false;
     }
 
     public function delete(AuthUser $user, OperasiPleno $pleno): bool

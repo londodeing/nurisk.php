@@ -23,6 +23,7 @@ class OrganizationRepository {
       _cachedPcnu = data.map((e) => Pcnu(
         id: e['id'] as int,
         nama: e['nama'] as String,
+        kodeSni: e['kode_sni'] as String?,
       )).toList();
       _pcnuCachedAt = DateTime.now();
       return _cachedPcnu!;

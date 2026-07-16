@@ -3,7 +3,7 @@
     <x-slot name="breadcrumb"><a href="{{ route('dashboard.pwnu') }}" class="text-gray-500 hover:text-gray-700">Home</a> <span class="text-gray-400 mx-1">/</span> Surat</x-slot>
     <x-slot name="actions">
         @can('create', App\Models\DokumenSuratUtama::class)
-        <a href="{{ route('surat.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">
+        <a href="{{ route('surat.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700">
             <i class="bi bi-plus-lg"></i> Buat Surat
         </a>
         @endcan

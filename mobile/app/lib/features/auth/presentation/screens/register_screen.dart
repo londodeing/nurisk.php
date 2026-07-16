@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nurisk_mobile/core/api/public_api_client.dart';
 import 'package:nurisk_mobile/core/runtime/runtime_initializer.dart';
+import 'package:nurisk_mobile/core/router/app_router.dart';
+import 'package:nurisk_mobile/core/storage/secure_storage_service.dart';
+import 'package:nurisk_mobile/features/auth/domain/models/auth_user_model.dart';
+import 'package:nurisk_mobile/features/auth/presentation/notifiers/auth_state_provider.dart';
+import 'package:nurisk_mobile/features/auth/presentation/providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -23,6 +29,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _nameCtrl = TextEditingController();
   final _nikCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
+  final _tanggalLahirCtrl = TextEditingController();
+  final _tempatLahirCtrl = TextEditingController();
+  final _profesiCtrl = TextEditingController();
+  String? _jenisKelamin;
+
+  // Step 4 controllers
+  final _pengalamanCtrl = TextEditingController();
 
   // Step 3 state
   String? _selectedKabId;
@@ -53,6 +66,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _nameCtrl.dispose();
     _nikCtrl.dispose();
     _emailCtrl.dispose();
+    _tanggalLahirCtrl.dispose();
+    _tempatLahirCtrl.dispose();
+    _profesiCtrl.dispose();
+    _pengalamanCtrl.dispose();
     _alamatCtrl.dispose();
     super.dispose();
   }
@@ -163,27 +180,57 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     try {
       final dio = ref.read(publicApiClientProvider);
       final res = await dio.post('auth/register/$_selectedJenis', data: {
-        'jenis': _selectedJenis,
         'no_hp': _phoneCtrl.text,
         'kata_sandi': _passCtrl.text,
         'kata_sandi_confirmation': _passConfirmCtrl.text,
         'nama_lengkap': _nameCtrl.text,
         'nik': _nikCtrl.text.isEmpty ? null : _nikCtrl.text,
         'email': _emailCtrl.text.isEmpty ? null : _emailCtrl.text,
+        'tanggal_lahir': _tanggalLahirCtrl.text.isEmpty ? null : _tanggalLahirCtrl.text,
+        'jenis_kelamin': _jenisKelamin,
+        'tempat_lahir': _tempatLahirCtrl.text.isEmpty ? null : _tempatLahirCtrl.text,
+        'profesi': _profesiCtrl.text.isEmpty ? null : _profesiCtrl.text,
+        'pengalaman_kebencanaan': _pengalamanCtrl.text.isEmpty ? null : _pengalamanCtrl.text,
         'id_kabupaten': _selectedKabId,
         'id_kecamatan': _selectedKecId,
         'id_desa': _selectedDesaId,
         'alamat_deskriptif': _alamatCtrl.text,
         'keahlian': _selectedKeahlianIds,
-        if (_selectedJenis != 'admin_pcnu') 'id_pcnu': _selectedPcnuId,
+        if (_selectedJenis == 'trc_pcnu') 'id_pcnu': _selectedPcnuId,
       });
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pendaftaran berhasil diajukan! Menunggu persetujuan.')),
-        );
-        ref.read(runtimeServicesProvider).navigation.pop();
+
+        final data = res.data['data'] as Map<String, dynamic>?;
+        final token = data?['token'] as String?;
+
+        if (token != null && data?['user'] != null) {
+          final user = AuthUserModel.fromJson(data!['user'] as Map<String, dynamic>);
+          await SecureStorageService.saveToken(token);
+          await ref.read(authStateProvider.notifier).loginWithDetails(
+            token: token,
+            userId: user.id.toString(),
+            userName: user.namaLengkap ?? '',
+            role: user.namaPeran ?? 'relawan',
+            scopeId: user.defaultScopeId?.toString() ?? '',
+            scopeType: user.defaultScopeType ?? '',
+            jabatan: '',
+          );
+          ref.invalidate(authProvider);
+
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Pendaftaran berhasil. Akun Anda langsung aktif.')),
+          );
+          context.go(RoutePaths.profile);
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Pendaftaran berhasil dikirim! Menunggu persetujuan.')),
+          );
+          ref.read(runtimeServicesProvider).navigation.pop();
+        }
       } else {
         setState(() {
           _errorMsg = res.data['message'] ?? 'Pendaftaran gagal.';
@@ -203,8 +250,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   // Validator helpers
   bool _validateStep1() {
-    if (_phoneCtrl.text.trim().isEmpty) {
+    final phone = _phoneCtrl.text.trim();
+    if (phone.isEmpty) {
       setState(() => _errorMsg = 'Nomor HP wajib diisi.');
+      return false;
+    }
+    if (!RegExp(r'^(08|\+628)[0-9]{8,12}$').hasMatch(phone)) {
+      setState(() => _errorMsg = 'Format nomor HP tidak valid. Contoh: 08123456789');
       return false;
     }
     if (_passCtrl.text.length < 8) {
@@ -222,6 +274,32 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _validateStep2() {
     if (_nameCtrl.text.trim().isEmpty) {
       setState(() => _errorMsg = 'Nama Lengkap wajib diisi sesuai KTP.');
+      return false;
+    }
+    final nik = _nikCtrl.text.trim();
+    if (nik.isNotEmpty && nik.length != 16) {
+      setState(() => _errorMsg = 'NIK harus tepat 16 digit.');
+      return false;
+    }
+    final email = _emailCtrl.text.trim();
+    if (email.isNotEmpty && !RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email)) {
+      setState(() => _errorMsg = 'Format email tidak valid.');
+      return false;
+    }
+    if (_tanggalLahirCtrl.text.trim().isEmpty) {
+      setState(() => _errorMsg = 'Tanggal Lahir wajib diisi.');
+      return false;
+    }
+    if (_jenisKelamin == null) {
+      setState(() => _errorMsg = 'Jenis Kelamin wajib dipilih.');
+      return false;
+    }
+    if (_tempatLahirCtrl.text.trim().isEmpty) {
+      setState(() => _errorMsg = 'Tempat Lahir wajib diisi.');
+      return false;
+    }
+    if (_profesiCtrl.text.trim().isEmpty) {
+      setState(() => _errorMsg = 'Profesi wajib diisi.');
       return false;
     }
     setState(() => _errorMsg = null);
@@ -245,16 +323,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       setState(() => _errorMsg = 'Alamat Lengkap wajib diisi.');
       return false;
     }
+    if (_alamatCtrl.text.length > 500) {
+      setState(() => _errorMsg = 'Alamat maksimal 500 karakter.');
+      return false;
+    }
     setState(() => _errorMsg = null);
     return true;
   }
 
   bool _validateStep4() {
-    if (_selectedJenis != 'relawan' && _selectedJenis != 'admin_pwnu' && _selectedJenis != 'admin_pcnu') {
-      if (_selectedPcnuId == null) {
-        setState(() => _errorMsg = 'PCNU Asal wajib dipilih.');
-        return false;
-      }
+    if (_selectedJenis == 'trc_pcnu' && _selectedPcnuId == null) {
+      setState(() => _errorMsg = 'PCNU Asal wajib dipilih.');
+      return false;
     }
     setState(() => _errorMsg = null);
     return true;
@@ -595,6 +675,71 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             border: OutlineInputBorder(),
           ),
         ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _tanggalLahirCtrl,
+          readOnly: true,
+          decoration: InputDecoration(
+            labelText: 'Tanggal Lahir *',
+            border: const OutlineInputBorder(),
+            suffixIcon: Icon(Icons.calendar_today, color: Colors.grey.shade600),
+          ),
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: DateTime(2000, 1, 1),
+              firstDate: DateTime(1950),
+              lastDate: DateTime.now(),
+            );
+            if (date != null) {
+              _tanggalLahirCtrl.text =
+                  '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+            }
+          },
+        ),
+        const SizedBox(height: 16),
+        const Text('Jenis Kelamin *', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Expanded(
+              child: RadioListTile<String>(
+                title: const Text('Laki-laki'),
+                value: 'L',
+                groupValue: _jenisKelamin,
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                onChanged: (v) => setState(() => _jenisKelamin = v),
+              ),
+            ),
+            Expanded(
+              child: RadioListTile<String>(
+                title: const Text('Perempuan'),
+                value: 'P',
+                groupValue: _jenisKelamin,
+                contentPadding: EdgeInsets.zero,
+                dense: true,
+                onChanged: (v) => setState(() => _jenisKelamin = v),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _tempatLahirCtrl,
+          decoration: const InputDecoration(
+            labelText: 'Tempat Lahir *',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: _profesiCtrl,
+          decoration: const InputDecoration(
+            labelText: 'Profesi *',
+            border: OutlineInputBorder(),
+          ),
+        ),
         const SizedBox(height: 24),
         Row(
           children: [
@@ -846,6 +991,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               },
             ),
           ],
+          const SizedBox(height: 24),
+          const Text(
+            'Pengalaman Kebencanaan',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _pengalamanCtrl,
+            maxLines: 3,
+            decoration: const InputDecoration(
+              hintText: 'Ceritakan pengalaman Anda dalam kegiatan kebencanaan (opsional)',
+              border: OutlineInputBorder(),
+            ),
+          ),
         ],
         const SizedBox(height: 32),
         Row(

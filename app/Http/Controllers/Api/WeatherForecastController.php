@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\WeatherSnapshot;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
@@ -19,18 +20,27 @@ class WeatherForecastController extends Controller
             return response()->json(['error' => 'lat and lon required'], 422);
         }
 
+        // Try database snapshot first (fast, no external API call)
+        $snapshot = WeatherSnapshot::latest('id')->first();
+        if ($snapshot && $snapshot->isFresh()) {
+            $dbData = $this->fromSnapshot($snapshot, $lat, $lon);
+            if ($dbData !== null) {
+                return response()->json($dbData);
+            }
+        }
+
         $roundedLat = round((float) $lat, 4);
         $roundedLon = round((float) $lon, 4);
         $cacheKey = "weather_forecast_{$roundedLat}_{$roundedLon}";
 
-        $data = Cache::remember($cacheKey, 600, function () use ($roundedLat, $roundedLon, $lat, $lon) {
+        $data = Cache::remember($cacheKey, 600, function () use ($roundedLat, $roundedLon) {
             $apiKey = config('services.openweather.key');
 
             if (!$apiKey || $apiKey === 'YOUR_API_KEY_HERE') {
                 return $this->mockForecast();
             }
 
-            $response = Http::timeout(10)->get(
+            $response = Http::timeout(5)->get(
                 'https://api.openweathermap.org/data/2.5/forecast',
                 [
                     'lat'   => $roundedLat,
@@ -99,6 +109,55 @@ class WeatherForecastController extends Controller
         });
 
         return response()->json($data);
+    }
+
+    private function fromSnapshot(WeatherSnapshot $snapshot, string $lat, string $lon): ?array
+    {
+        $hourly = $snapshot->hourly_forecast;
+        $hours = $hourly['hours'] ?? null;
+        if (!$hours || !is_array($hours) || count($hours) === 0) {
+            return null;
+        }
+
+        $list = [];
+        foreach ($hours as $h) {
+            $dt = strtotime($h['time']);
+            if ($dt === false) continue;
+
+            $hour = (int) date('H', $dt);
+            $label = match (true) {
+                $hour >= 0 && $hour < 6  => 'Malam',
+                $hour >= 6 && $hour < 12 => 'Pagi',
+                $hour >= 12 && $hour < 18 => 'Siang',
+                default                   => 'Sore/Malam',
+            };
+
+            $list[] = [
+                'time'       => date('Y-m-d H:i:s', $dt),
+                'label'      => $label,
+                'temp'       => $h['temperature'] ?? 0,
+                'condition'  => $h['condition'] ?? '',
+                'icon'       => $h['condition_code'] ?? '01d',
+                'wind_speed' => $h['wind_speed'] ?? 0,
+                'rain'       => $h['rain_volume_mm'] ?? 0,
+            ];
+        }
+
+        if (empty($list)) return null;
+
+        $grouped = [];
+        foreach ($list as $entry) {
+            $day = substr($entry['time'], 0, 10);
+            $grouped[$day][] = $entry;
+        }
+
+        return [
+            'city'    => 'Jawa Tengah',
+            'country' => 'ID',
+            'current' => $list[0],
+            'days'    => $grouped,
+            'list'    => $list,
+        ];
     }
 
     private function mockForecast(): array

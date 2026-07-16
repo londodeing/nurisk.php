@@ -498,9 +498,9 @@ fetch('/api/public/dashboard')
             return;
         }
         if (data.insiden && data.insiden.length > 0) {
-            var top3 = data.insiden.slice(0, 3);
+            var top6 = data.insiden.slice(0, 6);
             list.innerHTML = '';
-            top3.forEach(function (item) {
+            top6.forEach(function (item) {
                 list.appendChild(incard(item));
             });
         }
@@ -558,7 +558,11 @@ function openDrawer(filter, highlightId) {
         });
         title = 'Gap Kebutuhan Tertinggi';
     } else if (filter === 'casualties') {
-        title = 'Korban Terdampak';
+        items = items.filter(function (i) { return (i.korban_summary || 0) > 0; });
+        items.sort(function (a, b) {
+            return (b.korban_summary || 0) - (a.korban_summary || 0);
+        });
+        title = 'Kejadian dengan Korban';
     }
 
     document.getElementById('drawerTitle').textContent = title;
@@ -593,12 +597,12 @@ function openDrawer(filter, highlightId) {
                     '<span><i class="fa-solid fa-location-dot"></i> ' + (item.pcnu || '—') + '</span>' +
                     '<span><i class="fa-regular fa-calendar"></i> ' + date + '</span>' +
                     (gapTotal > 0 ? '<span style="color:#d97706;"><i class="fa-solid fa-box"></i> Gap: ' + gapTotal + '</span>' : '') +
+                    ((item.korban_summary || 0) > 0 ? '<span style="color:#157347;"><i class="fa-solid fa-users"></i> Korban: ' + item.korban_summary + '</span>' : '') +
                 '</div>' +
                 '<div style="margin-top:6px;"><span class="dlist-arrow"><i class="fa-solid fa-chevron-down"></i></span></div>' +
                 '<div class="detail-panel" id="detail_' + item.id + '"></div>';
 
-            el.querySelector('.dlist-top').onclick = function (e) {
-                e.stopPropagation();
+            el.onclick = function (e) {
                 toggleDetail(item.id, el);
             };
             body.appendChild(el);
@@ -649,6 +653,22 @@ function toggleDetail(id, containerEl) {
 
 function renderDetail(panel, data) {
     var html = '';
+
+    // Header info (Kode, Status)
+    if (data.kode) {
+        html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">' +
+            '<span style="font-size:10px; font-weight:700; color:#666; background:#f0f0f0; padding:3px 8px; border-radius:4px;">' + data.kode + '</span>';
+        if (data.status) {
+            var badgeClass = data.status === 'respon' ? 'respon' :
+                             data.status === 'pemulihan' ? 'pemulihan' :
+                             data.status === 'terverifikasi' ? 'terverifikasi' : 'default';
+            // simple inline style for status badge
+            var bg = badgeClass === 'respon' ? '#fde8e8' : badgeClass === 'pemulihan' ? '#fef3c7' : badgeClass === 'terverifikasi' ? '#dbeafe' : '#f3f4f6';
+            var col = badgeClass === 'respon' ? '#dc2626' : badgeClass === 'pemulihan' ? '#d97706' : badgeClass === 'terverifikasi' ? '#2563eb' : '#6b7280';
+            html += '<span style="font-size:9px; font-weight:700; padding:2px 7px; border-radius:5px; text-transform:uppercase; background:'+bg+'; color:'+col+';">' + data.status + '</span>';
+        }
+        html += '</div>';
+    }
 
     // Dampak stats
     var d = data.dampak;
@@ -760,7 +780,7 @@ function renderEarlyWarning(data) {
                 cityEl.textContent = 'Hujan: ' + ds.rain_probability_today + '% | ' + (ds.temp_min_today || '--') + '&deg; ~ ' + (ds.temp_max_today || '--') + '&deg;';
             }
 
-            // Hourly Forecast (render from the public forecast endpoint or internal data)
+            // Hourly Forecast
             fetch('/api/weather/forecast?lat=-7.5&lon=110.0')
                 .then(function (r) { return r.json(); })
                 .then(function (w2) {

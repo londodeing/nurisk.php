@@ -13,9 +13,9 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --nu-green: #157347;
-            --nu-green-dark: #0f5c38;
-            --nu-green-light: #e8f5ee;
+            --nu-green: #0F6B3C;
+            --nu-green-dark: #0B5730;
+            --nu-green-light: #E6F3EC;
             --bg: #f0f2f5;
             --glass-bg: rgba(255,255,255,0.60);
             --glass-border: rgba(255,255,255,0.35);
@@ -77,20 +77,9 @@
         .public-layout.full-width .public-sidebar { display: none; }
         .public-layout.full-width .public-content { max-width: 100%; }
 
-        /* Sidebar navigasi desktop */
+        /* Sidebar navigasi desktop (Disembunyikan, menggunakan Dock) */
         .public-sidebar {
-            width: var(--sidebar-width);
-            flex-shrink: 0;
-            padding: 24px 16px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            border-right: 1px solid rgba(0,0,0,0.04);
-            background: rgba(255,255,255,0.4);
-            position: sticky;
-            top: var(--header-height);
-            height: calc(100vh - var(--header-height));
-            overflow-y: auto;
+            display: none;
         }
         .sidebar-label {
             font-size: 10px; font-weight: 600; text-transform: uppercase;
@@ -119,65 +108,61 @@
         }
         .page-container { max-width: 1200px; margin: 0 auto; }
 
-        /* Bottom dock — hanya untuk mobile/tablet */
+        /* Bottom dock — Mac-OS Style Plank */
         .bottom-dock {
-            display: none;
+            display: flex;
+            position: fixed; bottom: var(--dock-bottom); left: 50%;
+            transform: translateX(-50%); z-index: 200;
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(24px) saturate(200%);
+            border: 1px solid rgba(255,255,255,0.45);
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            align-items: center; justify-content: space-around;
+            padding: 5px 6px;
+            width: calc(100% - 24px);
+            max-width: 440px;
+            height: var(--dock-height);
+        }
+        .dock-item {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 2px; text-decoration: none;
+            color: #aaa; font-size: 9px; font-weight: 500;
+            padding: 6px 8px 4px; border-radius: 14px;
+            transition: all 0.25s ease; flex: 1; min-width: 44px;
+            position: relative;
+        }
+        .dock-item .dock-icon { font-size: 18px; line-height: 1; color: #bbb; transition: color 0.25s ease; }
+        .dock-item .dock-label { font-size: 8px; opacity: 0.7; transition: opacity 0.25s ease; }
+        .dock-item:hover { color: var(--nu-green); }
+        .dock-item:hover .dock-icon { color: var(--nu-green); }
+        .dock-item.active .dock-icon { color: #0a5a30; }
+        .dock-item.active .dock-label { opacity: 1; color: #0a5a30; font-weight: 600; }
+        .dock-item.dock-fab {
+            flex: 1.2;
+        }
+        .dock-item.dock-fab .dock-icon {
+            background: #dc3545;
+            color: #fff;
+            width: 30px; height: 30px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(220,53,69,0.35);
+        }
+        .dock-item.dock-fab:hover .dock-icon {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+        .dock-item.dock-fab.active .dock-icon {
+            background: #c82333;
+            box-shadow: 0 2px 14px rgba(220,53,69,0.5);
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .public-sidebar { display: none; }
             .public-content { padding: 16px 16px 90px; }
             .public-header { padding: 0 16px; }
-            .bottom-dock {
-                display: flex;
-                position: fixed; bottom: var(--dock-bottom); left: 50%;
-                transform: translateX(-50%); z-index: 200;
-                background: rgba(255,255,255,0.72);
-                backdrop-filter: blur(24px) saturate(200%);
-                border: 1px solid rgba(255,255,255,0.45);
-                border-radius: 18px;
-                box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-                align-items: center; justify-content: space-around;
-                padding: 5px 6px;
-                width: calc(100% - 24px);
-                max-width: 440px;
-                height: var(--dock-height);
-            }
-            .dock-item {
-                display: flex; flex-direction: column; align-items: center;
-                justify-content: center; gap: 2px; text-decoration: none;
-                color: #aaa; font-size: 9px; font-weight: 500;
-                padding: 6px 8px 4px; border-radius: 14px;
-                transition: all 0.25s ease; flex: 1; min-width: 44px;
-                position: relative;
-            }
-            .dock-item .dock-icon { font-size: 18px; line-height: 1; color: #bbb; transition: color 0.25s ease; }
-            .dock-item .dock-label { font-size: 8px; opacity: 0.7; transition: opacity 0.25s ease; }
-            .dock-item:hover { color: var(--nu-green); }
-            .dock-item:hover .dock-icon { color: var(--nu-green); }
-            .dock-item.active .dock-icon { color: #0a5a30; }
-            .dock-item.active .dock-label { opacity: 1; color: #0a5a30; font-weight: 600; }
-            .dock-item.dock-fab {
-                flex: 1.2;
-            }
-            .dock-item.dock-fab .dock-icon {
-                background: #dc3545;
-                color: #fff;
-                width: 30px; height: 30px;
-                border-radius: 10px;
-                display: flex; align-items: center; justify-content: center;
-                font-size: 14px;
-                box-shadow: 0 2px 10px rgba(220,53,69,0.35);
-            }
-            .dock-item.dock-fab:hover .dock-icon {
-                background: #c82333;
-                transform: scale(1.05);
-            }
-            .dock-item.dock-fab.active .dock-icon {
-                background: #c82333;
-                box-shadow: 0 2px 14px rgba(220,53,69,0.5);
-            }
         }
         @media (max-width: 480px) {
             .bottom-dock { height: 60px; padding: 4px 4px; bottom: 10px; }
@@ -215,26 +200,6 @@
     {{-- LAYOUT — add "full-width" class for auth pages --}}
     <div class="public-layout @yield('layout-class')">
 
-        {{-- SIDEBAR (desktop) --}}
-        <aside class="public-sidebar">
-            <div class="sidebar-label">Menu</div>
-            <a href="{{ route('public.home') }}" class="sidebar-item @yield('nav-home', '')">
-                <span class="si-icon">🏠</span> Home
-            </a>
-            <a href="{{ route('public.map') }}" class="sidebar-item @yield('nav-map', '')">
-                <span class="si-icon">🗺️</span> Map
-            </a>
-            <a href="{{ route('public.resource') }}" class="sidebar-item @yield('nav-resource', '')">
-                <span class="si-icon">📦</span> Resource
-            </a>
-            <div class="sidebar-label">Akun</div>
-            <a href="{{ route('login') }}" class="sidebar-item @yield('nav-profil', '')">
-                <span class="si-icon">👤</span> Profil
-            </a>
-            <a href="{{ route('public.lapor') }}" class="sidebar-item sidebar-fab @yield('nav-lapor', '')">
-                <span class="si-icon">📢</span> Lapor Kejadian
-            </a>
-        </aside>
 
         {{-- CONTENT --}}
         <main class="public-content">
@@ -243,7 +208,7 @@
 
     </div>
 
-    {{-- BOTTOM DOCK (mobile/tablet only) --}}
+    {{-- BOTTOM DOCK (Mac-OS style plank) --}}
     <nav class="bottom-dock">
         <a href="{{ route('public.home') }}" class="dock-item @yield('nav-home', '')">
             <span class="dock-icon"><i class="fa-solid fa-house"></i></span>

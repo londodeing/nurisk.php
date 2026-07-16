@@ -56,6 +56,7 @@ class Keahlian {
 class Pcnu {
   final int id;
   final String nama;
+  final String? kodeSni;
 
-  const Pcnu({required this.id, required this.nama});
+  const Pcnu({required this.id, required this.nama, this.kodeSni});
 }

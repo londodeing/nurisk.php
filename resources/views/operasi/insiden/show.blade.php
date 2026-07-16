@@ -116,7 +116,7 @@
                     <div class="space-y-3">
                         @foreach($insiden->riwayatStatus as $r)
                         <div class="flex items-start gap-3">
-                            <div class="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0"></div>
+                            <div class="w-2 h-2 rounded-full bg-primary-500 mt-2 flex-shrink-0"></div>
                             <div>
                                 <x-badge-status :status="$r->status_terbaru" map="insiden" />
                                 <span class="text-xs text-gray-500 ml-2">oleh {{ $r->pengguna?->profil?->nama_lengkap ?? $r->pengguna?->no_hp ?? 'System' }} — {{ $r->dibuat_pada ? Carbon\Carbon::parse($r->dibuat_pada)->locale('id')->isoFormat('D MMM YYYY, HH:mm') : '-' }}</span>
@@ -206,7 +206,7 @@
                             @csrf
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Pilih Petugas TRC / Relawan Penerima Tugas (Bisa pilih lebih dari satu) <span class="text-red-500">*</span></label>
-                                <select name="petugas_trc_ids[]" multiple required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500 text-sm h-32">
+                                <select name="petugas_trc_ids[]" multiple required class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-primary-500 text-sm h-32">
                                     @foreach($trcList as $trc)
                                         <option value="{{ $trc->id_pengguna }}">{{ $trc->profil->nama_lengkap ?? $trc->no_hp }} ({{ $trc->peran->nama_peran ?? 'TRC' }})</option>
                                     @endforeach
@@ -215,9 +215,9 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1">Catatan Penugasan / Instruksi Khusus</label>
-                                <textarea name="catatan_penugasan" rows="3" class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500 text-sm" placeholder="Contoh: Lakukan kaji cepat fokus pada area pemukiman pinggir sungai..."></textarea>
+                                <textarea name="catatan_penugasan" rows="3" class="w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-primary-500 text-sm" placeholder="Contoh: Lakukan kaji cepat fokus pada area pemukiman pinggir sungai..."></textarea>
                             </div>
-                            <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors">
+                            <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors">
                                 <i class="bi bi-file-earmark-text-fill"></i> Terbitkan SPK & Surat Tugas
                             </button>
                         </form>
@@ -237,7 +237,7 @@
                     <h3 class="text-sm font-semibold text-gray-700">Assessment</h3>
                     @can('create', [App\Models\AssessmentUtama::class, $insiden])
                     @if(!$insiden->is_locked)
-                    <a href="{{ route('insiden.assessment.create', $insiden) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">
+                    <a href="{{ route('insiden.assessment.create', $insiden) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700">
                         <i class="bi bi-plus-lg"></i> Assessment Baru
                     </a>
                     @endif
@@ -245,7 +245,7 @@
                 </div>
                 @if($insiden->assessments->count())
                 <div class="space-y-3">
-                    @foreach($insiden->assessments()->latest('dibuat_pada')->get() as $assessment)
+                    @foreach($insiden->assessments->sortByDesc('dibuat_pada') as $assessment)
                     <div class="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <x-badge-status :status="$assessment->is_latest ? 'Terkini' : 'Lama'" map="laporan" />
@@ -278,7 +278,7 @@
                     </a>
                     @can('create', [App\Models\OperasiPenugasan::class, $insiden])
                     @if(!$insiden->is_locked)
-                    <a href="{{ route('insiden.penugasan.create', $insiden) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">
+                    <a href="{{ route('insiden.penugasan.create', $insiden) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700">
                         <i class="bi bi-plus-lg"></i> Tugaskan Personel
                     </a>
                     @endif
@@ -328,7 +328,7 @@
                 <h3 class="text-sm font-semibold text-gray-700">Pleno</h3>
                 @can('create', [\App\Models\OperasiPleno::class, $insiden])
                 @if(!$insiden->is_locked)
-                <a href="{{ route('insiden.pleno.create', $insiden) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700">
+                <a href="{{ route('insiden.pleno.create', $insiden) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700">
                     <i class="bi bi-plus-lg"></i> Pleno Baru
                 </a>
                 @endif

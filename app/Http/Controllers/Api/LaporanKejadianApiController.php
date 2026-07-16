@@ -93,7 +93,6 @@ class LaporanKejadianApiController extends Controller
             ]);
         }
 
-        $validated['kode_kejadian'] = LaporanKejadian::generateKodeKejadian();
         $validated['is_valid'] = 'menunggu';
 
         if ($request->user()) {
@@ -140,6 +139,8 @@ class LaporanKejadianApiController extends Controller
         }
 
         unset($validated['foto']);
+
+        $validated['kode_kejadian'] = LaporanKejadian::generateKodeKejadian($idPcnu);
 
         $laporan = LaporanKejadian::create($validated);
 

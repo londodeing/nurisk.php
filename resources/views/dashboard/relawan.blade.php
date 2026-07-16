@@ -24,7 +24,7 @@
         @if($activeAssignment)
         <div class="bg-white rounded-xl border border-l-4 border-l-green-500 border-gray-200 p-6">
             <div class="flex items-center gap-3 mb-4">
-                <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></span>
                 <h3 class="text-sm font-semibold text-green-700">⚡ Sedang Bertugas</h3>
             </div>
             <div class="space-y-2">

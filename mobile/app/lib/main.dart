@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nurisk_mobile/core/runtime/runtime_initializer.dart';
 import 'package:nurisk_mobile/core/runtime/runtime_state.dart';
 import 'package:nurisk_mobile/core/router/app_router.dart';
-import 'package:nurisk_mobile/core/theme/app_theme.dart';
+import 'package:nurisk_mobile/core/theme/nurisk_theme.dart';
 import 'package:nurisk_mobile/features/auth/presentation/notifiers/auth_state_provider.dart';
 import 'package:nurisk_mobile/core/sdui/sdui_registry_initializer.dart';
 
@@ -103,25 +103,29 @@ class _NuriskAppState extends ConsumerState<NuriskApp> {
       routerConfig: _router,
       restorationScopeId: 'nurisk',
       title: 'NURISK',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: nuriskLightTheme,
+      darkTheme: nuriskDarkTheme,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
-        return Listener(
-          behavior: HitTestBehavior.translucent,
-          onPointerDown: (event) {
-            final hitTestResult = HitTestResult();
-            RendererBinding.instance.hitTest(hitTestResult, event.position);
-            debugPrint('\n======================================================');
-            debugPrint('[FORENSIC_HIT_TEST] Pointer Down at ${event.position}');
-            for (var entry in hitTestResult.path) {
-              final target = entry.target;
-              debugPrint('[FORENSIC_HIT_TEST] -> ${target.runtimeType} | ${target.toString()}');
-            }
-            debugPrint('======================================================\n');
-          },
-          child: child ?? const SizedBox(),
+        final mq = MediaQuery.of(context);
+        return MediaQuery(
+          data: mq.copyWith(textScaler: mq.textScaler.clamp(minScaleFactor: 1.0, maxScaleFactor: 2.0)),
+          child: Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (event) {
+              final hitTestResult = HitTestResult();
+              RendererBinding.instance.hitTest(hitTestResult, event.position);
+              debugPrint('\n======================================================');
+              debugPrint('[FORENSIC_HIT_TEST] Pointer Down at ${event.position}');
+              for (var entry in hitTestResult.path) {
+                final target = entry.target;
+                debugPrint('[FORENSIC_HIT_TEST] -> ${target.runtimeType} | ${target.toString()}');
+              }
+              debugPrint('======================================================\n');
+            },
+            child: child ?? const SizedBox(),
+          ),
         );
       },
       localizationsDelegates: [

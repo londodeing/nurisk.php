@@ -35,6 +35,14 @@ class ExecutePlenoDecisions
         $pleno->load('keputusan');
         Log::info("Executing decisions for Pleno ID: {$pleno->id_pleno}");
 
+        try {
+            $pdfPath = $this->pdfService->generatePlenoPdf($pleno);
+            $pleno->update(['file_notulensi_path' => $pdfPath]);
+            Log::info("Successfully generated PDF report for Pleno ID: {$pleno->id_pleno} at {$pdfPath}");
+        } catch (\Exception $e) {
+            Log::error("Failed to generate PDF for Pleno ID: {$pleno->id_pleno}: " . $e->getMessage());
+        }
+
         foreach ($pleno->keputusan as $keputusan) {
             if (in_array($keputusan->status_pelaksanaan, ['selesai', 'dieksekusi'])) {
                 continue;

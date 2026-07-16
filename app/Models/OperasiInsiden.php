@@ -180,6 +180,16 @@ class OperasiInsiden extends Model
     }
 
     /**
+     * Dapatkan default route binding key untuk model ini (Semantic URL).
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'kode_kejadian';
+    }
+
+    /**
      * Helper: Apakah status insiden sudah selesai?
      */
     public function isSelesai(): bool

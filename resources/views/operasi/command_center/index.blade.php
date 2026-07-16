@@ -13,7 +13,7 @@
                         <h2 id="stat-relawan" class="text-3xl font-bold">0</h2>
                     </div>
                 </div>
-                <div class="bg-green-600 text-white rounded-2xl shadow-xl border border-green-400/40">
+                <div class="bg-primary-600 text-white rounded-2xl shadow-xl border border-primary-400/40">
                     <div class="p-6">
                         <h5 class="font-semibold opacity-90">Posko Aktif</h5>
                         <h2 id="stat-posko" class="text-3xl font-bold">0</h2>

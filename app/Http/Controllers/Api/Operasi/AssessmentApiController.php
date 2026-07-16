@@ -193,4 +193,14 @@ class AssessmentApiController extends Controller
         $kebutuhan->delete();
         return response()->json(['message' => 'Kebutuhan dihapus.']);
     }
+
+    public function downloadPdf(AssessmentUtama $assessment)
+    {
+        $this->authorize('view', $assessment);
+
+        $pdfService = app(\App\Services\SuratPdfService::class);
+        $path = $pdfService->generateAssessmentOnlyPdf($assessment);
+
+        return \Illuminate\Support\Facades\Storage::download($path);
+    }
 }

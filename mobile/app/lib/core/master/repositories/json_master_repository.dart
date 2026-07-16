@@ -7,6 +7,7 @@ import '../models/master_data.dart';
 import '../models/surat.dart';
 import '../models/assessment.dart';
 import '../models/display.dart';
+import '../models/kebutuhan_numerik.dart';
 
 class JsonMasterRepository {
   final Map<String, Object> _cache = {};
@@ -258,10 +259,22 @@ class JsonMasterRepository {
   Future<List<AssessmentKebutuhan>> getAssessmentKebutuhan() => _loadList(
     'assets/master/assessment/kebutuhan_numerik.json',
     (j) => AssessmentKebutuhan(
-      kode: j['kode'] as String,
-      nama: j['nama'] as String,
-      satuan: j['satuan'] as String,
+      kode: j['kode_item'] as String,
+      nama: j['nama_item'] as String,
+      satuan: j['satuan_default'] as String,
       kategori: j['kategori'] as String,
+    ),
+  );
+
+  Future<List<KebutuhanNumerikMaster>> getKebutuhanNumerikMaster() => _loadList(
+    'assets/master/assessment/kebutuhan_numerik.json',
+    (j) => KebutuhanNumerikMaster(
+      idItem: j['id_item'] as int,
+      kodeItem: j['kode_item'] as String,
+      namaItem: j['nama_item'] as String,
+      satuanDefault: j['satuan_default'] as String,
+      kategori: j['kategori'] as String,
+      urutan: j['urutan'] as int,
     ),
   );
 
