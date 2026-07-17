@@ -104,6 +104,7 @@ flutter:
     - .env
     - assets/profil/
     - assets/login/
+    - assets/logo/
     - assets/master/version.json
     - assets/master/bencana/jenis.json
     - assets/master/status/laporan.json
