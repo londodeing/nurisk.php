@@ -7,7 +7,7 @@ class ApiClient {
   static final Dio instance = _createDio();
 
   static Dio _createDio() {
-    var baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:8000';
+    var baseUrl = dotenv.env['API_BASE_URL'] ?? 'https://nurisk.org';
     if (!baseUrl.endsWith('/')) {
       baseUrl += '/';
     }

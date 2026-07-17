@@ -14,7 +14,11 @@ import 'package:nurisk_mobile/core/sdui/sdui_registry_initializer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('Warning: Failed to load .env file: $e');
+  }
   SduiRegistryInitializer.initialize();
   
   // FORENSIC: Enable Gesture Arena, HitTest, and Callback Tracing
@@ -99,13 +103,28 @@ class _NuriskAppState extends ConsumerState<NuriskApp> {
       );
     }
 
+    if (runtime.status == RuntimeStatus.uninitialized) {
+      return MaterialApp(
+        title: 'NURISK',
+        theme: nuriskLightTheme,
+        darkTheme: nuriskDarkTheme,
+        themeMode: ThemeMode.light,
+        debugShowCheckedModeBanner: false,
+        home: const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
     return MaterialApp.router(
       routerConfig: _router,
       restorationScopeId: 'nurisk',
       title: 'NURISK',
       theme: nuriskLightTheme,
       darkTheme: nuriskDarkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         final mq = MediaQuery.of(context);

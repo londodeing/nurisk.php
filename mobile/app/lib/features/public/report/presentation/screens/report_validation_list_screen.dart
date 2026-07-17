@@ -296,7 +296,7 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
           expand: false,
           builder: (context, scrollController) {
             final authState = ref.read(authStateProvider);
-            String baseUrl = dotenv.env['API_BASE_URL'] ?? const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://10.0.2.2:8000/api');
+            String baseUrl = dotenv.env['API_BASE_URL'] ?? const String.fromEnvironment('API_BASE_URL', defaultValue: 'https://nurisk.org/api');
             if (baseUrl.endsWith('/')) {
               baseUrl = baseUrl.substring(0, baseUrl.length - 1);
             }

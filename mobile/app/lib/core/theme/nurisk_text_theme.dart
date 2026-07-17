@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-TextTheme buildNuriskTextTheme() {
-  final base = GoogleFonts.plusJakartaSansTextTheme();
+TextTheme buildNuriskTextTheme(Brightness brightness) {
+  final base = GoogleFonts.plusJakartaSansTextTheme(
+    brightness == Brightness.dark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
+  );
   return base.copyWith(
     displayLarge: base.displayLarge?.copyWith(fontSize: 32, height: 40 / 32, fontWeight: FontWeight.w700, letterSpacing: -0.2),
     headlineLarge: base.headlineLarge?.copyWith(fontSize: 28, height: 36 / 28, fontWeight: FontWeight.w700, letterSpacing: -0.2),

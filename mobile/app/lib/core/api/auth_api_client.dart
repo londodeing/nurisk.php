@@ -7,7 +7,7 @@ import 'package:nurisk_mobile/features/auth/presentation/notifiers/auth_state_pr
 final authApiClientProvider = Provider<Dio>((ref) {
   final dio = Dio();
 
-  String baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:8000/api/';
+  String baseUrl = dotenv.env['API_BASE_URL'] ?? 'https://nurisk.org/api/';
   if (!baseUrl.endsWith('/')) {
     baseUrl += '/';
   }

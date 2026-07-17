@@ -101,7 +101,6 @@ flutter:
   # https://flutter.dev/to/asset-from-package
 
   assets:
-    - .env
     - assets/profil/
     - assets/login/
     - assets/logo/

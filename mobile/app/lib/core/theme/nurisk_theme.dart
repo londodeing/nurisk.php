@@ -10,7 +10,7 @@ final ThemeData nuriskLightTheme = ThemeData(
     error: NuriskColors.emergencyRed,
   ),
   scaffoldBackgroundColor: NuriskColors.bgWhite,
-  textTheme: buildNuriskTextTheme(),
+  textTheme: buildNuriskTextTheme(Brightness.light),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: NuriskColors.primary600,
@@ -34,11 +34,34 @@ final ThemeData nuriskLightTheme = ThemeData(
   ),
 );
 
-final ThemeData nuriskDarkTheme = nuriskLightTheme.copyWith(
+final ThemeData nuriskDarkTheme = ThemeData(
+  useMaterial3: true,
   brightness: Brightness.dark,
-  scaffoldBackgroundColor: NuriskColors.surfaceBase,
   colorScheme: ColorScheme.fromSeed(
     seedColor: NuriskColors.primaryAccentDark,
     brightness: Brightness.dark,
+  ),
+  scaffoldBackgroundColor: NuriskColors.surfaceBase,
+  textTheme: buildNuriskTextTheme(Brightness.dark),
+  elevatedButtonTheme: ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: NuriskColors.primaryAccentDark,
+      foregroundColor: Colors.black,
+      minimumSize: const Size(64, 48),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    ),
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    filled: true,
+    fillColor: NuriskColors.borderDark.withValues(alpha: 0.3),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(4)),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(4),
+      borderSide: const BorderSide(color: NuriskColors.primaryAccentDark, width: 1.5),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(4),
+      borderSide: const BorderSide(color: NuriskColors.emergencyRed, width: 1.5),
+    ),
   ),
 );

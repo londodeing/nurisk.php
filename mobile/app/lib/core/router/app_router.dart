@@ -101,12 +101,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       if (auth.isLoading) return null;
 
+      final isLoggedIn = auth.value != null;
+
       if (location == RoutePaths.splash) {
         return null;
       }
 
-      if (RoutePaths.isProtected(location)) {
+      if (RoutePaths.isProtected(location) && !isLoggedIn) {
         return RoutePaths.login;
+      }
+
+      if (isLoggedIn && RoutePaths.isAuthPage(location)) {
+        return RoutePaths.home;
       }
 
       return null;

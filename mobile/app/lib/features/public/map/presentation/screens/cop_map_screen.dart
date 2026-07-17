@@ -110,15 +110,27 @@ class _CopMapScreenState extends ConsumerState<CopMapScreen> with AppLifecycleOb
 
   Future<void> _goToMyLocation() async {
     if (mapController == null) return;
-    final loc = _lastUserLocation;
-    if (loc != null) {
+    
+    // Attempt to use device GPS directly
+    final geo = ref.read(runtimeServicesProvider).geo;
+    final result = await geo.getCurrentPosition();
+    
+    if (result.isSuccess && result.point != null) {
       await mapController!.animateCamera(
-        CameraUpdate.newLatLngZoom(loc, 14.0),
+        CameraUpdate.newLatLngZoom(
+          LatLng(result.point!.latitude, result.point!.longitude), 
+          15.0
+        ),
+      );
+    } else if (_lastUserLocation != null) {
+      // Fallback to maplibre tracked location
+      await mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(_lastUserLocation!, 15.0),
       );
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Lokasi belum tersedia. Pastikan GPS aktif.')),
+          SnackBar(content: Text(result.message ?? 'Gagal mendapatkan lokasi. Pastikan GPS dan izin lokasi aktif.')),
         );
       }
     }
@@ -342,7 +354,7 @@ class _CopMapScreenState extends ConsumerState<CopMapScreen> with AppLifecycleOb
 
           Positioned(
             right: 16,
-            bottom: MediaQuery.of(context).padding.bottom + 80,
+            bottom: 24, // Diturunkan agar tidak mepet tapi tetap aman dari navbar
             child: FloatingActionButton(
               heroTag: 'my_location',
               onPressed: _goToMyLocation,

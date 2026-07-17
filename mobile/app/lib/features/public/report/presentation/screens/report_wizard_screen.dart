@@ -340,7 +340,7 @@ class _ReportWizardScreenState extends ConsumerState<ReportWizardScreen> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
             child: Container(
-              color: const Color(0xFFF8F9FA).withValues(alpha: 0.6),
+              color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.6),
             ),
           ),
         ),

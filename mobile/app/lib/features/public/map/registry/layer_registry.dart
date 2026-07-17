@@ -5,7 +5,7 @@ import '../domain/models/map_layer_plugin.dart';
 import '../domain/plugins/generic_raster_plugin.dart';
 
 String _tileUrl(String layerName) {
-  String base = dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:8000/api/';
+  String base = dotenv.env['API_BASE_URL'] ?? 'https://nurisk.org/api/';
   if (!base.endsWith('/')) base += '/';
   return '${base}public/map/tiles/{z}/{x}/{y}.png?layers=$layerName';
 }
