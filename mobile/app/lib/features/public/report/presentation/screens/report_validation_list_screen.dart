@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nurisk_mobile/core/router/app_router.dart';
@@ -295,7 +296,10 @@ class _ReportValidationListScreenState extends ConsumerState<ReportValidationLis
           expand: false,
           builder: (context, scrollController) {
             final authState = ref.read(authStateProvider);
-            final String baseUrl = const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://10.0.2.2:8000/api');
+            String baseUrl = dotenv.env['API_BASE_URL'] ?? const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://10.0.2.2:8000/api');
+            if (baseUrl.endsWith('/')) {
+              baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+            }
             final proxyUrl = laporan.photoPath != null ? '$baseUrl/stream-media?path=${laporan.photoPath}&disk=s3' : null;
 
             return Column(
