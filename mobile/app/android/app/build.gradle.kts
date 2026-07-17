@@ -39,6 +39,10 @@ kotlin {
     }
 }
 
+base {
+    archivesName.set("NUrisk")
+}
+
 flutter {
     source = "../.."
 }

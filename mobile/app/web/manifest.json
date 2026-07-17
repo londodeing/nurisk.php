@@ -1,11 +1,11 @@
 {
-    "name": "nurisk_mobile",
-    "short_name": "nurisk_mobile",
+    "name": "NURISK",
+    "short_name": "NURISK",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FFFFFF",
+    "theme_color": "#0F6B3C",
+    "description": "NURISK - Sistem Manajemen Operasi Bencana",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,11 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../../core/theme/nurisk_colors.dart';
 
 const List<_NavItem> _navItems = [
   _NavItem(Icons.home_outlined, Icons.home),
   _NavItem(Icons.map_outlined, Icons.map),
-  _NavItem(Icons.add_alert_outlined, Icons.add_alert),
   _NavItem(Icons.inventory_2_outlined, Icons.inventory_2),
   _NavItem(Icons.person_outline, Icons.person),
 ];
@@ -14,6 +15,77 @@ class _NavItem {
   final IconData outlined;
   final IconData filled;
   const _NavItem(this.outlined, this.filled);
+}
+
+
+
+class _LogoButton extends StatefulWidget {
+  final VoidCallback onTap;
+
+  const _LogoButton({required this.onTap});
+
+  @override
+  State<_LogoButton> createState() => _LogoButtonState();
+}
+
+class _LogoButtonState extends State<_LogoButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 180),
+    );
+    _scale = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 1.08)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.08, end: 1.0)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
+    ]).animate(_ctrl);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  void _onTap() {
+    HapticFeedback.lightImpact();
+    _ctrl.forward(from: 0.0);
+    widget.onTap();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _onTap,
+      child: AnimatedBuilder(
+        animation: _scale,
+        builder: (context, child) {
+          return Transform.scale(scale: _scale.value, child: child);
+        },
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: SvgPicture.asset(
+            'assets/logo/logo.svg',
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class NuriskBottomNav extends StatelessWidget {
@@ -28,12 +100,14 @@ class NuriskBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
         child: Container(
-          height: 64,
+          height: 64 + bottomInset,
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.55),
             border: Border(
@@ -47,21 +121,42 @@ class NuriskBottomNav extends StatelessWidget {
               ),
             ],
           ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                children: List.generate(_navItems.length, (i) {
-                  return Expanded(
-                    child: _NavBarItem(
-                      item: _navItems[i],
-                      isActive: i == currentIndex,
-                      onTap: () => onItemTapped(i),
-                    ),
-                  );
-                }),
-              ),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 4, 16, 4 + bottomInset),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _NavBarItem(
+                    item: _navItems[0],
+                    isActive: 0 == currentIndex,
+                    onTap: () => onItemTapped(0),
+                  ),
+                ),
+                Expanded(
+                  child: _NavBarItem(
+                    item: _navItems[1],
+                    isActive: 1 == currentIndex,
+                    onTap: () => onItemTapped(1),
+                  ),
+                ),
+                Expanded(
+                  child: _LogoButton(onTap: () => onItemTapped(2)),
+                ),
+                Expanded(
+                  child: _NavBarItem(
+                    item: _navItems[2],
+                    isActive: 3 == currentIndex,
+                    onTap: () => onItemTapped(3),
+                  ),
+                ),
+                Expanded(
+                  child: _NavBarItem(
+                    item: _navItems[3],
+                    isActive: 4 == currentIndex,
+                    onTap: () => onItemTapped(4),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -138,7 +233,9 @@ class _NavBarItemState extends State<_NavBarItem>
               widget.isActive ? widget.item.filled : widget.item.outlined,
               key: ValueKey('nav_${widget.isActive}'),
               size: 28,
-              color: widget.isActive ? NuriskColors.primary600 : NuriskColors.neutral500,
+              color: widget.isActive
+                  ? NuriskColors.primary600
+                  : NuriskColors.neutral500,
             ),
           ),
         ),
