@@ -188,7 +188,7 @@
     {{-- HEADER --}}
     <header class="public-header">
         <a href="{{ route('public.home') }}" class="logo">
-            <div class="logo-icon">NU</div>
+            <x-application-logo class="logo-icon" style="background: none;" />
             <div class="logo-text">NURISK <small>NU Peduli Jawa Tengah</small></div>
         </a>
         <div class="header-actions">
@@ -219,8 +219,10 @@
             <span class="dock-label">Map</span>
         </a>
         <a href="{{ route('public.lapor') }}" class="dock-item dock-fab @yield('nav-lapor', '')">
-            <span class="dock-icon"><i class="fa-solid fa-bullhorn"></i></span>
-            <span class="dock-label">Lapor</span>
+            <span class="dock-icon" style="background: transparent; box-shadow: none;">
+                <x-application-logo style="width: 26px; height: 26px;" />
+            </span>
+            <span class="dock-label" style="color: var(--nu-green); font-weight: 600;">Lapor</span>
         </a>
         <a href="{{ route('public.resource') }}" class="dock-item @yield('nav-resource', '')">
             <span class="dock-icon"><i class="fa-solid fa-cubes"></i></span>
