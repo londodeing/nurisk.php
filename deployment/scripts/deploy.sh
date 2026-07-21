@@ -94,7 +94,7 @@ mv -Tf "$RELEASES_DIR/current.tmp" "$APP_DIR/current"
 
 # --- 9. PHP-FPM reload ---
 echo "[9/12] Reloading PHP-FPM..."
-sudo systemctl reload php8.3-fpm
+systemctl reload php8.5-fpm
 
 # --- 10. Supervisor update ---
 echo "[10/12] Updating supervisor..."
@@ -110,7 +110,7 @@ if [ "$HTTP_STATUS" != "200" ]; then
     echo "ERROR: Health check gagal! HTTP $HTTP_STATUS"
     echo "Rolling back..."
     sudo ln -sfn "$(ls -td "$RELEASES_DIR"/* | head -2 | tail -1)" "$APP_DIR/current"
-    sudo systemctl reload php8.3-fpm
+    systemctl reload php8.5-fpm
     echo "Rollback selesai. Kembali ke release sebelumnya."
     tail -20 "$SHARED_DIR/storage/logs/laravel.log"
     exit 1
