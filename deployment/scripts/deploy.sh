@@ -46,7 +46,7 @@ echo "=== NURISK DEPLOY START: $RELEASE_NAME ($BRANCH) ==="
 echo "[1/12] Creating release directory..."
 mkdir -p "$RELEASES_DIR"
 git clone --depth=1 --branch "$BRANCH" "file://$APP_DIR" "$RELEASE_DIR" 2>/dev/null || \
-    git clone --depth=1 --branch "$BRANCH" "https://github.com/nurisk/nurisk.git" "$RELEASE_DIR"
+    git clone --depth=1 --branch "$BRANCH" "https://github.com/londodeing/nurisk.php.git" "$RELEASE_DIR"
 cd "$RELEASE_DIR"
 
 # --- 2. Composer ---
