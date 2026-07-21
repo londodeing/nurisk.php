@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\DB;
 
 class AssessmentService
 {
+    public function __construct(
+        private \App\Services\InsidenService $insidenService
+    ) {}
+
     /**
      * Create a new Assessment atomically (Old flow).
      */
@@ -608,6 +612,17 @@ class AssessmentService
                 ]);
             }
 
+            // Automasi Transisi Status: Jika masih terverifikasi atau draft, naikkan ke respon
+            $insidenFresh = $insiden->fresh();
+            if (in_array($insidenFresh->status_insiden, ['draft', 'terverifikasi'])) {
+                $this->insidenService->ubahStatus(
+                    $insidenFresh,
+                    'respon',
+                    $petugas,
+                    'Otomatis: Assessment berhasil disubmit oleh TRC di lapangan'
+                );
+            }
+
             return $assessment->fresh()->load($this->defaultRelations());
         });
     }
@@ -748,6 +763,22 @@ class AssessmentService
                     'distribusi_hasil_panen' => $de['distribusi'] ?? null,
                     'fasilitas_pengolahan_kolektif' => $de['fasilitas'] ?? null,
                 ]);
+            }
+
+            // Automasi Transisi Status untuk Update Assessment Lanjutan
+            $insidenFresh = $assessment->insiden->fresh();
+            if ($insidenFresh && in_array($insidenFresh->status_insiden, ['draft', 'terverifikasi'])) {
+                // Untuk updateLengkap kita butuh petugas, karena fungsi updateLengkap tidak terima param petugas,
+                // kita bisa cek Auth::user() jika tidak ada $petugas
+                $aktor = auth()->user() ?: \App\Models\AuthUser::find($assessment->id_petugas_assessment);
+                if ($aktor) {
+                    $this->insidenService->ubahStatus(
+                        $insidenFresh,
+                        'respon',
+                        $aktor,
+                        'Otomatis: Assessment diperbarui oleh TRC di lapangan'
+                    );
+                }
             }
 
             return $assessment->fresh()->load($this->defaultRelations());

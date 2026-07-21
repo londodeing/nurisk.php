@@ -28,3 +28,4 @@ rr
 # Large database files
 mariadb_data/
 nurisk-sync-poc/
+mobile/

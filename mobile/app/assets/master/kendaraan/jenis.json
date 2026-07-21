@@ -1,8 +1,0 @@
-[
-  {"id": 1, "nama": "Ambulans",         "ikon": "ambulance"},
-  {"id": 2, "nama": "Mobil Operasional","ikon": "car"},
-  {"id": 3, "nama": "Truk Logistik",    "ikon": "truck"},
-  {"id": 4, "nama": "Motor Operasional","ikon": "motorcycle"},
-  {"id": 5, "nama": "Perahu Karet",     "ikon": "boat"},
-  {"id": 6, "nama": "Drone",           "ikon": "drone"}
-]

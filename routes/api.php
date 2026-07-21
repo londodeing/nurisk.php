@@ -244,6 +244,9 @@ Route::prefix('profile')->group(function () {
 Route::prefix('account')->group(function () {
     Route::get('home', [\App\Http\Controllers\Api\AccountHomeController::class, 'index'])->name('api.account.home');
 });
+
+Route::middleware('auth:sanctum')->delete('account', [\App\Http\Controllers\Api\AccountController::class, 'destroy'])
+    ->name('api.account.destroy');
 Route::prefix('dashboard')->group(function () {
     Route::get('home', [\App\Http\Controllers\Api\DashboardHomeController::class, 'index'])->name('api.dashboard.home');
 });

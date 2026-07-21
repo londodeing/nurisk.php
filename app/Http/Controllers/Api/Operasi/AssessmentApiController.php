@@ -79,22 +79,144 @@ class AssessmentApiController extends Controller
     public function show(AssessmentUtama $assessment, Request $request): JsonResponse
     {
         $this->authorize('view', $assessment);
-        $assessment->loadMissing(['insiden', 'dampakManusiaV2', 'kebutuhanMendesak', 'kebutuhanNumerik', 'petugas.profil']);
-        return $this->apiResponse(new AssessmentResource($assessment));
+        $assessment->loadMissing([
+            'insiden', 'dampakManusiaV2', 'kebutuhanMendesak', 'kebutuhanNumerik', 
+            'petugas.profil', 'dampakRumah', 'dampakFasum', 'dampakVital', 
+            'dampakLingkungan', 'dampakEkonomi', 'lokasiDetail', 'narasiDetail', 
+            'kebutuhanLanjutan', 'narasiKejadian', 'biodataKejadian'
+        ]);
+
+        $resource = new AssessmentResource($assessment);
+        $formData = $this->buildFormData($assessment);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Data berhasil diambil',
+            'data' => $resource,
+            'form_data' => $formData
+        ]);
     }
 
-    public function update(Request $request, AssessmentUtama $assessment): JsonResponse
+    private function buildFormData(AssessmentUtama $assessment): array
+    {
+        $data = [
+            'uuid_insiden' => $assessment->insiden->uuid_insiden ?? null,
+            'jenis_laporan' => $assessment->jenis_laporan,
+            'cakupan_wilayah_deskripsi' => $assessment->cakupan_wilayah_deskripsi,
+            'latitude' => $assessment->latitude,
+            'longitude' => $assessment->longitude,
+            'waktu_assesment' => $assessment->waktu_assesment?->format('Y-m-d H:i:s'),
+        ];
+        
+        if ($assessment->dampakManusiaV2) {
+            $data['dampak_manusia'] = $assessment->dampakManusiaV2->toArray();
+            unset($data['dampak_manusia']['id_assessment']);
+        }
+        
+        $di = [];
+        if ($assessment->dampakRumah) {
+            $di['rumah_rusak_berat'] = $assessment->dampakRumah->rusak_berat;
+            $di['rumah_rusak_sedang'] = $assessment->dampakRumah->rusak_sedang;
+            $di['rumah_rusak_ringan'] = $assessment->dampakRumah->rusak_ringan;
+            $di['rumah_terendam'] = $assessment->dampakRumah->terendam;
+            $di['rumah_terancam'] = $assessment->dampakRumah->terancam;
+        }
+        if ($assessment->dampakFasum) {
+            $di['fasilitas_kesehatan_rusak'] = $assessment->dampakFasum->kesehatan;
+            $di['fasilitas_pendidikan_rusak'] = $assessment->dampakFasum->pendidikan;
+            $di['tempat_ibadah_rusak'] = $assessment->dampakFasum->ibadah;
+            $di['kantor_pemerintah_rusak'] = $assessment->dampakFasum->kantor;
+            $di['sanitasi'] = $assessment->dampakFasum->sanitasi;
+            $di['pasar'] = $assessment->dampakFasum->pasar;
+            $di['spbu'] = $assessment->dampakFasum->spbu;
+            $di['jembatan_putus'] = $assessment->dampakFasum->jembatan;
+        }
+        if ($assessment->dampakVital) {
+            $di['jalan_rusak_km'] = $assessment->dampakVital->jalan;
+            $di['sarana_air_bersih_rusak'] = $assessment->dampakVital->air_bersih;
+            $di['jaringan_listrik_padam_kk'] = $assessment->dampakVital->listrik;
+            $di['jaringan_komunikasi_putus'] = $assessment->dampakVital->telekomunikasi;
+            $di['irigasi'] = $assessment->dampakVital->irigasi;
+            $di['sawah_ha'] = $assessment->dampakVital->sawah_ha;
+            $di['ternak_ekor'] = $assessment->dampakVital->ternak_ekor;
+            $di['hutan_ha'] = $assessment->dampakVital->hutan_ha;
+            $di['catatan_infrastruktur'] = $assessment->dampakVital->catatan_vital ?? ($assessment->dampakFasum->catatan_fasum ?? null);
+            if (!isset($di['spbu']) && $assessment->dampakVital->spbu > 0) {
+                $di['spbu'] = $assessment->dampakVital->spbu;
+            }
+        }
+        if (!empty($di)) {
+            $data['dampak_infrastruktur'] = $di;
+        }
+
+        if ($assessment->dampakLingkungan) {
+            $dl = $assessment->dampakLingkungan->toArray();
+            $dl['unggas'] = $assessment->dampakLingkungan->ternak_unggas_ekor;
+            $dl['kaki_empat'] = $assessment->dampakLingkungan->ternak_kaki_empat_ekor;
+            $dl['perikanan_kolam'] = $assessment->dampakLingkungan->perikanan_kolam_ha;
+            $dl['perikanan_nelayan'] = $assessment->dampakLingkungan->perikanan_nelayan_unit;
+            unset($dl['id_assessment_lingkungan'], $dl['id_assessment'], $dl['ternak_unggas_ekor'], $dl['ternak_kaki_empat_ekor'], $dl['perikanan_kolam_ha'], $dl['perikanan_nelayan_unit'], $dl['tingkat_kerusakan_lingkungan'], $dl['butuh_rehabilitasi_lahan']);
+            $data['dampak_lingkungan'] = $dl;
+        }
+
+        if ($assessment->dampakEkonomi) {
+            $de = $assessment->dampakEkonomi->toArray();
+            unset($de['id_assessment_ekonomi'], $de['id_assessment']);
+            $data['dampak_ekonomi'] = $de;
+        }
+
+        if ($assessment->biodataKejadian) {
+            $bk = $assessment->biodataKejadian->toArray();
+            unset($bk['id_assessment_biodata'], $bk['id_assessment']);
+            $data['biodata_kejadian'] = $bk;
+        }
+
+        if ($assessment->narasiKejadian) {
+            $nk = $assessment->narasiKejadian->toArray();
+            unset($nk['id_assessment_narasi'], $nk['id_assessment']);
+            $data['narasi_kejadian'] = $nk;
+        }
+
+        if ($assessment->lokasiDetail) {
+            $ld = $assessment->lokasiDetail->toArray();
+            unset($ld['id_lokasi_detail'], $ld['id_assessment']);
+            $data['lokasi_detail'] = $ld;
+        }
+
+        if ($assessment->narasiDetail) {
+            $nd = $assessment->narasiDetail->toArray();
+            unset($nd['id_narasi_detail'], $nd['id_assessment']);
+            $data['narasi_detail'] = $nd;
+        }
+
+        if ($assessment->kebutuhanLanjutan) {
+            $kl = $assessment->kebutuhanLanjutan->toArray();
+            unset($kl['id_kebutuhan_lanjutan'], $kl['id_assessment']);
+            $data['kebutuhan_lanjutan'] = $kl;
+        }
+        
+        if ($assessment->kebutuhanNumerik) {
+            $data['kebutuhan_numerik'] = $assessment->kebutuhanNumerik->map(function($kn) {
+                return [
+                    'id_item' => $kn->id_item,
+                    'jumlah_dibutuhkan' => $kn->jumlah_dibutuhkan,
+                    'jumlah_tersedia' => $kn->jumlah_tersedia,
+                    'satuan' => $kn->satuan,
+                    'prioritas' => $kn->prioritas,
+                    'keterangan' => $kn->keterangan
+                ];
+            })->toArray();
+        }
+
+        return $data;
+    }
+
+    public function update(\App\Http\Requests\Operasi\StoreAssessmentRequest $request, AssessmentUtama $assessment): JsonResponse
     {
         $this->authorize('update', $assessment);
 
-        $validated = $request->validate([
-            'cakupan_wilayah_deskripsi' => 'nullable|string',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'jenis_laporan' => 'sometimes|in:awal,lanjutan',
-        ]);
-
-        $assessment->update($validated);
+        $data = $request->validated();
+        $assessment = $this->service->updateAssessment($assessment, $data);
 
         return $this->apiResponse(new AssessmentResource($assessment->fresh(['dampakManusiaV2', 'kebutuhanMendesak', 'kebutuhanNumerik'])), 'Assessment diperbarui');
     }

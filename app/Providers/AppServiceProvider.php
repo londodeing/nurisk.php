@@ -405,6 +405,7 @@ class AppServiceProvider extends ServiceProvider
         OperasiKlaster::observe(SyncObserver::class);
         OperasiPenugasan::observe(SyncObserver::class);
         OperasiMobilisasi::observe(SyncObserver::class);
+        \App\Models\OperasiInsiden::observe(\App\Observers\OperasiInsidenObserver::class);
 
         RateLimiter::for('login', fn (Request $request) => [
             Limit::perMinute(10)->by($request->ip()),

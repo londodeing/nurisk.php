@@ -1,7 +1,0 @@
-[
-  {"id": "lokal",      "nama": "Lokal",      "level": 1},
-  {"id": "kecamatan",  "nama": "Kecamatan",  "level": 2},
-  {"id": "kabupaten",  "nama": "Kabupaten",  "level": 3},
-  {"id": "provinsi",   "nama": "Provinsi",   "level": 4},
-  {"id": "nasional",   "nama": "Nasional",   "level": 5}
-]

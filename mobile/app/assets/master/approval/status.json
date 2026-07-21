@@ -1,6 +1,0 @@
-[
-  {"id": "PENDING",             "nama": "Menunggu",      "urutan": 0, "warna": "#F59E0B"},
-  {"id": "APPROVED",            "nama": "Disetujui",     "urutan": 1, "warna": "#22C55E"},
-  {"id": "REJECTED",            "nama": "Ditolak",       "urutan": 2, "warna": "#EF4444"},
-  {"id": "REVISION_REQUESTED",  "nama": "Perlu Revisi",  "urutan": 3, "warna": "#F97316"}
-]

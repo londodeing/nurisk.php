@@ -17,7 +17,7 @@ return [
     'allowed_methods' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 
     'allowed_origins' => [
-        env('APP_URL', 'https://nurisk.or.id'),
+        '*', // Mobile apps (Android/iOS) do not send Origin header; wildcard needed for native clients
     ],
 
     'allowed_origins_patterns' => [],

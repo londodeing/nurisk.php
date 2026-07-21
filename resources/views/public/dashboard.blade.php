@@ -164,32 +164,6 @@
         gap: 16px;
         margin-bottom: 24px;
     }
-    .qrcard {
-        background: rgba(255,255,255,0.75);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-radius: 16px;
-        padding: 18px 20px;
-        border: 1px solid rgba(255,255,255,0.5);
-        box-shadow: 0 2px 16px rgba(0,0,0,0.03);
-        display: flex; align-items: center; gap: 16px;
-    }
-    .qrcard-img {
-        width: 80px; height: 80px; flex-shrink: 0;
-        border-radius: 12px; overflow: hidden;
-        background: #f8f9fa;
-    }
-    .qrcard-img img { width: 100%; height: 100%; object-fit: contain; }
-    .qrcard-body h4 { font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 3px; }
-    .qrcard-body p { font-size: 11px; color: #999; line-height: 1.5; }
-    .qrcard-btn {
-        display: inline-block; margin-top: 8px;
-        font-size: 11px; font-weight: 600; padding: 5px 14px;
-        background: var(--nu-green); color: #fff; text-decoration: none;
-        border-radius: 8px; transition: all 0.2s;
-    }
-    .qrcard-btn:hover { background: var(--nu-green-dark); }
-
     .shortcuts {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -339,7 +313,6 @@
         .weather-strip { flex-direction: column; align-items: stretch; gap: 10px; }
         .weather-now { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.06); padding-right: 0; padding-bottom: 8px; }
         .incard-grid { grid-template-columns: 1fr; }
-        .qrcard { flex-direction: column; text-align: center; }
         .shortcuts { grid-template-columns: 1fr; }
         .bottom-row { gap: 12px; }
     }
@@ -404,19 +377,6 @@
 
     {{-- Bottom Row --}}
     <div class="bottom-row">
-        <div class="qrcard">
-            <div class="qrcard-img">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://laziznu.org/donasi-bencana" alt="QR" loading="lazy">
-            </div>
-            <div class="qrcard-body">
-                <h4><i class="fa-solid fa-hand-holding-heart" style="color:var(--nu-green);"></i> Bantuan Bencana</h4>
-                <p>Donasi kemanusiaan melalui Laziznu NU Peduli.</p>
-                <a href="https://laziznu.org/donasi-bencana" target="_blank" rel="noopener" class="qrcard-btn">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Donasi
-                </a>
-            </div>
-        </div>
-
         <div class="shortcuts">
             <a href="{{ route('public.map') }}" class="shortcut">
                 <div class="sc-icon green"><i class="fa-solid fa-map"></i></div>

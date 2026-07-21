@@ -1,6 +1,0 @@
-[
-  {"id": "rendah", "nama": "Rendah", "skor": 1, "warna": "#22C55E"},
-  {"id": "sedang", "nama": "Sedang", "skor": 2, "warna": "#EAB308"},
-  {"id": "tinggi", "nama": "Tinggi", "skor": 3, "warna": "#F97316"},
-  {"id": "kritis", "nama": "Kritis", "skor": 4, "warna": "#EF4444"}
-]

@@ -22,12 +22,19 @@ class StoreAssessmentRequest extends FormRequest
         if ($this->uuid_insiden) {
             $insiden = \App\Models\OperasiInsiden::where('uuid_insiden', $this->uuid_insiden)->first();
             if ($insiden) {
-                // Find latest assessment for this incident
-                $latestAssessment = \App\Models\AssessmentUtama::where('id_insiden', $insiden->id_insiden)
-                    ->latest('id_assessment_utama')
-                    ->first();
-                if ($latestAssessment) {
-                    $minMeninggal = $latestAssessment->dampakManusiaV2?->meninggal ?? 0;
+                $query = \App\Models\AssessmentUtama::where('id_insiden', $insiden->id_insiden)
+                    ->latest('id_assessment_utama');
+                
+                if ($isUpdate && $this->route('assessment')) {
+                    $assessmentId = $this->route('assessment') instanceof \App\Models\AssessmentUtama 
+                        ? $this->route('assessment')->id_assessment_utama 
+                        : $this->route('assessment');
+                    $query->where('id_assessment_utama', '<', $assessmentId);
+                }
+
+                $previousAssessment = $query->first();
+                if ($previousAssessment) {
+                    $minMeninggal = $previousAssessment->dampakManusiaV2?->meninggal ?? 0;
                 }
             }
         }

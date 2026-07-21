@@ -1,7 +1,0 @@
-[
-  {"id": "minor",          "nama": "Minor",          "skor": 1, "warna": "#22C55E"},
-  {"id": "sedang",         "nama": "Sedang",         "skor": 2, "warna": "#EAB308"},
-  {"id": "signifikan",     "nama": "Signifikan",     "skor": 3, "warna": "#F97316"},
-  {"id": "berat",          "nama": "Berat",          "skor": 4, "warna": "#EF4444"},
-  {"id": "katastrofik",    "nama": "Katastrofik",    "skor": 5, "warna": "#991B1B"}
-]

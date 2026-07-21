@@ -12,6 +12,11 @@ Route::controller(PublicDashboardWebController::class)->group(function () {
     Route::get('/lapor',         'lapor')->name('public.lapor');
     Route::get('/resource',      'resource')->name('public.resource');
 });
+
+Route::view('/privacy', 'public.privacy')->name('public.privacy');
+Route::view('/delete-account', 'public.delete-account')->name('public.delete-account');
+Route::view('/terms', 'public.terms')->name('public.terms');
+Route::view('/child-safety', 'public.child-safety')->name('public.child-safety');
 Route::post('/lapor', [LaporController::class, 'store'])->middleware('throttle:10,60')->name('public.lapor.store');
 
 Route::get('/health', \App\Http\Controllers\Api\HealthCheckController::class)->name('health');

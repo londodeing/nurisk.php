@@ -27,6 +27,7 @@ class LaporanKejadianApiController extends Controller
         private LocationService $locationService,
         private UploadMediaHandler $uploadMediaHandler,
         private SuratService $suratService,
+        private \App\Services\InsidenService $insidenService,
     ) {}
 
     public function index(Request $request): JsonResponse
@@ -316,16 +317,22 @@ class LaporanKejadianApiController extends Controller
             }
         }
 
-        $insiden = DB::transaction(function () use ($laporan, $idPcnu, $validated) {
-            $insiden = OperasiInsiden::create([
-                'kode_kejadian'    => $laporan->kode_kejadian,
+        $insiden = DB::transaction(function () use ($laporan, $idPcnu, $validated, $request) {
+            $insiden = $this->insidenService->buatInsiden([
                 'id_laporan_asal'  => $laporan->id_laporan_kejadian,
                 'id_jenis_bencana' => $laporan->id_jenis_bencana,
                 'id_pcnu'          => $idPcnu,
-                'status_insiden'   => $validated['status_insiden'] ?? 'draft',
                 'prioritas'        => $validated['prioritas'] ?? 'sedang',
+                'status_insiden'   => 'draft',
                 'waktu_mulai'      => $laporan->waktu_kejadian,
             ]);
+
+            $this->insidenService->ubahStatus(
+                $insiden,
+                $validated['status_insiden'] ?? 'terverifikasi',
+                $request->user(),
+                'Eskalasi dari Laporan Kejadian Publik (Mobile API)'
+            );
 
             if (!empty($validated['petugas_trc_ids'])) {
                 $jenisSurat = MasterSuratJenis::where('kode_jenis', 'ST')

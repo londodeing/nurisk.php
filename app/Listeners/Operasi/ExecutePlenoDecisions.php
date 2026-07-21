@@ -22,11 +22,13 @@ class ExecutePlenoDecisions
 {
     private SuratService $suratService;
     private SuratPdfService $pdfService;
+    private \App\Services\InsidenService $insidenService;
 
-    public function __construct(SuratService $suratService, SuratPdfService $pdfService)
+    public function __construct(SuratService $suratService, SuratPdfService $pdfService, \App\Services\InsidenService $insidenService)
     {
         $this->suratService = $suratService;
         $this->pdfService = $pdfService;
+        $this->insidenService = $insidenService;
     }
 
     public function handle(PlenoFinalized $event): void
@@ -43,13 +45,16 @@ class ExecutePlenoDecisions
             Log::error("Failed to generate PDF for Pleno ID: {$pleno->id_pleno}: " . $e->getMessage());
         }
 
+        $insiden = OperasiInsiden::find($pleno->id_insiden);
+        $shouldTransitionToPemulihan = false;
+
         foreach ($pleno->keputusan as $keputusan) {
             if (in_array($keputusan->status_pelaksanaan, ['selesai', 'dieksekusi'])) {
                 continue;
             }
 
             try {
-                DB::transaction(function () use ($pleno, $keputusan) {
+                DB::transaction(function () use ($pleno, $keputusan, &$shouldTransitionToPemulihan) {
                     $kategori = $keputusan->kategori_objek;
 
                     if ($kategori === 'aktivasi_posko') {
@@ -60,12 +65,29 @@ class ExecutePlenoDecisions
 
                     if ($kategori === 'logistik') {
                         $this->executeLogistik($pleno, $keputusan);
+                        $shouldTransitionToPemulihan = true;
                     }
 
                     $keputusan->update(['status_pelaksanaan' => 'selesai']);
                 });
             } catch (\Exception $e) {
                 Log::error("Failed to execute keputusan {$keputusan->id_keputusan}: " . $e->getMessage());
+            }
+        }
+
+        if ($shouldTransitionToPemulihan && $insiden && in_array($insiden->status_insiden, ['draft', 'terverifikasi', 'respon'])) {
+            try {
+                $aktor = Auth::user() ?: \App\Models\AuthUser::find($pleno->disetujui_oleh);
+                if ($aktor) {
+                    $this->insidenService->ubahStatus(
+                        $insiden,
+                        'pemulihan',
+                        $aktor,
+                        'Otomatis: Pleno mengesahkan keputusan logistik/pemulihan'
+                    );
+                }
+            } catch (\Exception $e) {
+                Log::error("Failed to transition status to pemulihan for insiden {$insiden->id_insiden}: " . $e->getMessage());
             }
         }
     }

@@ -152,8 +152,9 @@
                 <td>
                     @php $dm = $assessment->dampakManusiaV2 ?? $assessment->dampakManusia; @endphp
                     @if($dm)
-                        Meninggal: {{ number_format($dm->meninggal ?? 0) }} jiwa, 
-                        Menderita: {{ number_format($dm->terdampak_jiwa ?? ($dm->menderita_mengungsi ?? 0)) }} jiwa, 
+                        Meninggal: {{ number_format($dm->meninggal ?? 0) }} jiwa, Hilang: {{ number_format($dm->hilang ?? 0) }} jiwa.<br>
+                        Luka Berat: {{ number_format($dm->luka_berat ?? 0) }} jiwa, Luka Ringan: {{ number_format($dm->luka_ringan ?? 0) }} jiwa.<br>
+                        Menderita: {{ number_format($dm->terdampak_jiwa ?? ($dm->menderita_mengungsi ?? 0)) }} jiwa ({{ number_format($dm->terdampak_kk ?? 0) }} KK), 
                         Mengungsi: {{ number_format($dm->pengungsi_jiwa ?? 0) }} jiwa ({{ number_format($dm->pengungsi_kk ?? 0) }} KK).
                     @else
                         -
@@ -164,12 +165,22 @@
                 <td><strong>Infrastruktur</strong></td>
                 <td style="text-align: center;">{{ $rs ? number_format($rs->skor_infrastruktur, 1) : '-' }}</td>
                 <td>
-                    @php $infra = $assessment->dampakInfrastruktur; @endphp
-                    @if($infra)
-                        Rumah Rusak Berat: {{ number_format($infra->rumah_rb ?? 0) }} unit, 
-                        Rusak Sedang: {{ number_format($infra->rumah_rs ?? 0) }} unit, 
-                        Rusak Ringan: {{ number_format($infra->rumah_rr ?? 0) }} unit.<br>
-                        Fasilitas: Pendidikan ({{ $infra->fasilitas_pendidikan ?? 0 }}), Ibadah ({{ $infra->fasilitas_ibadah ?? 0 }}), Kesehatan ({{ $infra->fasilitas_kesehatan ?? 0 }}).
+                    @php 
+                        $dr = $assessment->dampakRumah;
+                        $df = $assessment->dampakFasum;
+                        $dv = $assessment->dampakVital;
+                    @endphp
+                    
+                    @if($dr || $df || $dv)
+                        <strong>Rumah:</strong> Rusak Berat ({{ $dr->rumah_rb ?? 0 }}), Sedang ({{ $dr->rumah_rs ?? 0 }}), Ringan ({{ $dr->rumah_rr ?? 0 }}), Terendam ({{ $dr->rumah_terendam ?? 0 }}), Terancam ({{ $dr->rumah_terancam ?? 0 }}).<br>
+                        
+                        <strong>Fasum:</strong> Pendidikan ({{ $df->fasilitas_pendidikan ?? 0 }}), Ibadah ({{ $df->tempat_ibadah_rusak ?? 0 }}), Kesehatan ({{ $df->fasilitas_kesehatan ?? 0 }}), Pasar ({{ $df->pasar ?? 0 }}), Sanitasi ({{ $df->sanitasi ?? 0 }}).<br>
+                        
+                        <strong>Vital:</strong> Jalan Rusak ({{ $dv->jalan_rusak_km ?? 0 }} km), Jembatan (Putus: {{ $dv->jembatan_putus ?? 0 }}, Rusak: {{ $dv->jembatan_rusak ?? 0 }}). Listrik Padam ({{ $dv->jaringan_listrik_padam_kk ?? 0 }} KK).<br>
+                        
+                        <strong>Lainnya:</strong> Irigasi ({{ $dv->irigasi ?? 0 }} Ha), Sawah ({{ $dv->sawah_ha ?? 0 }} Ha), Hutan ({{ $dv->hutan_ha ?? 0 }} Ha), SPBU ({{ $dv->spbu ?? 0 }}).<br>
+                        
+                        <strong>Jaringan Komunikasi:</strong> {{ ($dv->jaringan_komunikasi_putus ?? false) ? 'Putus' : 'Aman' }}. <strong>Air Bersih:</strong> {{ ($dv->sarana_air_bersih_rusak ?? false) ? 'Rusak' : 'Aman' }}.
                     @else
                         -
                     @endif
@@ -181,9 +192,16 @@
                 <td>
                     @php $ling = $assessment->dampakLingkungan; @endphp
                     @if($ling)
-                        Lahan Pertanian Rusak: {{ number_format($ling->lahan_pertanian_rusak_ha ?? 0) }} Ha, 
-                        Lahan Perkebunan Rusak: {{ number_format($ling->lahan_perkebunan_rusak_ha ?? 0) }} Ha.<br>
-                        Hewan Ternak Mati/Hilang: {{ number_format($ling->ternak_terdampak_ekor ?? 0) }} ekor.
+                        <strong>Kerusakan Alam:</strong> Lahan Pertanian ({{ number_format($ling->lahan_pertanian_rusak_ha ?? 0) }} Ha), Hutan Terdampak ({{ number_format($ling->hutan_terdampak_ha ?? 0) }} Ha).<br>
+                        
+                        <strong>Hewan / Peternakan:</strong> Unggas Mati ({{ number_format($ling->ternak_unggas_ekor ?? 0) }} ekor), Kaki Empat Mati ({{ number_format($ling->ternak_kaki_empat_ekor ?? 0) }} ekor), Kolam Ikan ({{ number_format($ling->perikanan_kolam_ha ?? 0) }} Ha), Nelayan ({{ number_format($ling->perikanan_nelayan_unit ?? 0) }} Unit).<br>
+                        
+                        <strong>Status Pencemaran:</strong><br>
+                        - Sumber Air Tercemar: {{ ($ling->sumber_air_tercemar ?? false) ? 'Ya' : 'Tidak' }}<br>
+                        - Pencemaran Tanah: {{ ($ling->pencemaran_tanah ?? false) ? 'Ya' : 'Tidak' }}<br>
+                        - Erosi / Sedimentasi: {{ ($ling->erosi_sedimentasi ?? false) ? 'Ya' : 'Tidak' }}<br>
+                        - Kerusakan Ekosistem Pesisir: {{ ($ling->kerusakan_ekosistem_pesisir ?? false) ? 'Ya' : 'Tidak' }}<br>
+                        - Kerusakan DAS: {{ ($ling->kerusakan_daerah_aliran_sungai ?? false) ? 'Ya' : 'Tidak' }}
                     @else
                         -
                     @endif
@@ -195,8 +213,21 @@
                 <td>
                     @php $eko = $assessment->dampakEkonomi; @endphp
                     @if($eko)
-                        Estimasi Kerugian: Rp {{ number_format($eko->estimasi_kerugian_total ?? 0, 0, ',', '.') }}, 
-                        Usaha Terdampak: {{ number_format($eko->usaha_terdampak ?? 0) }} usaha.
+                        <strong>Persentase Ekonomi Terdampak:</strong> {{ $eko->persentase_ekonomi_terdampak ?? '-' }}<br>
+                        
+                        <strong>Sektor Pencaharian Terdampak:</strong><br>
+                        @if(!empty($eko->sektor_pencaharian_1)) 
+                        1. {{ $eko->sektor_pencaharian_1 }} ({{ $eko->kontribusi_1 ?? 0 }}%) - Status: {{ str_replace('_', ' ', $eko->status_terdampak_1 ?? '-') }}<br>
+                        @endif
+                        @if(!empty($eko->sektor_pencaharian_2)) 
+                        2. {{ $eko->sektor_pencaharian_2 }} ({{ $eko->kontribusi_2 ?? 0 }}%) - Status: {{ str_replace('_', ' ', $eko->status_terdampak_2 ?? '-') }}<br>
+                        @endif
+                        @if(!empty($eko->sektor_pencaharian_3)) 
+                        3. {{ $eko->sektor_pencaharian_3 }} ({{ $eko->kontribusi_3 ?? 0 }}%) - Status: {{ str_replace('_', ' ', $eko->status_terdampak_3 ?? '-') }}<br>
+                        @endif
+                        
+                        <strong>Distribusi Hasil Panen:</strong> {{ str_replace('_', ' ', $eko->distribusi_hasil_panen ?? '-') }}<br>
+                        <strong>Fasilitas Pengolahan Kolektif:</strong> {{ str_replace('_', ' ', $eko->fasilitas_pengolahan_kolektif ?? '-') }}
                     @else
                         -
                     @endif
