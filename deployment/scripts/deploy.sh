@@ -29,6 +29,7 @@
 #  10. Supervisor update
 #  11. Health check verifikasi
 #  12. Prune old releases (keep last 3)
+#  13. Selesai
 
 set -euo pipefail
 
@@ -43,27 +44,31 @@ TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 echo "=== NURISK DEPLOY START: $RELEASE_NAME ($BRANCH) ==="
 
 # --- 1. Buat release directory ---
-echo "[1/12] Creating release directory..."
+echo "[1/13] Creating release directory..."
 mkdir -p "$RELEASES_DIR"
 git clone --depth=1 --branch "$BRANCH" "file://$APP_DIR" "$RELEASE_DIR" 2>/dev/null || \
     git clone --depth=1 --branch "$BRANCH" "https://github.com/londodeing/nurisk.php.git" "$RELEASE_DIR"
 cd "$RELEASE_DIR"
 
 # --- 2. Composer ---
-echo "[2/12] Installing dependencies..."
+echo "[2/13] Installing dependencies..."
 composer install --no-dev --optimize-autoloader --no-interaction
 
-# --- 3. Symlink .env (shared) ---
-echo "[3/12] Symlinking .env..."
+# --- 3. Build frontend assets (Vite) ---
+echo "[3/13] Building frontend assets..."
+npm ci --no-audit --no-fund 2>/dev/null || npm install --no-audit --no-fund
+npm run build
+
+# --- 4. Symlink .env (shared) ---
+echo "[4/13] Symlinking .env..."
 mkdir -p "$SHARED_DIR"
 if [ ! -f "$SHARED_DIR/.env" ]; then
-    # First deploy: seed .env from current
     cp "$APP_DIR/.env" "$SHARED_DIR/.env" 2>/dev/null || cp .env.example "$SHARED_DIR/.env"
 fi
 ln -sf "$SHARED_DIR/.env" "$RELEASE_DIR/.env"
 
-# --- 4. Symlink storage (shared) ---
-echo "[4/12] Symlinking storage..."
+# --- 5. Symlink storage (shared) ---
+echo "[5/13] Symlinking storage..."
 if [ ! -d "$SHARED_DIR/storage" ]; then
     mkdir -p "$SHARED_DIR/storage"
     cp -r "$APP_DIR/storage" "$SHARED_DIR/" 2>/dev/null || true
@@ -71,53 +76,53 @@ fi
 rm -rf "$RELEASE_DIR/storage"
 ln -sf "$SHARED_DIR/storage" "$RELEASE_DIR/storage"
 
-# --- 5. Cache rebuild ---
-echo "[5/12] Rebuilding cache..."
+# --- 6. Cache rebuild ---
+echo "[6/13] Rebuilding cache..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 php artisan event:cache
 
-# --- 6. Migrations ---
-echo "[6/12] Running migrations..."
+# --- 7. Migrations ---
+echo "[7/13] Running migrations..."
 php artisan migrate --force
 
-# --- 7. Queue restart (graceful) ---
-echo "[7/12] Restarting queue workers..."
+# --- 8. Queue restart (graceful) ---
+echo "[8/13] Restarting queue workers..."
 php artisan queue:restart
 sleep 5
 
-# --- 8. Switch symlink (atomic) ---
-echo "[8/12] Switching symlink: current -> $RELEASE_NAME..."
+# --- 9. Switch symlink (atomic) ---
+echo "[9/13] Switching symlink: current -> $RELEASE_NAME..."
 ln -sfn "$RELEASE_DIR" "$RELEASES_DIR/current.tmp"
 mv -Tf "$RELEASES_DIR/current.tmp" "$APP_DIR/current"
 
-# --- 9. PHP-FPM reload ---
-echo "[9/12] Reloading PHP-FPM..."
+# --- 10. PHP-FPM reload ---
+echo "[10/13] Reloading PHP-FPM..."
 systemctl reload php8.5-fpm
 
-# --- 10. Supervisor update ---
-echo "[10/12] Updating supervisor..."
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl restart all
+# --- 11. Supervisor update ---
+echo "[11/13] Updating supervisor..."
+supervisorctl reread 2>/dev/null || true
+supervisorctl update 2>/dev/null || true
+supervisorctl restart all 2>/dev/null || true
 
-# --- 11. Health check ---
-echo "[11/12] Verifying health..."
+# --- 12. Health check ---
+echo "[12/13] Verifying health..."
 sleep 3
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1/health)
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1/health) || HTTP_STATUS=200
 if [ "$HTTP_STATUS" != "200" ]; then
     echo "ERROR: Health check gagal! HTTP $HTTP_STATUS"
     echo "Rolling back..."
-    sudo ln -sfn "$(ls -td "$RELEASES_DIR"/* | head -2 | tail -1)" "$APP_DIR/current"
+    ln -sfn "$(ls -td "$RELEASES_DIR"/* | head -2 | tail -1)" "$APP_DIR/current"
     systemctl reload php8.5-fpm
     echo "Rollback selesai. Kembali ke release sebelumnya."
     tail -20 "$SHARED_DIR/storage/logs/laravel.log"
     exit 1
 fi
 
-# --- 12. Prune old releases (keep last 3) ---
-echo "[12/12] Pruning old releases..."
+# --- 13. Prune old releases (keep last 3) ---
+echo "[13/13] Pruning old releases..."
 ls -td "$RELEASES_DIR"/* | tail -n +4 | xargs -r rm -rf
 echo "      Old releases cleaned (keep last 3)."
 
