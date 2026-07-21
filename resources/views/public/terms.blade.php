@@ -77,7 +77,7 @@
 <div class="terms-container">
 
     <h1>Syarat dan Ketentuan NURisk</h1>
-    <div class="subtitle">Terakhir diperbarui: <strong>[Tanggal Berlaku]</strong></div>
+    <div class="subtitle">Terakhir diperbarui: <strong>21 Juli 2026</strong></div>
 
     <p>
         Dengan mengakses dan menggunakan aplikasi NURisk, Anda menyetujui syarat dan ketentuan berikut.

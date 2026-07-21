@@ -95,7 +95,7 @@
 <div class="privacy-container">
 
     <h1>Kebijakan Privasi NURisk</h1>
-    <div class="subtitle">Terakhir diperbarui: <strong>[Tanggal Berlaku]</strong></div>
+    <div class="subtitle">Terakhir diperbarui: <strong>21 Juli 2026</strong></div>
 
     <p>
         NURisk adalah aplikasi sistem pelaporan dan manajemen penanggulangan bencana yang dikelola oleh
