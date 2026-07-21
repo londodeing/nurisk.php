@@ -24,7 +24,6 @@ return new class extends Migration
             $table->enum('prioritas', ['rendah', 'sedang', 'tinggi', 'kritis'])->default('sedang');
             $table->enum('status_gap', ['dibuka', 'diprioritaskan', 'dikerjakan', 'terselesaikan', 'ditutup'])->default('dibuka');
 
-            $table->unsignedBigInteger('id_penugasan')->nullable();
             $table->text('catatan_penanganan')->nullable();
             $table->dateTime('waktu_terselesaikan')->nullable();
 
