@@ -44,7 +44,7 @@ class IncidentProjectionService
             $timeline = [];
             foreach ($incident->riwayatStatus as $riwayat) {
                 $timeline[] = [
-                    'time' => $riwayat->created_at->toIso8601String(),
+                    'time' => $riwayat->created_at?->toIso8601String() ?? now()->toIso8601String(),
                     'status' => strtoupper($riwayat->status_baru),
                     'title' => 'Status diubah menjadi ' . $riwayat->status_baru,
                 ];
