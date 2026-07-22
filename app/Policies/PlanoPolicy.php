@@ -58,6 +58,9 @@ class PlanoPolicy
 
     private function insidenTidakKunci(OperasiPleno $pleno): bool
     {
+        if (!$pleno->exists || !$pleno->insiden) {
+            return true;
+        }
         return !$pleno->insiden->isClosed();
     }
 
@@ -108,6 +111,9 @@ class PlanoPolicy
 
     public function finalisasi(AuthUser $user, OperasiPleno $pleno): bool
     {
+        if (!$pleno->exists) {
+            return $this->authCtx()->hasAnyRole(['super_admin', 'pwnu', 'pcnu']);
+        }
         if (!$this->insidenTidakKunci($pleno)) {
             return false;
         }

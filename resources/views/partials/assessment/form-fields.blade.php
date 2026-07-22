@@ -606,8 +606,8 @@
                             <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100">
                                 <label class="block text-xs font-semibold text-slate-600 mb-2"><i class="bi bi-sunset text-rose-500 mr-1"></i>Kerusakan Pesisir</label>
                                 <select name="dampak_lingkungan[kerusakan_pesisir]" class="w-full rounded-lg border-rose-200 focus:border-rose-500">
-                                    <option value="0" {{ old('dampak_lingkungan.kerusakan_pesisir', $ling?->kerusakan_pesisir) == '0' ? 'selected' : '' }}>Tidak</option>
-                                    <option value="1" {{ old('dampak_lingkungan.kerusakan_pesisir', $ling?->kerusakan_pesisir) == '1' ? 'selected' : '' }}>Ya</option>
+                                    <option value="0" {{ old('dampak_lingkungan.kerusakan_pesisir', $ling?->kerusakan_ekosistem_pesisir) == '0' ? 'selected' : '' }}>Tidak</option>
+                                    <option value="1" {{ old('dampak_lingkungan.kerusakan_pesisir', $ling?->kerusakan_ekosistem_pesisir) == '1' ? 'selected' : '' }}>Ya</option>
                                 </select>
                             </div>
                         </div>
@@ -630,7 +630,7 @@
                                 '51% - 75%' => '51% - 75% (Tinggi)',
                                 '> 75%' => '> 75% (Lumpuh Total)',
                             ] as $val => $label)
-                                <option value="{{ $val }}" {{ old('dampak_ekonomi.persentase', $eko?->persentase) === $val ? 'selected' : '' }}>{{ $label }}</option>
+                                <option value="{{ $val }}" {{ old('dampak_ekonomi.persentase', $eko?->persentase_ekonomi_terdampak) === $val ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -642,7 +642,7 @@
                             <div class="md:col-span-5">
                                 <label class="block text-xs font-semibold text-slate-600 mb-1"><i class="bi bi-{{ $i }}-circle text-indigo-400 mr-1"></i>Nama Sektor</label>
                                 <input type="text" name="dampak_ekonomi[sektor_{{ $i }}]" placeholder="Contoh: Pertanian"
-                                       value="{{ old('dampak_ekonomi.sektor_'.$i, $eko?->{'sektor_'.$i}) }}"
+                                       value="{{ old('dampak_ekonomi.sektor_'.$i, $eko?->{'sektor_pencaharian_'.$i}) }}"
                                        class="w-full rounded-lg border-indigo-200 focus:border-indigo-500">
                             </div>
                             <div class="md:col-span-3">
@@ -658,9 +658,9 @@
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">Status Kehilangan</label>
                                 <select name="dampak_ekonomi[status_{{ $i }}]" class="w-full rounded-lg border-indigo-200 focus:border-indigo-500">
                                     <option value="">-- Status --</option>
-                                    <option value="tidak_terdampak" {{ old('dampak_ekonomi.status_'.$i, $eko?->{'status_'.$i}) === 'tidak_terdampak' ? 'selected' : '' }}>Tidak Terdampak</option>
-                                    <option value="sementara" {{ old('dampak_ekonomi.status_'.$i, $eko?->{'status_'.$i}) === 'sementara' ? 'selected' : '' }}>Sementara</option>
-                                    <option value="permanen" {{ old('dampak_ekonomi.status_'.$i, $eko?->{'status_'.$i}) === 'permanen' ? 'selected' : '' }}>Permanen</option>
+                                    <option value="tidak_terdampak" {{ old('dampak_ekonomi.status_'.$i, $eko?->{'status_terdampak_'.$i}) === 'tidak_terdampak' ? 'selected' : '' }}>Tidak Terdampak</option>
+                                    <option value="sementara" {{ old('dampak_ekonomi.status_'.$i, $eko?->{'status_terdampak_'.$i}) === 'sementara' ? 'selected' : '' }}>Sementara</option>
+                                    <option value="permanen" {{ old('dampak_ekonomi.status_'.$i, $eko?->{'status_terdampak_'.$i}) === 'permanen' ? 'selected' : '' }}>Permanen</option>
                                 </select>
                             </div>
                         </div>
@@ -672,18 +672,18 @@
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Fasilitas Distribusi/Logistik</label>
                             <select name="dampak_ekonomi[distribusi]" class="w-full rounded-xl border-slate-200 focus:border-indigo-500 transition-all">
                                 <option value="">-- Pilih --</option>
-                                <option value="berfungsi" {{ old('dampak_ekonomi.distribusi', $eko?->distribusi) === 'berfungsi' ? 'selected' : '' }}>Berfungsi</option>
-                                <option value="rusak_sebagian" {{ old('dampak_ekonomi.distribusi', $eko?->distribusi) === 'rusak_sebagian' ? 'selected' : '' }}>Rusak Sebagian</option>
-                                <option value="rusak_total" {{ old('dampak_ekonomi.distribusi', $eko?->distribusi) === 'rusak_total' ? 'selected' : '' }}>Rusak Total / Lumpuh</option>
+                                <option value="berfungsi" {{ old('dampak_ekonomi.distribusi', $eko?->distribusi_hasil_panen) === 'berfungsi' ? 'selected' : '' }}>Berfungsi</option>
+                                <option value="rusak_sebagian" {{ old('dampak_ekonomi.distribusi', $eko?->distribusi_hasil_panen) === 'rusak_sebagian' ? 'selected' : '' }}>Rusak Sebagian</option>
+                                <option value="rusak_total" {{ old('dampak_ekonomi.distribusi', $eko?->distribusi_hasil_panen) === 'rusak_total' ? 'selected' : '' }}>Rusak Total / Lumpuh</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-1">Fasilitas Pengolahan Kolektif</label>
                             <select name="dampak_ekonomi[fasilitas]" class="w-full rounded-xl border-slate-200 focus:border-indigo-500 transition-all">
                                 <option value="">-- Pilih --</option>
-                                <option value="berfungsi" {{ old('dampak_ekonomi.fasilitas', $eko?->fasilitas) === 'berfungsi' ? 'selected' : '' }}>Berfungsi</option>
-                                <option value="rusak_sebagian" {{ old('dampak_ekonomi.fasilitas', $eko?->fasilitas) === 'rusak_sebagian' ? 'selected' : '' }}>Rusak Sebagian</option>
-                                <option value="rusak_total" {{ old('dampak_ekonomi.fasilitas', $eko?->fasilitas) === 'rusak_total' ? 'selected' : '' }}>Rusak Total / Lumpuh</option>
+                                <option value="berfungsi" {{ old('dampak_ekonomi.fasilitas', $eko?->fasilitas_pengolahan_kolektif) === 'berfungsi' ? 'selected' : '' }}>Berfungsi</option>
+                                <option value="rusak_sebagian" {{ old('dampak_ekonomi.fasilitas', $eko?->fasilitas_pengolahan_kolektif) === 'rusak_sebagian' ? 'selected' : '' }}>Rusak Sebagian</option>
+                                <option value="rusak_total" {{ old('dampak_ekonomi.fasilitas', $eko?->fasilitas_pengolahan_kolektif) === 'rusak_total' ? 'selected' : '' }}>Rusak Total / Lumpuh</option>
                             </select>
                         </div>
                     </div>

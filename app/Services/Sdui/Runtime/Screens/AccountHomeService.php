@@ -136,7 +136,7 @@ class AccountHomeService
                    (SELECT COUNT(*) FROM operasi_sitrep WHERE id_insiden = i.id_insiden) AS jumlah_sitrep
             FROM operasi_insiden i
             LEFT JOIN operasi_klaster ok ON i.id_insiden = ok.id_insiden
-            LEFT JOIN operasi_master_klaster mk ON ok.id_klaster = mk.id_klaster
+            LEFT JOIN master_klaster mk ON ok.id_master_klaster = mk.id_master_klaster
             WHERE i.status_insiden NOT IN ('selesai', 'dibatalkan')
             {$scopeFilter}
             ORDER BY FIELD(i.prioritas, 'kritis', 'tinggi', 'sedang', 'rendah'), i.waktu_mulai DESC
@@ -174,7 +174,7 @@ class AccountHomeService
             JOIN bencana_master_jenis bj ON i.id_jenis_bencana = bj.id_jenis
             JOIN organisasi_pcnu p ON i.id_pcnu = p.id_pcnu
             LEFT JOIN operasi_klaster ok ON i.id_insiden = ok.id_insiden
-            WHERE ok.id_operasi_klaster IS NULL
+            WHERE ok.id_klaster_operasi IS NULL
               AND i.status_insiden NOT IN ('selesai', 'dibatalkan')
               {$scopeFilter}
             LIMIT 3

@@ -72,12 +72,12 @@ $roleSuper = $role === 'super_admin';
     <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider mt-4 mb-2">Analisis</p>
     <x-nav-link href="{{ route('histori.index') }}" icon="bi-clock-history">Histori Bencana</x-nav-link>
     <x-nav-link href="#" icon="bi-map">Peta Risiko</x-nav-link>
+    @endif
 
     <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider mt-4 mb-2">Administrasi</p>
     <x-nav-link href="{{ route('admin.pengguna.index') }}" icon="bi-people-fill">Pengguna</x-nav-link>
     <x-nav-link href="{{ route('admin.approval.index') }}" icon="bi-person-check">Approval Registrasi</x-nav-link>
     {{-- <x-nav-link href="#" icon="bi-journal-text">Audit Log</x-nav-link> --}}
-    @endif
 
     <p class="px-3 text-[10px] font-semibold text-gray-500 uppercase tracking-wider mt-4 mb-2">Monitoring</p>
     <x-nav-link href="{{ route('command-center') }}" icon="bi-display" class="text-yellow-400">Command Center</x-nav-link>

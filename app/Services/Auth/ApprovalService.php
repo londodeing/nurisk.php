@@ -13,7 +13,10 @@ class ApprovalService
     public function setujui(AuthUser $calon, AuthUser $approver, ?string $catatan = null): void
     {
         DB::transaction(function () use ($calon, $approver) {
-            $calon->update(['status_akun' => AuthUser::STATUS_AKTIF]);
+            $calon->update([
+                'status_akun' => AuthUser::STATUS_AKTIF,
+                'is_tersedia' => 1
+            ]);
 
             PenggunaJabatan::where('id_pengguna', $calon->id_pengguna)
                 ->where('status_aktif', 0)
@@ -41,7 +44,7 @@ class ApprovalService
         ]);
     }
 
-    public function daftarMenungguApproval(AuthUser $approver): \Illuminate\Database\Eloquent\Collection
+    public function daftarMenungguApproval(AuthUser $approver): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $ctx = app(AuthorizationContextService::class);
 
@@ -60,9 +63,9 @@ class ApprovalService
                 ->whereHas('jabatan', fn($jab) => $jab->where('slug', 'anggota-trc-pcnu'))
             );
         } else {
-            return new \Illuminate\Database\Eloquent\Collection();
+            return new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
         }
 
-        return $query->latest('dibuat_pada')->get();
+        return $query->latest('dibuat_pada')->paginate(20);
     }
 }

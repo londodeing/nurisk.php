@@ -15,7 +15,7 @@ class AuthorizationContextService
     public function getCurrentUser(): ?AuthUser
     {
         if ($this->cachedUser === null) {
-            $user = Auth::user();
+            $user = Auth::user() ?? Auth::guard('sanctum')->user();
             if (!$user) {
                 return null;
             }

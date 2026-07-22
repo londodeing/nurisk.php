@@ -38,11 +38,13 @@ class AuthUserPolicy
         $role = $ctx->getRoleName();
 
         if ($role === 'super_admin') {
-            return true;
+            return $calon->peran()->where('nama_peran', 'pwnu')->exists();
         }
 
         if ($role === 'pwnu') {
-            return true;
+            return $calon->jabatanPosisi()
+                ->whereHas('jabatan', fn($q) => $q->whereIn('slug', ['anggota-trc-pwnu', 'admin-pcnu']))
+                ->exists();
         }
 
         if ($role === 'pcnu') {

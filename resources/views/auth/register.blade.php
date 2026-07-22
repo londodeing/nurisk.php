@@ -431,11 +431,11 @@ function fetchKabupaten() {
         .then(res => res.json())
         .then(data => {
             const sel = document.getElementById('sel-kabupaten');
-            if (data.data) {
-                data.data.forEach(item => {
+            if (Array.isArray(data)) {
+                data.forEach(item => {
                     const opt = document.createElement('option');
-                    opt.value = item.id;
-                    opt.textContent = item.nama;
+                    opt.value = item.id_kab;
+                    opt.textContent = item.nama_kab;
                     sel.appendChild(opt);
                 });
             }
@@ -454,10 +454,10 @@ function loadKecamatan(idKab) {
     fetch(`/api/wilayah/kecamatan?id_kab=${idKab}`)
         .then(res => res.json())
         .then(data => {
-            if (data.data) data.data.forEach(k => {
+            if (Array.isArray(data)) data.forEach(k => {
                 const opt = document.createElement('option');
-                opt.value = k.id;
-                opt.textContent = k.nama;
+                opt.value = k.id_kec;
+                opt.textContent = k.nama_kec;
                 selKec.appendChild(opt);
             });
         })
@@ -472,10 +472,10 @@ function loadDesa(idKec) {
     fetch(`/api/wilayah/desa?id_kec=${idKec}`)
         .then(res => res.json())
         .then(data => {
-            if (data.data) data.data.forEach(d => {
+            if (Array.isArray(data)) data.forEach(d => {
                 const opt = document.createElement('option');
-                opt.value = d.id;
-                opt.textContent = d.nama;
+                opt.value = d.id_desa;
+                opt.textContent = d.nama_desa;
                 sel.appendChild(opt);
             });
         })
