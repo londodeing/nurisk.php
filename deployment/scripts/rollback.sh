@@ -89,7 +89,7 @@ ln -sfn "$TARGET_RELEASE" "$RELEASES_DIR/current.tmp"
 mv -Tf "$RELEASES_DIR/current.tmp" "$APP_DIR/current"
 
 # PHP-FPM reload
-sudo systemctl reload php8.3-fpm
+sudo systemctl reload php8.5-fpm
 
 # Queue restart — worker akan pakai kode dari release baru (lama)
 php artisan queue:restart --quiet 2>/dev/null || true
