@@ -19,17 +19,18 @@
 # Workflow:
 #   1. Clone/fetch ke release baru
 #   2. Composer install (no dev)
-#   3. Symlink .env (shared)
+#   3. Symlink .env (shared) + APP_KEY generate
 #   4. Symlink storage (shared)
-#   5. Cache rebuild
-#   6. Database migration (--force)
-#   7. Queue restart (graceful)
-#   8. Switch symlink current → release baru
-#   9. PHP-FPM reload (zero-downtime)
-#  10. Supervisor update
-#  11. Health check verifikasi
-#  12. Prune old releases (keep last 3)
-#  13. Selesai
+#   5. Build frontend assets (Vite)
+#   6. Cache rebuild
+#   7. Database migration (--force)
+#   8. Queue restart (graceful)
+#   9. Switch symlink current → release baru
+#  10. PHP-FPM reload (zero-downtime)
+#  11. Supervisor update
+#  12. Health check verifikasi
+#  13. Prune old releases (keep last 3)
+#  14. Selesai
 
 set -euo pipefail
 
@@ -78,38 +79,38 @@ npm ci --no-audit --no-fund 2>/dev/null || npm install --no-audit --no-fund
 npm run build
 
 # --- 6. Cache rebuild ---
-echo "[7/14] Rebuilding cache..."
+echo "[6/14] Rebuilding cache..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 php artisan event:cache
 
 # --- 7. Migrations ---
-echo "[8/14] Running migrations..."
+echo "[7/14] Running migrations..."
 php artisan migrate --force
 
 # --- 8. Queue restart (graceful) ---
-echo "[9/14] Restarting queue workers..."
+echo "[8/14] Restarting queue workers..."
 php artisan queue:restart
 sleep 5
 
 # --- 9. Switch symlink ---
-echo "[10/14] Switching symlink: current -> $RELEASE_NAME..."
+echo "[9/14] Switching symlink: current -> $RELEASE_NAME..."
 ln -sfn "$RELEASE_DIR" "$RELEASES_DIR/current.tmp"
 mv -Tf "$RELEASES_DIR/current.tmp" "$APP_DIR/current"
 
 # --- 10. PHP-FPM reload ---
-echo "[11/14] Reloading PHP-FPM..."
+echo "[10/14] Reloading PHP-FPM..."
 systemctl reload php8.3-fpm
 
 # --- 11. Supervisor update ---
-echo "[12/14] Updating supervisor..."
+echo "[11/14] Updating supervisor..."
 supervisorctl reread 2>/dev/null || true
 supervisorctl update 2>/dev/null || true
 supervisorctl restart nurisk-queue-pdf:* nurisk-queue-default:* 2>/dev/null || true
 
 # --- 12. Health check ---
-echo "[13/14] Verifying health..."
+echo "[12/14] Verifying health..."
 sleep 3
 HTTP_STATUS=$(curl -sLk -o /dev/null -w "%{http_code}" https://127.0.0.1/health) || HTTP_STATUS=200
 if [ "$HTTP_STATUS" != "200" ]; then
@@ -123,7 +124,7 @@ if [ "$HTTP_STATUS" != "200" ]; then
 fi
 
 # --- 13. Prune old releases (keep last 3) ---
-echo "[14/14] Pruning old releases..."
+echo "[13/14] Pruning old releases..."
 ls -td "$RELEASES_DIR"/* | tail -n +4 | xargs -r rm -rf
 echo "      Old releases cleaned (keep last 3)."
 
