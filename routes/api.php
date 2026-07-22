@@ -172,7 +172,7 @@ Route::post('v1/device/refresh-token', [DeviceAuthController::class, 'refreshTok
 // ============================================================
 Route::prefix('auth')->name('api.auth.')->group(function () {
     Route::post('register/{jenis}', [AuthenticationApiController::class, 'register'])->name('register');
-    Route::post('login', [AuthenticationApiController::class, 'login'])->name('login');
+    Route::post('login', [AuthenticationApiController::class, 'login'])->middleware('throttle:10,1')->name('login');
 });
 
 // ============================================================
@@ -218,7 +218,7 @@ Route::get('keahlian', function () {
 // ============================================================
 // API — SQL Views (PUBLIK — read-only aggregated data)
 // ============================================================
-Route::prefix('views')->name('api.views.')->group(function () {
+Route::middleware('auth:sanctum')->prefix('views')->name('api.views.')->group(function () {
     Route::get('command-center-summary', [SqlViewController::class, 'commandCenterSummary'])->name('command-center-summary');
     Route::get('incident-timeline/{id}', [SqlViewController::class, 'incidentTimeline'])->name('incident-timeline');
     Route::get('alert-insiden-baru', [SqlViewController::class, 'alertInsiden'])->name('alert-insiden');
@@ -658,7 +658,7 @@ Route::get('/stream-media', function (\Illuminate\Http\Request $request) {
     $disk = $request->query('disk', config('filesystems.default'));
     if (!\Illuminate\Support\Facades\Storage::disk($disk)->exists($path)) return abort(404);
     return \Illuminate\Support\Facades\Storage::disk($disk)->response($path);
-})->name('stream-media');
+})->middleware('auth:sanctum')->name('stream-media');
 
 // ============================================================
 // API — Media (auth:sanctum)
@@ -674,3 +674,12 @@ Route::middleware('auth:sanctum')->prefix('media')->name('api.media.')->group(fu
 // API — Health Check (publik)
 // ============================================================
 Route::get('health', HealthCheckController::class)->name('api.health');
+
+// ============================================================
+// API — Admin Approval (Mobile)
+// ============================================================
+Route::middleware('auth:sanctum')->prefix('admin/approval')->name('api.admin.approval.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Api\Admin\ApprovalApiController::class, 'index'])->name('index');
+    Route::patch('{calon}/setujui', [\App\Http\Controllers\Api\Admin\ApprovalApiController::class, 'setujui'])->name('setujui');
+    Route::patch('{calon}/tolak', [\App\Http\Controllers\Api\Admin\ApprovalApiController::class, 'tolak'])->name('tolak');
+});

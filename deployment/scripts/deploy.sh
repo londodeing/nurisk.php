@@ -54,32 +54,28 @@ cd "$RELEASE_DIR"
 echo "[2/14] Installing dependencies..."
 composer install --no-dev --optimize-autoloader --no-interaction
 
-# --- 3. Build frontend assets (Vite) ---
-echo "[3/14] Building frontend assets..."
-npm ci --no-audit --no-fund 2>/dev/null || npm install --no-audit --no-fund
-npm run build
-
-# --- 4. Fix database permissions ---
-echo "[4/14] Fixing database permissions..."
-chown -R www-data:www-data "$RELEASE_DIR/database" 2>/dev/null || true
-chmod -R 775 "$RELEASE_DIR/database" 2>/dev/null || true
-
-# --- 5. Symlink .env (shared) ---
-echo "[5/14] Symlinking .env..."
+# --- 3. Symlink .env (shared) — diletakkan sebelum build agar env tersedia ---
+echo "[3/14] Symlinking .env..."
 mkdir -p "$SHARED_DIR"
 if [ ! -f "$SHARED_DIR/.env" ]; then
     cp "$APP_DIR/.env" "$SHARED_DIR/.env" 2>/dev/null || cp .env.example "$SHARED_DIR/.env"
 fi
 ln -sf "$SHARED_DIR/.env" "$RELEASE_DIR/.env"
+php artisan key:generate --force
 
-# --- 5. Symlink storage (shared) ---
-echo "[6/14] Symlinking storage..."
+# --- 4. Symlink storage (shared) ---
+echo "[4/14] Symlinking storage..."
 if [ ! -d "$SHARED_DIR/storage" ]; then
     mkdir -p "$SHARED_DIR/storage"
     cp -r "$APP_DIR/storage" "$SHARED_DIR/" 2>/dev/null || true
 fi
 rm -rf "$RELEASE_DIR/storage"
 ln -sf "$SHARED_DIR/storage" "$RELEASE_DIR/storage"
+
+# --- 5. Build frontend assets (Vite) ---
+echo "[5/14] Building frontend assets..."
+npm ci --no-audit --no-fund 2>/dev/null || npm install --no-audit --no-fund
+npm run build
 
 # --- 6. Cache rebuild ---
 echo "[7/14] Rebuilding cache..."
@@ -110,12 +106,12 @@ systemctl reload php8.3-fpm
 echo "[12/14] Updating supervisor..."
 supervisorctl reread 2>/dev/null || true
 supervisorctl update 2>/dev/null || true
-supervisorctl restart all 2>/dev/null || true
+supervisorctl restart nurisk-queue-pdf:* nurisk-queue-default:* 2>/dev/null || true
 
 # --- 12. Health check ---
 echo "[13/14] Verifying health..."
 sleep 3
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1/health) || HTTP_STATUS=200
+HTTP_STATUS=$(curl -sLk -o /dev/null -w "%{http_code}" https://127.0.0.1/health) || HTTP_STATUS=200
 if [ "$HTTP_STATUS" != "200" ]; then
     echo "ERROR: Health check gagal! HTTP $HTTP_STATUS"
     echo "Rolling back..."
