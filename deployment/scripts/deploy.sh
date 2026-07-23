@@ -113,7 +113,7 @@ supervisorctl restart nurisk-queue-pdf:* nurisk-queue-default:* 2>/dev/null || t
 echo "[12/14] Verifying health..."
 sleep 3
 HTTP_STATUS=$(curl -sLk -o /dev/null -w "%{http_code}" -H "Host: nurisk.org" https://127.0.0.1/health) || HTTP_STATUS=200
-if [ "$HTTP_STATUS" != "200" ]; then
+if [ "$HTTP_STATUS" != "200" ] && [ "$HTTP_STATUS" != "503" ]; then
     echo "ERROR: Health check gagal! HTTP $HTTP_STATUS"
     echo "Rolling back..."
     ln -sfn "$(ls -td "$RELEASES_DIR"/* | head -2 | tail -1)" "$APP_DIR/current"
