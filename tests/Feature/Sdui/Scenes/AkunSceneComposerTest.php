@@ -124,7 +124,7 @@ class AkunSceneComposerTest extends TestCase
         $this->assertEquals('pcnu', $json['meta']['rendered_for_role']);
 
         $childrenStr = json_encode($json['root']['children']);
-        $this->assertStringContainsString('Pusat Komando', $childrenStr);
+        $this->assertStringNotContainsString('Pusat Komando', $childrenStr);
     }
 
     public function test_super_admin_receives_all_sections()
@@ -142,7 +142,7 @@ class AkunSceneComposerTest extends TestCase
 
         $childrenStr = json_encode($json['root']['children']);
         $this->assertStringContainsString('Penugasan Aktif Saya', $childrenStr);
-        $this->assertStringContainsString('Pusat Komando', $childrenStr);
+        $this->assertStringNotContainsString('Pusat Komando', $childrenStr);
         $this->assertStringContainsString('Akses Penuh', $childrenStr);
         $this->assertStringContainsString('Ganti Kata Sandi', $childrenStr);
         $this->assertStringContainsString('Keluar', $childrenStr);
@@ -162,7 +162,7 @@ class AkunSceneComposerTest extends TestCase
         $this->assertEquals('pwnu', $json['meta']['rendered_for_role']);
 
         $childrenStr = json_encode($json['root']['children']);
-        $this->assertStringContainsString('Pusat Komando', $childrenStr);
+        $this->assertStringNotContainsString('Pusat Komando', $childrenStr);
         $this->assertStringContainsString('PWNU Jawa Tengah', $childrenStr);
     }
 
@@ -198,8 +198,8 @@ class AkunSceneComposerTest extends TestCase
         $json = $composer->compose();
 
         $childrenStr = json_encode($json['root']['children']);
-        $this->assertStringContainsString('Pusat Komando', $childrenStr);
-        $this->assertStringContainsString('Tidak ada insiden aktif', $childrenStr);
+        $this->assertStringNotContainsString('Pusat Komando', $childrenStr);
+        $this->assertStringNotContainsString('Tidak ada insiden aktif', $childrenStr);
     }
 
     public function test_jabatan_aktif_not_rendered_when_null()
@@ -390,7 +390,7 @@ class AkunSceneComposerTest extends TestCase
         $json = $composer->compose();
 
         $this->assertArrayHasKey('app_bar', $json);
-        $this->assertEquals('Akun & Pusat Komando', $json['app_bar']['title']);
+        $this->assertEquals('Akun', $json['app_bar']['title']);
         $this->assertEquals('refresh', $json['app_bar']['actions'][0]['icon']);
         $this->assertEquals('reload', $json['app_bar']['actions'][0]['action']['type']);
     }

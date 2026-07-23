@@ -31,7 +31,7 @@ class AkunSceneComposer implements SceneComposer
             'etag'        => $this->computeEtag($profil),
             'meta'        => $this->buildMeta($profil),
             'app_bar'     => [
-                'title'   => 'Akun & Pusat Komando',
+                'title'   => 'Akun',
                 'actions' => [
                     ['icon' => 'refresh', 'action' => ['type' => 'reload']]
                 ]
@@ -42,7 +42,6 @@ class AkunSceneComposer implements SceneComposer
                 'children' => array_values(array_filter([
                     $this->buildIdentityCard($profil, $jabatanAktif, $keahlian),
                     $this->buildStatusOperasional($penugasan, $profil),
-                    $this->buildCommandCenterSection($commandCenter, $alertInsiden, $profil),
                     $this->buildAkunMenu($profil),
                     ['type' => 'spacer', 'style' => ['height' => '4']],
                 ]))

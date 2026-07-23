@@ -79,7 +79,7 @@ class MasterExportCommand extends Command
         // Kabupaten
         $kabList = WilayahKabupaten::all()->map(fn($k) => [
             'id_kab'  => $k->id_kab,
-            'nama_kab' => $k->tipe . ' ' . $k->nama_kab,
+            'nama_kab' => str_starts_with(strtolower($k->nama_kab), strtolower($k->tipe)) ? $k->nama_kab : $k->tipe . ' ' . $k->nama_kab,
         ])->values()->toArray();
         $this->exportJsonFile($dir . '/wilayah/kabupaten.json', $kabList);
 
@@ -119,7 +119,7 @@ class MasterExportCommand extends Command
         )");
         $stmt = $pdo->prepare("INSERT OR REPLACE INTO kabupaten (id_kab, nama_kab) VALUES (?, ?)");
         foreach (WilayahKabupaten::all() as $k) {
-            $stmt->execute([$k->id_kab, $k->tipe . ' ' . $k->nama_kab]);
+            $stmt->execute([$k->id_kab, str_starts_with(strtolower($k->nama_kab), strtolower($k->tipe)) ? $k->nama_kab : $k->tipe . ' ' . $k->nama_kab]);
         }
 
         // Kecamatan

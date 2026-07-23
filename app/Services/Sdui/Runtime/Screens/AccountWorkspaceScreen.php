@@ -19,7 +19,7 @@ class AccountWorkspaceScreen
         ?array $commandCenter,
         ?array $alertInsiden
     ): ScreenNode {
-        $screen = Runtime::screen('account_workspace', 'Akun & Pusat Komando');
+        $screen = Runtime::screen('account_workspace', 'Akun');
 
         // Always build IdentitySection (holds the Guest card if profil is null)
         $screen = $screen->withSection(IdentitySection::build($profil, $jabatanAktif, $keahlian, $penugasan));
@@ -28,9 +28,6 @@ class AccountWorkspaceScreen
             $namaPeran = $profil['nama_peran'] ?? 'publik';
             if ($namaPeran !== 'publik') {
                 $screen = $screen->withSection(StatusOperasionalSection::build($penugasan, $profil));
-                if ($commandCenter !== null) {
-                    $screen = $screen->withSection(CommandCenterSection::build($commandCenter, $alertInsiden, $profil));
-                }
             }
             $screen = $screen->withSection(MenuSection::build($profil));
         }

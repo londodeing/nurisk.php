@@ -24,7 +24,7 @@ class WilayahApiController extends Controller
         return response()->json(
             $kabupaten->map(fn($k) => [
                 'id_kab'  => $k->id_kab,
-                'nama_kab' => $k->tipe . ' ' . $k->nama_kab,
+                'nama_kab' => str_starts_with(strtolower($k->nama_kab), strtolower($k->tipe)) ? $k->nama_kab : $k->tipe . ' ' . $k->nama_kab,
             ])->values()->toArray()
         );
     }

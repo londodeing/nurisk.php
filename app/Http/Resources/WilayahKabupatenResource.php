@@ -18,7 +18,7 @@ class WilayahKabupatenResource extends JsonResource
             'id'    => $this->id_kab,
             'nama'  => $this->nama_kab,
             'tipe'  => $this->tipe,
-            'label' => $this->tipe . ' ' . $this->nama_kab,
+            'label' => str_starts_with(strtolower($this->nama_kab), strtolower($this->tipe)) ? $this->nama_kab : $this->tipe . ' ' . $this->nama_kab,
         ];
     }
 }

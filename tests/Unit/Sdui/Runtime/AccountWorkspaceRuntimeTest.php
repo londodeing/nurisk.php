@@ -48,7 +48,7 @@ class AccountWorkspaceRuntimeTest extends TestCase
         $this->assertSame('account_workspace', $json['id']);
         
         $this->assertObjectHasProperty('title', $json['props']);
-        $this->assertSame('Akun & Pusat Komando', $json['props']->title);
+        $this->assertSame('Akun', $json['props']->title);
 
         $this->assertArrayHasKey('children', $json);
         $this->assertCount(3, $json['children']); // IdentitySection, StatusOperasionalSection, MenuSection

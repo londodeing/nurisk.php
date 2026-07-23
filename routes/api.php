@@ -474,12 +474,15 @@ Route::middleware(['auth:sanctum', 'role:super_admin,pwnu,pcnu,relawan,trc'])->g
     // Admin — Manajemen Pengguna
     Route::get('admin/pengguna', [PenggunaApiController::class, 'index'])->middleware('role:super_admin,pwnu,pcnu,trc,relawan')->name('api.admin.pengguna.index');
 
-    Route::prefix('admin')->name('api.admin.')->middleware('role:super_admin,pwnu')->group(function () {
+    Route::prefix('admin')->name('api.admin.')->middleware('role:super_admin,pwnu,pcnu')->group(function () {
         Route::get('pengguna/menunggu', [PenggunaApiController::class, 'menunggu'])->name('pengguna.menunggu');
         Route::get('pengguna/{pengguna}', [PenggunaApiController::class, 'show'])->name('pengguna.show');
         Route::put('pengguna/{pengguna}', [PenggunaApiController::class, 'update'])->name('pengguna.update');
         Route::patch('pengguna/{pengguna}/setujui', [PenggunaApiController::class, 'setujui'])->name('pengguna.setujui');
         Route::patch('pengguna/{pengguna}/tolak', [PenggunaApiController::class, 'tolak'])->name('pengguna.tolak');
+    });
+
+    Route::prefix('admin')->name('api.admin.')->middleware('role:super_admin,pwnu')->group(function () {
 
         // PenggunaJabatan — mapping user ke jabatan dengan scope
         Route::apiResource('pengguna-jabatan', PenggunaJabatanController::class)->except(['edit', 'create']);

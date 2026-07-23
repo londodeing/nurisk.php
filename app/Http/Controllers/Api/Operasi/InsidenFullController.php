@@ -62,6 +62,9 @@ class InsidenFullController extends Controller
             ->when($request->id_pcnu, fn($q, $v) => $q->where('id_pcnu', $v))
             ->when($request->id_jenis_bencana, fn($q, $v) => $q->where('id_jenis_bencana', $v))
             ->when($request->search, fn($q, $v) => $q->where('kode_kejadian', 'like', "%{$v}%"))
+            ->when($request->prioritas, fn($q, $v) => $q->where('prioritas', $v))
+            ->when($request->tanggal_awal, fn($q, $v) => $q->whereDate('waktu_mulai', '>=', $v))
+            ->when($request->tanggal_akhir, fn($q, $v) => $q->whereDate('waktu_mulai', '<=', $v))
             ->when($request->aktif, fn($q) => $q->aktif())
             ->orderBy($request->sort_by ?? 'dibuat_pada', $request->sort_order ?? 'desc')
             ->paginate($request->get('per_page', 15));

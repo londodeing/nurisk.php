@@ -93,7 +93,7 @@ class SduiContractTest extends TestCase
         $this->assertEquals('ListView', $json['root']['type']);
         $this->assertEquals('account_workspace', $json['root']['id']);
         $this->assertArrayHasKey('props', $json['root']);
-        $this->assertEquals('Akun & Pusat Komando', $json['root']['props']['title']);
+        $this->assertEquals('Akun', $json['root']['props']['title']);
         $this->assertArrayHasKey('children', $json['root']);
         $this->assertIsArray($json['root']['children']);
     }
