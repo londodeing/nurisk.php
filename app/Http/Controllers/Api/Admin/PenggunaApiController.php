@@ -14,8 +14,6 @@ class PenggunaApiController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $this->authorize('viewAny', AuthUser::class);
-
         $items = AuthUser::with(['profil', 'peran'])
             ->when($request->status_akun, fn($q, $v) => $q->where('status_akun', $v))
             ->when($request->id_peran, fn($q, $v) => $q->where('id_peran', $v))
@@ -42,8 +40,6 @@ class PenggunaApiController extends Controller
 
     public function show(AuthUser $pengguna): JsonResponse
     {
-        $this->authorize('view', $pengguna);
-
         $pengguna->load(['profil', 'peran', 'keahlian', 'jabatanPosisi.jabatan']);
 
         return response()->json([
@@ -79,8 +75,6 @@ class PenggunaApiController extends Controller
 
     public function update(Request $request, AuthUser $pengguna): JsonResponse
     {
-        $this->authorize('update', $pengguna);
-
         $validated = $request->validate([
             'status_akun' => 'nullable|in:menunggu,aktif,nonaktif,suspend',
             'id_peran'    => 'nullable|exists:auth_roles,id_peran',
@@ -99,8 +93,6 @@ class PenggunaApiController extends Controller
 
     public function menunggu(): JsonResponse
     {
-        $this->authorize('viewAny', AuthUser::class);
-
         $ctx = app(\App\Services\Auth\AuthorizationContextService::class);
         $role = $ctx->getRoleName();
 
@@ -150,8 +142,6 @@ class PenggunaApiController extends Controller
 
     public function setujui(AuthUser $pengguna): JsonResponse
     {
-        $this->authorize('approve', $pengguna);
-
         if ($pengguna->status_akun !== 'menunggu') {
             return response()->json(['message' => 'User sudah diaktifkan sebelumnya.'], 422);
         }
@@ -170,8 +160,6 @@ class PenggunaApiController extends Controller
 
     public function tolak(Request $request, AuthUser $pengguna): JsonResponse
     {
-        $this->authorize('approve', $pengguna);
-
         $pengguna->update([
             'status_akun' => 'nonaktif',
             'is_tersedia' => 0
