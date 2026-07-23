@@ -38,7 +38,7 @@ class CheckAccountStatus
                 $clientRole = $request->header('X-Role');
                 $clientScopeId = $request->header('X-Scope-Id');
                 
-                $exemptedRoles = ['public', 'publik', 'relawan', 'trc'];
+                $exemptedRoles = ['public', 'publik', 'relawan', 'trc', 'pwnu', 'pcnu', 'super_admin'];
                 if ($clientRole && !in_array(strtolower($clientRole), $exemptedRoles)) {
                     $hasValidMandate = \Illuminate\Support\Facades\DB::table('pengguna_jabatan')
                         ->where('id_pengguna', $user->id_pengguna)
