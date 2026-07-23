@@ -42,9 +42,21 @@ class AuthUserPolicy
         }
 
         if ($role === 'pwnu') {
+            $pwnuScopeId = $ctx->getScopeId();
+            $accessiblePcnuIds = $ctx->getAccessiblePcnuIds();
+
             return $calon->jabatanPosisi()
-                ->whereHas('jabatan', fn($q) => $q->whereIn('slug', ['anggota-trc-pwnu', 'admin-pcnu']))
-                ->exists();
+                ->where(function ($q) use ($pwnuScopeId, $accessiblePcnuIds) {
+                    $q->where(function ($q1) use ($pwnuScopeId) {
+                        $q1->whereHas('jabatan', fn($j) => $j->where('slug', 'anggota-trc-pwnu'))
+                           ->where('tipe_lingkup', 'pwnu')
+                           ->where('id_lingkup', $pwnuScopeId);
+                    })->orWhere(function ($q2) use ($accessiblePcnuIds) {
+                        $q2->whereHas('jabatan', fn($j) => $j->where('slug', 'admin-pcnu'))
+                           ->where('tipe_lingkup', 'pcnu')
+                           ->whereIn('id_lingkup', $accessiblePcnuIds ?: []);
+                    });
+                })->exists();
         }
 
         if ($role === 'pcnu') {

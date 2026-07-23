@@ -101,10 +101,40 @@ class PenggunaApiController extends Controller
     {
         $this->authorize('viewAny', AuthUser::class);
 
-        $items = AuthUser::with(['profil', 'peran'])
-            ->where('status_akun', 'menunggu')
-            ->latest('dibuat_pada')
-            ->paginate(20);
+        $ctx = app(\App\Services\Auth\AuthorizationContextService::class);
+        $role = $ctx->getRoleName();
+
+        $query = AuthUser::with(['profil', 'peran'])
+            ->where('status_akun', 'menunggu');
+
+        if ($role === 'super_admin') {
+            $query->whereHas('peran', fn($q) => $q->where('nama_peran', 'pwnu'));
+        } elseif ($role === 'pwnu') {
+            $pwnuScopeId = $ctx->getScopeId();
+            $accessiblePcnuIds = $ctx->getAccessiblePcnuIds();
+            $query->whereHas('jabatanPosisi', function($q) use ($pwnuScopeId, $accessiblePcnuIds) {
+                $q->where(function ($q1) use ($pwnuScopeId) {
+                    $q1->whereHas('jabatan', fn($j) => $j->where('slug', 'anggota-trc-pwnu'))
+                       ->where('tipe_lingkup', 'pwnu')
+                       ->where('id_lingkup', $pwnuScopeId);
+                })->orWhere(function ($q2) use ($accessiblePcnuIds) {
+                    $q2->whereHas('jabatan', fn($j) => $j->where('slug', 'admin-pcnu'))
+                       ->where('tipe_lingkup', 'pcnu')
+                       ->whereIn('id_lingkup', $accessiblePcnuIds ?: []);
+                });
+            });
+        } elseif ($role === 'pcnu') {
+            $scopeId = $ctx->getScopeId();
+            $query->whereHas('jabatanPosisi', function($q) use ($scopeId) {
+                $q->where('tipe_lingkup', 'pcnu')
+                  ->where('id_lingkup', $scopeId)
+                  ->whereHas('jabatan', fn($j) => $j->where('slug', 'anggota-trc-pcnu'));
+            });
+        } else {
+            $query->whereRaw('1 = 0');
+        }
+
+        $items = $query->latest('dibuat_pada')->paginate(20);
 
         return response()->json([
             'data' => $items->map(fn($u) => [
